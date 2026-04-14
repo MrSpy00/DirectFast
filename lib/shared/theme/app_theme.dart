@@ -7,12 +7,12 @@ class AppTheme {
   // ── Light palette ──────────────────────────────────────────────────────────
   static const _primaryLight = Color(0xFF6750A4);
   static const _secondaryLight = Color(0xFF625B71);
-  static const _tertiaryLight = Color(0xFF7D5260);
+  static const _tertiaryLight = Color(0xFF5E5AAE);
 
   // ── Dark palette ───────────────────────────────────────────────────────────
   static const _primaryDark = Color(0xFFD0BCFF);
   static const _secondaryDark = Color(0xFFCCC2DC);
-  static const _tertiaryDark = Color(0xFFEFB8C8);
+  static const _tertiaryDark = Color(0xFFD2C6FF);
 
   // ── True-Black OLED surface hierarchy ──────────────────────────────────────
   static const _darkSurface = Color(0xFF000000);
@@ -29,7 +29,7 @@ class AppTheme {
   );
 
   static const accentGradient = LinearGradient(
-    colors: [Color(0xFFF093FB), Color(0xFFF5576C)],
+    colors: [Color(0xFF8A6BFF), Color(0xFF5D76FF)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );

@@ -8,6 +8,7 @@ import '../../../shared/constants/app_strings.dart';
 import '../../../core/services/locale_service.dart';
 import '../../../shared/widgets/glassmorphic_container.dart';
 import '../../../shared/widgets/app_logo.dart';
+import '../../../shared/theme/app_theme.dart';
 import '../viewmodels/theme_viewmodel.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -190,11 +191,7 @@ class SettingsScreen extends ConsumerWidget {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF8A2BE2), Color(0xFFFF4FA3)],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
+                      gradient: AppTheme.accentGradient,
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Column(
@@ -202,12 +199,17 @@ class SettingsScreen extends ConsumerWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Icon(Icons.person,
-                                color: Colors.white, size: 20,),
+                            const Icon(
+                              Icons.person,
+                              color: Colors.white,
+                              size: 20,
+                            ),
                             const SizedBox(width: 8),
                             Text(
-                              AppStrings.tr('developed_by',
-                                  args: [AppConstants.developerName],),
+                              AppStrings.tr(
+                                'developed_by',
+                                args: [AppConstants.developerName],
+                              ),
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 16,

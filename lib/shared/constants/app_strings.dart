@@ -492,8 +492,8 @@ class AppStrings {
 
     // Utils Screen
     'utils_subtitle': {
-      'tr': 'QR, Bağlantılar ve Şifreleme',
-      'en': 'QR, Links & Encryption',
+      'tr': 'QR, Bağlantılar, Şifreleme ve Şablonlar',
+      'en': 'QR, Links, Encryption & Templates',
     },
     'tab_qr': {
       'tr': 'QR',

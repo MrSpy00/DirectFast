@@ -196,7 +196,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   else ...[
                     RepaintBoundary(
                       child: _buildPlatformGrid(
-                          platformsByCategory, selectedPlatform,),
+                        platformsByCategory,
+                        selectedPlatform,
+                      ),
                     ),
                     const SizedBox(height: 24),
                     _buildInputSection(selectedPlatform),
@@ -304,7 +306,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   /// `platformName:contact`. Tap fills the input field and selects the
   /// matching platform.
   Widget _buildRecentContacts(
-      List<ChatHistoryItem> history, PlatformType selectedPlatform,) {
+    List<ChatHistoryItem> history,
+    PlatformType selectedPlatform,
+  ) {
     // Deduplicate: keep first occurrence of each platform+contact combo.
     final seen = <String>{};
     final unique = <ChatHistoryItem>[];
@@ -618,8 +622,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   _getPlatformIcon(platform, true),
                   const SizedBox(width: 12),
                   Text(
-                    AppStrings.tr('open_platform',
-                        args: [platform.displayName],),
+                    AppStrings.tr(
+                      'open_platform',
+                      args: [platform.displayName],
+                    ),
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 16,
@@ -641,53 +647,119 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        RepaintBoundary(
+        GlassmorphicContainer.flat(
+          padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              Expanded(
-                child: _UtilityShortcutCard(
-                  icon: Icons.qr_code_2,
-                  label: AppStrings.tr('qr_generator'),
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
                   gradient: AppTheme.primaryGradient,
-                  onTap: () {
-                    HapticFeedback.lightImpact();
-                    context.push(AppRouter.utils);
-                  },
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.auto_awesome_rounded,
+                  color: Colors.white,
+                  size: 20,
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: _UtilityShortcutCard(
-                  icon: Icons.link_off,
-                  label: AppStrings.tr('link_cleaner'),
-                  gradient: AppTheme.accentGradient,
-                  onTap: () {
-                    HapticFeedback.lightImpact();
-                    context.push(AppRouter.utils, extra: 1);
-                  },
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _UtilityShortcutCard(
-                  icon: Icons.lock_outline,
-                  label: AppStrings.tr('message_encryptor'),
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF11998E), Color(0xFF38EF7D)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  onTap: () {
-                    HapticFeedback.lightImpact();
-                    context.push(AppRouter.utils, extra: 2);
-                  },
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      AppStrings.tr('utilities'),
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      AppStrings.tr('utils_subtitle'),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.65),
+                          ),
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
+        ).animate().fadeIn(duration: 350.ms, delay: 130.ms),
+        const SizedBox(height: 14),
+        RepaintBoundary(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final cardWidth = (constraints.maxWidth - 12) / 2;
+              return Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                children: [
+                  SizedBox(
+                    width: cardWidth,
+                    child: _UtilityShortcutCard(
+                      icon: Icons.qr_code_2,
+                      label: AppStrings.tr('qr_generator'),
+                      gradient: AppTheme.primaryGradient,
+                      onTap: () {
+                        HapticFeedback.lightImpact();
+                        context.push(AppRouter.utils);
+                      },
+                    ),
+                  ),
+                  SizedBox(
+                    width: cardWidth,
+                    child: _UtilityShortcutCard(
+                      icon: Icons.link_off,
+                      label: AppStrings.tr('link_cleaner'),
+                      gradient: AppTheme.accentGradient,
+                      onTap: () {
+                        HapticFeedback.lightImpact();
+                        context.push(AppRouter.utils, extra: 1);
+                      },
+                    ),
+                  ),
+                  SizedBox(
+                    width: cardWidth,
+                    child: _UtilityShortcutCard(
+                      icon: Icons.lock_outline,
+                      label: AppStrings.tr('message_encryptor'),
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF5B8CFF), Color(0xFF6A5CFF)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      onTap: () {
+                        HapticFeedback.lightImpact();
+                        context.push(AppRouter.utils, extra: 2);
+                      },
+                    ),
+                  ),
+                  SizedBox(
+                    width: cardWidth,
+                    child: _UtilityShortcutCard(
+                      icon: Icons.bookmarks_outlined,
+                      label: AppStrings.tr('templates'),
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF7F53AC), Color(0xFF647DEE)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      onTap: () {
+                        HapticFeedback.lightImpact();
+                        context.push(AppRouter.utils, extra: 3);
+                      },
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
         ).animate().fadeIn(duration: 400.ms, delay: 200.ms),
-        const SizedBox(height: 24),
-        _buildInputSection(PlatformType.email),
       ],
     );
   }
@@ -835,7 +907,9 @@ class _SmartClipboardBanner extends StatelessWidget {
                   child: Text(
                     AppStrings.tr('use'),
                     style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 13,),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                    ),
                   ),
                 ),
                 // Dismiss
@@ -958,32 +1032,43 @@ class _UtilityShortcutCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GlassmorphicContainer.flat(
-      padding: const EdgeInsets.all(14),
+      padding: EdgeInsets.zero,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                gradient: gradient,
-                borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(18),
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  gradient: gradient,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(icon, color: Colors.white, size: 22),
               ),
-              child: Icon(icon, color: Colors.white, size: 26),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              label,
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  label,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              Icon(
+                Icons.chevron_right_rounded,
+                size: 20,
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.5),
+              ),
+            ],
+          ),
         ),
       ),
     );
