@@ -1,15 +1,12 @@
 # DirectFast
 
-<div align="center">
+## 🚀 Quick Connect to Your Contacts
 
-  <h3>🚀 Quick Connect to Your Contacts</h3>
-  <p>Chat on messaging platforms without saving contacts</p>
+Chat on messaging platforms without saving contacts.
 
-  ![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)
-  ![Dart](https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white)
-  ![Material Design](https://img.shields.io/badge/Material%20Design-757575?style=for-the-badge&logo=material-design&logoColor=white)
-
-</div>
+![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)
+![Dart](https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white)
+![Material Design](https://img.shields.io/badge/Material%20Design-757575?style=for-the-badge&logo=material-design&logoColor=white)
 
 ---
 
@@ -33,7 +30,7 @@
 
 This app follows **Clean Architecture** principles with **MVVM** pattern:
 
-```
+```text
 lib/
 ├── core/
 │   ├── constants/        # App constants and enums
@@ -76,23 +73,27 @@ lib/
 ### Installation
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/MrSpy00/DirectFast.git
 cd DirectFast
 ```
 
-2. Install dependencies:
+1. Install dependencies:
+
 ```bash
 flutter pub get
 ```
 
-3. (Optional) Clean previous artifacts:
+1. (Optional) Clean previous artifacts:
+
 ```bash
 flutter clean
 flutter pub get
 ```
 
-4. Run the app:
+1. Run the app:
+
 ```bash
 flutter run
 ```
@@ -147,7 +148,7 @@ This project is open source and available under the MIT License.
 
 ## 👨‍💻 Developer
 
-**Developed by Aegis**
+Developed by Aegis
 
 - GitHub: [@MrSpy00](https://github.com/MrSpy00)
 
@@ -171,7 +172,6 @@ Give a ⭐️ if this project helped you!
 
 ---
 
-<div align="center">
-  <p>Made with ❤️ using Flutter</p>
-  <p>© 2026 Aegis</p>
-</div>
+Made with ❤️ using Flutter
+
+© 2026 Aegis
