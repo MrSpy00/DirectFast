@@ -15,12 +15,16 @@
 
 ## ✨ Features
 
-- **Multiple Platforms**: WhatsApp, Telegram, Viber, and Signal support
+- **18 Platform Support**: WhatsApp, Telegram, Signal, Viber, WeChat, LINE, Messenger, Discord, Instagram, X, Snapchat, YouTube, TikTok, Twitch, Facebook, Kick, LinkedIn, Email
 - **No Contact Saving**: Directly open chats without cluttering your contacts
 - **Smart Clipboard**: Automatic detection of phone numbers and usernames
-- **Beautiful UI**: Material 3 design with glassmorphism effects
+- **Quick Templates**: Save and reuse frequently sent messages
+- **QR Generator**: Create and save QR codes for shareable contact details
+- **Link Cleaner**: Remove tracking parameters from URLs
+- **Message Encryptor**: Encrypt/decrypt messages locally on device
+- **Beautiful UI**: Material 3 design with smooth animations
 - **Chat History**: Track your recent conversations
-- **Dark Mode**: Full dark/light theme support
+- **Dark Mode & Localization**: Full dark/light support with Turkish/English language options
 - **Privacy First**: All data stored locally on your device
 
 ---
@@ -51,11 +55,11 @@ lib/
 
 ## 🛠️ Tech Stack
 
-- **Framework**: Flutter 3.x
+- **Framework**: Flutter 3.38.x
 - **Language**: Dart
 - **State Management**: Riverpod
 - **Navigation**: GoRouter
-- **Local Storage**: Hive
+- **Local Storage**: SharedPreferences
 - **Animations**: flutter_animate
 - **Fonts**: Google Fonts
 
@@ -82,9 +86,10 @@ cd DirectFast
 flutter pub get
 ```
 
-3. Generate code (Hive adapters):
+3. (Optional) Clean previous artifacts:
 ```bash
-flutter pub run build_runner build --delete-conflicting-outputs
+flutter clean
+flutter pub get
 ```
 
 4. Run the app:
@@ -100,8 +105,22 @@ flutter run
 |-----------|---------------|--------|
 | WhatsApp  | Phone Number  | ✅     |
 | Telegram  | Username      | ✅     |
-| Viber     | Phone Number  | ✅     |
 | Signal    | Phone Number  | ✅     |
+| Viber     | Phone Number  | ✅     |
+| WeChat    | Username      | ✅     |
+| LINE      | Username      | ✅     |
+| Messenger | Username      | ✅     |
+| Discord   | Username      | ✅     |
+| Instagram | Username      | ✅     |
+| X         | Username      | ✅     |
+| Snapchat  | Username      | ✅     |
+| YouTube   | Username      | ✅     |
+| TikTok    | Username      | ✅     |
+| Twitch    | Username      | ✅     |
+| Facebook  | Username      | ✅     |
+| Kick      | Username      | ✅     |
+| LinkedIn  | Username      | ✅     |
+| Email     | Email Address | ✅     |
 
 ---
 
@@ -115,7 +134,7 @@ flutter run
 
 - **No External Servers**: All data stays on your device
 - **Input Sanitization**: Protection against XSS and injection attacks
-- **Local Storage**: History stored with Hive encryption
+- **Local Storage**: History and templates stored locally in SharedPreferences
 - **No Tracking**: Zero analytics or telemetry
 
 ---
@@ -154,5 +173,5 @@ Give a ⭐️ if this project helped you!
 
 <div align="center">
   <p>Made with ❤️ using Flutter</p>
-  <p>© 2024 Aegis</p>
+  <p>© 2026 Aegis</p>
 </div>
