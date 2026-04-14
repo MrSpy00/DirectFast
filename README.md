@@ -125,14 +125,6 @@ flutter run
 
 ---
 
-## 🎨 Screenshots
-
-[![DirectFast screenshot 1](https://i.hizliresim.com/l5k7aiz.jpeg)](https://i.hizliresim.com/l5k7aiz.jpeg) [![DirectFast screenshot 2](https://i.hizliresim.com/cs1iouy.jpeg)](https://i.hizliresim.com/cs1iouy.jpeg) [![DirectFast screenshot 3](https://i.hizliresim.com/kq3wjtg.jpeg)](https://i.hizliresim.com/kq3wjtg.jpeg)
-
-[![DirectFast screenshot 4](https://i.hizliresim.com/mqbxypo.jpeg)](https://i.hizliresim.com/mqbxypo.jpeg) [![DirectFast screenshot 5](https://i.hizliresim.com/pzro3vn.jpeg)](https://i.hizliresim.com/pzro3vn.jpeg) [![DirectFast screenshot 6](https://i.hizliresim.com/qovrgyr.jpeg)](https://i.hizliresim.com/qovrgyr.jpeg)
-
----
-
 ## 🔒 Privacy & Security
 
 - **No External Servers**: All data stays on your device
