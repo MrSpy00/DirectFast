@@ -1,3 +1,5 @@
+import 'app_strings_i18n_generated.dart';
+
 class AppStrings {
   // Supported locales
   static const String turkish = 'tr';
@@ -5,6 +7,16 @@ class AppStrings {
   static const String spanish = 'es';
   static const String arabic = 'ar';
   static const String hindi = 'hi';
+  static const String french = 'fr';
+  static const String german = 'de';
+  static const String russian = 'ru';
+  static const String portuguese = 'pt';
+  static const String chinese = 'zh';
+  static const String japanese = 'ja';
+  static const String korean = 'ko';
+  static const String italian = 'it';
+  static const String indonesian = 'id';
+  static const String bengali = 'bn';
 
   static const List<String> supportedLocales = [
     turkish,
@@ -12,6 +24,16 @@ class AppStrings {
     spanish,
     arabic,
     hindi,
+    french,
+    german,
+    russian,
+    portuguese,
+    chinese,
+    japanese,
+    korean,
+    italian,
+    indonesian,
+    bengali,
   ];
 
   static const String fallbackLocale = english;
@@ -22,6 +44,16 @@ class AppStrings {
     spanish: 'Español',
     arabic: 'العربية',
     hindi: 'हिन्दी',
+    french: 'Français',
+    german: 'Deutsch',
+    russian: 'Русский',
+    portuguese: 'Português',
+    chinese: '中文',
+    japanese: '日本語',
+    korean: '한국어',
+    italian: 'Italiano',
+    indonesian: 'Bahasa Indonesia',
+    bengali: 'বাংলা',
   };
 
   // Current locale
@@ -57,6 +89,26 @@ class AppStrings {
         return 'arabic';
       case hindi:
         return 'hindi';
+      case french:
+        return 'french';
+      case german:
+        return 'german';
+      case russian:
+        return 'russian';
+      case portuguese:
+        return 'portuguese';
+      case chinese:
+        return 'chinese';
+      case japanese:
+        return 'japanese';
+      case korean:
+        return 'korean';
+      case italian:
+        return 'italian';
+      case indonesian:
+        return 'indonesian';
+      case bengali:
+        return 'bengali';
       default:
         return 'english';
     }
@@ -74,8 +126,8 @@ class AppStrings {
       'en': 'Quick Connect',
     },
     'chat_without_saving': {
-      'tr': 'Numarayı yaz, platformu seç, anında bağlantı kur.',
-      'en': 'Enter a contact, choose a platform, and connect instantly.',
+      'tr': 'Platformu seç, anında bağlantı kur.',
+      'en': 'Choose a platform and connect instantly.',
     },
 
     // Navigation
@@ -514,6 +566,46 @@ class AppStrings {
       'ar': 'الهندية',
       'hi': 'हिन्दी',
     },
+    'french': {
+      'tr': 'Fransızca',
+      'en': 'French',
+    },
+    'german': {
+      'tr': 'Almanca',
+      'en': 'German',
+    },
+    'russian': {
+      'tr': 'Rusça',
+      'en': 'Russian',
+    },
+    'portuguese': {
+      'tr': 'Portekizce',
+      'en': 'Portuguese',
+    },
+    'chinese': {
+      'tr': 'Çince',
+      'en': 'Chinese',
+    },
+    'japanese': {
+      'tr': 'Japonca',
+      'en': 'Japanese',
+    },
+    'korean': {
+      'tr': 'Korece',
+      'en': 'Korean',
+    },
+    'italian': {
+      'tr': 'İtalyanca',
+      'en': 'Italian',
+    },
+    'indonesian': {
+      'tr': 'Endonezce',
+      'en': 'Indonesian',
+    },
+    'bengali': {
+      'tr': 'Bengalce',
+      'en': 'Bengali',
+    },
     'color_violet': {
       'tr': 'Menekşe',
       'en': 'Violet',
@@ -691,8 +783,8 @@ class AppStrings {
 
     // Utils Screen
     'utils_subtitle': {
-      'tr': 'QR, Link, Şifreleme, Şablonlar ve Gmail oluşturucu',
-      'en': 'QR, Links, Encryption, Templates, and Gmail composer',
+      'tr': 'QR, Link, Şifreleme, Şablonlar, Şifre ve Gmail araçları',
+      'en': 'QR, Links, Encryption, Templates, Password, and Gmail tools',
     },
     'tab_qr': {
       'tr': 'QR',
@@ -713,6 +805,82 @@ class AppStrings {
     'tab_gmail': {
       'tr': 'Gmail',
       'en': 'Gmail',
+    },
+    'tab_passwords': {
+      'tr': 'Şifre',
+      'en': 'Passwords',
+    },
+    'password_generator': {
+      'tr': 'Gelişmiş Şifre Oluşturucu',
+      'en': 'Advanced Password Generator',
+    },
+    'password_generator_desc': {
+      'tr': 'Güçlü ve güvenli şifreleri tek dokunuşla üretin',
+      'en': 'Generate strong and secure passwords in one tap',
+    },
+    'password_length': {
+      'tr': 'Şifre Uzunluğu',
+      'en': 'Password Length',
+    },
+    'include_uppercase': {
+      'tr': 'Büyük Harf (A-Z)',
+      'en': 'Uppercase Letters (A-Z)',
+    },
+    'include_lowercase': {
+      'tr': 'Küçük Harf (a-z)',
+      'en': 'Lowercase Letters (a-z)',
+    },
+    'include_numbers': {
+      'tr': 'Rakam (0-9)',
+      'en': 'Numbers (0-9)',
+    },
+    'include_symbols': {
+      'tr': 'Sembol (!@#...)',
+      'en': 'Symbols (!@#...)',
+    },
+    'exclude_ambiguous_chars': {
+      'tr': 'Benzer karakterleri hariç tut (O/0, I/l/1)',
+      'en': 'Exclude ambiguous characters (O/0, I/l/1)',
+    },
+    'generated_password': {
+      'tr': 'Oluşturulan Şifre',
+      'en': 'Generated Password',
+    },
+    'copy_password': {
+      'tr': 'Şifreyi Kopyala',
+      'en': 'Copy Password',
+    },
+    'password_copied': {
+      'tr': 'Şifre panoya kopyalandı',
+      'en': 'Password copied to clipboard',
+    },
+    'entropy_bits': {
+      'tr': 'Entropi: %s bit',
+      'en': 'Entropy: %s bits',
+    },
+    'password_strength_weak': {
+      'tr': 'Çok Zayıf',
+      'en': 'Very Weak',
+    },
+    'password_strength_fair': {
+      'tr': 'Orta',
+      'en': 'Fair',
+    },
+    'password_strength_good': {
+      'tr': 'İyi',
+      'en': 'Good',
+    },
+    'password_strength_strong': {
+      'tr': 'Güçlü',
+      'en': 'Strong',
+    },
+    'password_strength_very_strong': {
+      'tr': 'Çok Güçlü',
+      'en': 'Very Strong',
+    },
+    'at_least_one_charset': {
+      'tr': 'En az bir karakter grubu seçmelisiniz',
+      'en': 'Select at least one character group',
     },
     'gmail_sender': {
       'tr': 'Gmail Oluşturucu',
@@ -799,8 +967,7 @@ class AppStrings {
     'could_not_open_platform_retry': {
       'tr':
           '%s açılamadı. Uygulamanın yüklü olduğundan emin olup tekrar deneyin.',
-      'en':
-          'Could not open %s. Make sure the app is installed and try again.',
+      'en': 'Could not open %s. Make sure the app is installed and try again.',
     },
     'discord_copied_opened': {
       'tr': 'Kullanıcı adı kopyalandı, Discord açıldı',
@@ -859,10 +1026,14 @@ class AppStrings {
   // Get translated string
   static String get(String key, {List<String>? args}) {
     final locale = normalizeLocale(_currentLocale);
-    final translation = _translations[key]?[locale] ??
-      _translations[key]?[fallbackLocale] ??
-      _translations[key]?[turkish] ??
-      key;
+    final manualTranslations = _translations[key];
+    final generatedTranslation = kGeneratedLocaleTranslations[locale]?[key];
+
+    final translation = manualTranslations?[locale] ??
+        generatedTranslation ??
+        manualTranslations?[fallbackLocale] ??
+        manualTranslations?[turkish] ??
+        key;
 
     if (args != null && args.isNotEmpty) {
       String result = translation;

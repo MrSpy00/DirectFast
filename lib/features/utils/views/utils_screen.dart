@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math' as math;
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -39,13 +40,14 @@ class _UtilsScreenState extends State<UtilsScreen> {
     _Segment(icon: Icons.link_off_rounded, labelKey: 'tab_links'),
     _Segment(icon: Icons.lock_outline_rounded, labelKey: 'tab_encrypt'),
     _Segment(icon: Icons.bookmarks_outlined, labelKey: 'tab_templates'),
+    _Segment(icon: Icons.password_rounded, labelKey: 'tab_passwords'),
     _Segment(icon: Icons.email_outlined, labelKey: 'tab_gmail'),
   ];
 
   @override
   void initState() {
     super.initState();
-    _currentPage = widget.initialTab.clamp(0, 4);
+    _currentPage = widget.initialTab.clamp(0, _segments.length - 1);
     _pageController = PageController(initialPage: _currentPage);
   }
 
@@ -99,6 +101,7 @@ class _UtilsScreenState extends State<UtilsScreen> {
                     _LinkCleanerPage(),
                     _MessageEncryptorPage(),
                     _TemplatesPage(),
+                    _PasswordGeneratorPage(),
                     _GmailComposerPage(),
                   ],
                 ),
@@ -165,6 +168,8 @@ class _UtilsScreenState extends State<UtilsScreen> {
                 ),
                 Text(
                   AppStrings.tr('utils_subtitle'),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: Theme.of(context)
                             .colorScheme
@@ -184,7 +189,7 @@ class _UtilsScreenState extends State<UtilsScreen> {
   Widget _buildSegmentedControl() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: _PremiumSegmentedControl(
+      child: _ScrollableSegmentedControl(
         segments: _segments,
         selectedIndex: _currentPage,
         onChanged: _onSegmentTap,
@@ -201,12 +206,12 @@ class _Segment {
   const _Segment({required this.icon, required this.labelKey});
 }
 
-class _PremiumSegmentedControl extends StatelessWidget {
+class _ScrollableSegmentedControl extends StatelessWidget {
   final List<_Segment> segments;
   final int selectedIndex;
   final ValueChanged<int> onChanged;
 
-  const _PremiumSegmentedControl({
+  const _ScrollableSegmentedControl({
     required this.segments,
     required this.selectedIndex,
     required this.onChanged,
@@ -214,95 +219,96 @@ class _PremiumSegmentedControl extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final pillWidth = constraints.maxWidth / segments.length;
+    return SizedBox(
+      height: 56,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+        itemCount: segments.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        itemBuilder: (context, index) {
+          final segment = segments[index];
+          final isSelected = selectedIndex == index;
 
-        return Container(
-          height: 58,
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceContainerHighest,
-            borderRadius: BorderRadius.circular(29),
-          ),
-          child: Stack(
-            children: [
-              // Sliding gradient pill
-              AnimatedPositioned(
-                duration: const Duration(milliseconds: 280),
-                curve: Curves.easeInOutCubic,
-                left: selectedIndex * pillWidth,
-                top: 4,
-                bottom: 4,
-                width: pillWidth,
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Theme.of(context).colorScheme.primary,
-                        Theme.of(context).colorScheme.secondary,
-                      ],
-                    ),
-                    borderRadius: BorderRadius.circular(25),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .primary
-                            .withValues(alpha: 0.45),
-                        blurRadius: 12,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
-                  ),
+          return GestureDetector(
+            onTap: () => onChanged(index),
+            behavior: HitTestBehavior.opaque,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 220),
+              curve: Curves.easeOutCubic,
+              constraints: const BoxConstraints(minWidth: 108),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              decoration: BoxDecoration(
+                gradient:
+                    isSelected ? AppTheme.primaryGradientFor(context) : null,
+                color: isSelected
+                    ? null
+                    : Theme.of(context)
+                        .colorScheme
+                        .surfaceContainerHighest
+                        .withValues(alpha: 0.9),
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(
+                  color: isSelected
+                      ? Theme.of(context)
+                          .colorScheme
+                          .primary
+                          .withValues(alpha: 0.6)
+                      : Theme.of(context)
+                          .colorScheme
+                          .outline
+                          .withValues(alpha: 0.25),
                 ),
+                boxShadow: isSelected
+                    ? [
+                        BoxShadow(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .primary
+                              .withValues(alpha: 0.3),
+                          blurRadius: 10,
+                          offset: const Offset(0, 3),
+                        ),
+                      ]
+                    : null,
               ),
-              // Labels row (on top of sliding pill)
-              Row(
-                children: segments.asMap().entries.map((e) {
-                  final isSelected = e.key == selectedIndex;
-                  return Expanded(
-                    child: GestureDetector(
-                      onTap: () => onChanged(e.key),
-                      behavior: HitTestBehavior.opaque,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            e.value.icon,
-                            size: 19,
-                            color: isSelected
-                                ? Colors.white
-                                : Theme.of(context)
-                                    .colorScheme
-                                    .onSurface
-                                    .withValues(alpha: 0.55),
-                          ),
-                          const SizedBox(height: 3),
-                          Text(
-                            AppStrings.tr(e.value.labelKey),
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: isSelected
-                                  ? FontWeight.w700
-                                  : FontWeight.w500,
-                              color: isSelected
-                                  ? Colors.white
-                                  : Theme.of(context)
-                                      .colorScheme
-                                      .onSurface
-                                      .withValues(alpha: 0.55),
-                            ),
-                          ),
-                        ],
-                      ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    segment.icon,
+                    size: 18,
+                    color: isSelected
+                        ? Colors.white
+                        : Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.65),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    AppStrings.tr(segment.labelKey),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight:
+                          isSelected ? FontWeight.w700 : FontWeight.w600,
+                      color: isSelected
+                          ? Colors.white
+                          : Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.75),
                     ),
-                  );
-                }).toList(),
+                  ),
+                ],
               ),
-            ],
-          ),
-        );
-      },
+            ),
+          );
+        },
+      ),
     );
   }
 }
@@ -967,9 +973,7 @@ class _MessageEncryptorPageState extends State<_MessageEncryptorPage> {
                   label: _isEncryptMode
                       ? AppStrings.tr('encrypt')
                       : AppStrings.tr('decrypt'),
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF11998E), Color(0xFF38EF7D)],
-                  ),
+                  gradient: AppTheme.accentGradientFor(context),
                 ),
               ],
             ),
@@ -1022,6 +1026,403 @@ class _MessageEncryptorPageState extends State<_MessageEncryptorPage> {
               ),
             ).animate().fadeIn().slideY(begin: 0.08, end: 0),
           ],
+        ],
+      ),
+    );
+  }
+}
+
+// ── Password Generator Page ─────────────────────────────────────────────────
+
+class _PasswordGeneratorPage extends StatefulWidget {
+  const _PasswordGeneratorPage();
+
+  @override
+  State<_PasswordGeneratorPage> createState() => _PasswordGeneratorPageState();
+}
+
+class _PasswordGeneratorPageState extends State<_PasswordGeneratorPage> {
+  late final math.Random _random = _createRandom();
+
+  int _length = 16;
+  bool _includeUppercase = true;
+  bool _includeLowercase = true;
+  bool _includeNumbers = true;
+  bool _includeSymbols = true;
+  bool _excludeAmbiguous = true;
+
+  String _password = '';
+  double _entropyBits = 0;
+
+  static const _uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  static const _lowercase = 'abcdefghijklmnopqrstuvwxyz';
+  static const _numbers = '0123456789';
+  static const _symbols = '!@#\$%^&*()-_=+[]{}|;:,.<>?/';
+
+  static math.Random _createRandom() {
+    try {
+      return math.Random.secure();
+    } catch (_) {
+      return math.Random();
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _generatePassword(showError: false);
+  }
+
+  String _buildCharset() {
+    final buffer = StringBuffer();
+    if (_includeUppercase) {
+      buffer.write(_uppercase);
+    }
+    if (_includeLowercase) {
+      buffer.write(_lowercase);
+    }
+    if (_includeNumbers) {
+      buffer.write(_numbers);
+    }
+    if (_includeSymbols) {
+      buffer.write(_symbols);
+    }
+
+    var charset = buffer.toString();
+    if (_excludeAmbiguous) {
+      charset = charset.replaceAll(RegExp('[O0Il1]'), '');
+    }
+
+    return charset;
+  }
+
+  String _strengthKey(double entropyBits) {
+    if (entropyBits < 40) {
+      return 'password_strength_weak';
+    }
+    if (entropyBits < 56) {
+      return 'password_strength_fair';
+    }
+    if (entropyBits < 72) {
+      return 'password_strength_good';
+    }
+    if (entropyBits < 96) {
+      return 'password_strength_strong';
+    }
+    return 'password_strength_very_strong';
+  }
+
+  Color _strengthColor(BuildContext context, double entropyBits) {
+    final scheme = Theme.of(context).colorScheme;
+    if (entropyBits < 40) {
+      return scheme.error;
+    }
+    if (entropyBits < 56) {
+      return Colors.orange;
+    }
+    if (entropyBits < 72) {
+      return Colors.amber;
+    }
+    if (entropyBits < 96) {
+      return Colors.lightGreen;
+    }
+    return scheme.primary;
+  }
+
+  void _updateOptions(VoidCallback update) {
+    setState(update);
+    _generatePassword(showError: false);
+  }
+
+  void _generatePassword({bool showError = true}) {
+    final charset = _buildCharset();
+    if (charset.isEmpty) {
+      setState(() {
+        _password = '';
+        _entropyBits = 0;
+      });
+      if (showError) {
+        _showSnackBar(
+          context,
+          AppStrings.tr('at_least_one_charset'),
+          isError: true,
+        );
+      }
+      return;
+    }
+
+    final chars = charset.split('');
+    final out = StringBuffer();
+    for (var i = 0; i < _length; i++) {
+      out.write(chars[_random.nextInt(chars.length)]);
+    }
+
+    final entropy = _length * (math.log(chars.length) / math.ln2);
+
+    setState(() {
+      _password = out.toString();
+      _entropyBits = entropy;
+    });
+  }
+
+  void _copyPassword() {
+    if (_password.isEmpty) {
+      _showSnackBar(
+        context,
+        AppStrings.tr('at_least_one_charset'),
+        isError: true,
+      );
+      return;
+    }
+    HapticFeedback.lightImpact();
+    Clipboard.setData(ClipboardData(text: _password));
+    _showSnackBar(context, AppStrings.tr('password_copied'));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final strengthKey = _strengthKey(_entropyBits);
+    final strengthColor = _strengthColor(context, _entropyBits);
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
+      physics: const BouncingScrollPhysics(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          GlassmorphicContainer.flat(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        gradient: AppTheme.primaryGradientFor(context),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.password_rounded,
+                        color: Colors.white,
+                        size: 22,
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            AppStrings.tr('password_generator'),
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium
+                                ?.copyWith(fontWeight: FontWeight.w700),
+                          ),
+                          Text(
+                            AppStrings.tr('password_generator_desc'),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style:
+                                Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface
+                                          .withValues(alpha: 0.55),
+                                    ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 18),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      AppStrings.tr('password_length'),
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
+                      decoration: BoxDecoration(
+                        gradient: AppTheme.accentGradientFor(context),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        '$_length',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Slider(
+                  value: _length.toDouble(),
+                  min: 8,
+                  max: 64,
+                  divisions: 56,
+                  label: '$_length',
+                  onChanged: (value) {
+                    _updateOptions(() => _length = value.round());
+                  },
+                ),
+                const SizedBox(height: 6),
+                _PasswordOptionTile(
+                  label: AppStrings.tr('include_uppercase'),
+                  value: _includeUppercase,
+                  onChanged: (value) =>
+                      _updateOptions(() => _includeUppercase = value),
+                ),
+                _PasswordOptionTile(
+                  label: AppStrings.tr('include_lowercase'),
+                  value: _includeLowercase,
+                  onChanged: (value) =>
+                      _updateOptions(() => _includeLowercase = value),
+                ),
+                _PasswordOptionTile(
+                  label: AppStrings.tr('include_numbers'),
+                  value: _includeNumbers,
+                  onChanged: (value) =>
+                      _updateOptions(() => _includeNumbers = value),
+                ),
+                _PasswordOptionTile(
+                  label: AppStrings.tr('include_symbols'),
+                  value: _includeSymbols,
+                  onChanged: (value) =>
+                      _updateOptions(() => _includeSymbols = value),
+                ),
+                _PasswordOptionTile(
+                  label: AppStrings.tr('exclude_ambiguous_chars'),
+                  value: _excludeAmbiguous,
+                  onChanged: (value) =>
+                      _updateOptions(() => _excludeAmbiguous = value),
+                ),
+                const SizedBox(height: 14),
+                _GradientButton(
+                  onPressed: () {
+                    HapticFeedback.mediumImpact();
+                    _generatePassword();
+                  },
+                  icon: Icons.casino_rounded,
+                  label: AppStrings.tr('generate'),
+                  gradient: AppTheme.primaryGradientFor(context),
+                ),
+              ],
+            ),
+          ).animate().fadeIn(duration: 450.ms),
+          const SizedBox(height: 14),
+          GlassmorphicContainer.flat(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      AppStrings.tr('generated_password'),
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                    ),
+                    const Spacer(),
+                    Text(
+                      AppStrings.tr(strengthKey),
+                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                            color: strengthColor,
+                            fontWeight: FontWeight.w700,
+                          ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .surfaceContainerHighest
+                        .withValues(alpha: 0.45),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: SelectableText(
+                    _password,
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          fontFamily: 'monospace',
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.5,
+                        ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  AppStrings.tr(
+                    'entropy_bits',
+                    args: [_entropyBits.toStringAsFixed(0)],
+                  ),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.65),
+                      ),
+                ),
+                const SizedBox(height: 12),
+                OutlinedButton.icon(
+                  onPressed: _copyPassword,
+                  icon: const Icon(Icons.copy_rounded),
+                  label: Text(AppStrings.tr('copy_password')),
+                ),
+              ],
+            ),
+          ).animate().fadeIn(duration: 450.ms, delay: 80.ms),
+        ],
+      ),
+    );
+  }
+}
+
+class _PasswordOptionTile extends StatelessWidget {
+  final String label;
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  const _PasswordOptionTile({
+    required this.label,
+    required this.value,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              label,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w500,
+                  ),
+            ),
+          ),
+          Switch(
+            value: value,
+            onChanged: onChanged,
+          ),
         ],
       ),
     );
@@ -1379,7 +1780,7 @@ class _TemplateCard extends StatelessWidget {
                         fontWeight: FontWeight.w700,
                       ),
                   maxLines: 1,
-                  overflow: TextOverflow.fade,
+                  overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 3),
                 Text(
@@ -1391,7 +1792,7 @@ class _TemplateCard extends StatelessWidget {
                             .withValues(alpha: 0.6),
                       ),
                   maxLines: 2,
-                  overflow: TextOverflow.fade,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
@@ -1700,8 +2101,10 @@ class _GmailComposerPageState extends State<_GmailComposerPage> {
         AppStrings.tr(labelKey),
         style: Theme.of(context).textTheme.labelLarge?.copyWith(
               fontWeight: FontWeight.w700,
-              color:
-                  Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.8),
             ),
       ),
     );
@@ -1725,11 +2128,7 @@ class _GmailComposerPageState extends State<_GmailComposerPage> {
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFFEA4335), Color(0xFFFBBC05)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
+                        gradient: AppTheme.accentGradientFor(context),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Icon(
@@ -1826,11 +2225,7 @@ class _GmailComposerPageState extends State<_GmailComposerPage> {
                   onPressed: _sendEmail,
                   icon: Icons.send_rounded,
                   label: AppStrings.tr('gmail_send'),
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFFEA4335), Color(0xFFFBBC05)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
+                  gradient: AppTheme.primaryGradientFor(context),
                 ),
               ],
             ),

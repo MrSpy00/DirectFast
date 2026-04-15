@@ -288,6 +288,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   const SizedBox(height: 4),
                   Text(
                     AppStrings.tr('chat_without_saving'),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       color: Colors.white.withValues(alpha: 0.9),
                       fontSize: 13,
@@ -429,9 +431,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 margin: const EdgeInsets.symmetric(horizontal: 4),
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
-                  gradient: isSelected
-                      ? AppTheme.primaryGradientFor(context)
-                      : null,
+                  gradient:
+                      isSelected ? AppTheme.primaryGradientFor(context) : null,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Column(
@@ -555,7 +556,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             isSelected ? FontWeight.bold : FontWeight.w500,
                       ),
                       maxLines: 2,
-                      overflow: TextOverflow.fade,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
@@ -731,8 +732,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     child: _UtilityShortcutCard(
                       icon: Icons.lock_outline,
                       label: AppStrings.tr('message_encryptor'),
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF5B8CFF), Color(0xFF6A5CFF)],
+                      gradient: LinearGradient(
+                        colors: [
+                          Theme.of(context).colorScheme.tertiary,
+                          Theme.of(context).colorScheme.primary,
+                        ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
@@ -747,8 +751,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     child: _UtilityShortcutCard(
                       icon: Icons.bookmarks_outlined,
                       label: AppStrings.tr('templates'),
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF7F53AC), Color(0xFF647DEE)],
+                      gradient: LinearGradient(
+                        colors: [
+                          Theme.of(context).colorScheme.secondary,
+                          Theme.of(context).colorScheme.tertiary,
+                        ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
@@ -759,18 +766,40 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                   ),
                   SizedBox(
-                    width: constraints.maxWidth,
+                    width: cardWidth,
                     child: _UtilityShortcutCard(
-                      icon: Icons.email_outlined,
-                      label: AppStrings.tr('gmail_sender'),
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFFEA4335), Color(0xFFFBBC05)],
+                      icon: Icons.password_rounded,
+                      label: AppStrings.tr('password_generator'),
+                      gradient: LinearGradient(
+                        colors: [
+                          Theme.of(context).colorScheme.primary,
+                          Theme.of(context).colorScheme.secondary,
+                        ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
                       onTap: () {
                         HapticFeedback.lightImpact();
                         context.push(AppRouter.utils, extra: 4);
+                      },
+                    ),
+                  ),
+                  SizedBox(
+                    width: cardWidth,
+                    child: _UtilityShortcutCard(
+                      icon: Icons.email_outlined,
+                      label: AppStrings.tr('gmail_sender'),
+                      gradient: LinearGradient(
+                        colors: [
+                          Theme.of(context).colorScheme.tertiary,
+                          Theme.of(context).colorScheme.secondary,
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      onTap: () {
+                        HapticFeedback.lightImpact();
+                        context.push(AppRouter.utils, extra: 5);
                       },
                     ),
                   ),
@@ -908,7 +937,7 @@ class _SmartClipboardBanner extends StatelessWidget {
                               fontWeight: FontWeight.w500,
                             ),
                         maxLines: 1,
-                        overflow: TextOverflow.fade,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
@@ -1075,7 +1104,7 @@ class _UtilityShortcutCard extends StatelessWidget {
                         fontWeight: FontWeight.w700,
                       ),
                   maxLines: 2,
-                  overflow: TextOverflow.fade,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
               Icon(
@@ -1101,21 +1130,31 @@ class _CyberBackground extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final scheme = Theme.of(context).colorScheme;
+
+    final darkMiddle = Color.lerp(Colors.black, scheme.primary, 0.16)!;
+    final darkEnd = Color.lerp(Colors.black, scheme.secondary, 0.12)!;
+
+    final lightMiddle =
+        Color.lerp(scheme.surface, scheme.primaryContainer, 0.7)!;
+    final lightEnd =
+        Color.lerp(scheme.surface, scheme.secondaryContainer, 0.65)!;
+
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: isDark
-              ? const [
-                  Color(0xFF000000),
-                  Color(0xFF050510),
-                  Color(0xFF080818),
+              ? [
+                  Colors.black,
+                  darkMiddle,
+                  darkEnd,
                 ]
-              : const [
-                  Color(0xFFFFFBFE),
-                  Color(0xFFF5F0FF),
-                  Color(0xFFEDE7F6),
+              : [
+                  scheme.surface,
+                  lightMiddle,
+                  lightEnd,
                 ],
         ),
       ),
