@@ -24,8 +24,8 @@ class AppStrings {
       'en': 'Quick Connect',
     },
     'chat_without_saving': {
-      'tr': 'Kişi kaydetmeden sohbet et',
-      'en': 'Chat without saving contacts',
+      'tr': 'Numarayı yaz, platformu seç, anında bağlantı kur.',
+      'en': 'Enter a contact, choose a platform, and connect instantly.',
     },
 
     // Navigation
@@ -443,8 +443,8 @@ class AppStrings {
 
     // Messages
     'opening': {
-      'tr': '%s açılıyor...',
-      'en': 'Opening %s...',
+      'tr': '%s açılıyor',
+      'en': 'Opening %s',
     },
     'failed_to_open': {
       'tr': '%s açılamadı. Uygulamanın yüklü olduğundan emin olun.',
@@ -459,8 +459,20 @@ class AppStrings {
       'en': 'Please enter a valid phone number (7-15 digits)',
     },
     'enter_valid_username': {
-      'tr': 'Geçerli bir kullanıcı adı girin (5-32 karakter)',
-      'en': 'Please enter a valid username (5-32 characters)',
+      'tr': 'Geçerli bir kullanıcı adı girin (2-50 karakter)',
+      'en': 'Please enter a valid username (2-50 characters)',
+    },
+    'enter_phone_required': {
+      'tr': 'Lütfen telefon numarası girin',
+      'en': 'Please enter a phone number',
+    },
+    'enter_email_required': {
+      'tr': 'Lütfen bir e-posta adresi girin',
+      'en': 'Please enter an email address',
+    },
+    'enter_username_required': {
+      'tr': 'Lütfen bir kullanıcı adı girin',
+      'en': 'Please enter a username',
     },
     'enter_valid_email': {
       'tr': 'Geçerli bir e-posta adresi girin',
@@ -492,8 +504,8 @@ class AppStrings {
 
     // Utils Screen
     'utils_subtitle': {
-      'tr': 'QR, Bağlantılar, Şifreleme ve Şablonlar',
-      'en': 'QR, Links, Encryption & Templates',
+      'tr': 'QR, Link, Şifreleme, Şablonlar ve Gmail oluşturucu',
+      'en': 'QR, Links, Encryption, Templates, and Gmail composer',
     },
     'tab_qr': {
       'tr': 'QR',
@@ -510,6 +522,114 @@ class AppStrings {
     'tab_templates': {
       'tr': 'Şablonlar',
       'en': 'Templates',
+    },
+    'tab_gmail': {
+      'tr': 'Gmail',
+      'en': 'Gmail',
+    },
+    'gmail_sender': {
+      'tr': 'Gmail Oluşturucu',
+      'en': 'Gmail Composer',
+    },
+    'gmail_sender_desc': {
+      'tr':
+          'Alıcı, konu, mesaj ve isteğe bağlı CC/BCC alanlarıyla e-posta taslağı oluşturun',
+      'en':
+          'Create an email draft with recipient, subject, message, and optional CC/BCC fields',
+    },
+    'gmail_recipient_label': {
+      'tr': 'Alıcı',
+      'en': 'Recipient',
+    },
+    'gmail_cc_label': {
+      'tr': 'CC (Opsiyonel)',
+      'en': 'CC (Optional)',
+    },
+    'gmail_bcc_label': {
+      'tr': 'BCC (Opsiyonel)',
+      'en': 'BCC (Optional)',
+    },
+    'gmail_subject_label': {
+      'tr': 'Konu',
+      'en': 'Subject',
+    },
+    'gmail_body_label': {
+      'tr': 'Mesaj',
+      'en': 'Message',
+    },
+    'gmail_recipient_hint': {
+      'tr': 'Alıcı e-posta adresi',
+      'en': 'Recipient email address',
+    },
+    'gmail_cc_hint': {
+      'tr': 'CC e-posta adresi',
+      'en': 'CC email address',
+    },
+    'gmail_bcc_hint': {
+      'tr': 'BCC e-posta adresi',
+      'en': 'BCC email address',
+    },
+    'gmail_subject_hint': {
+      'tr': 'Konu',
+      'en': 'Subject',
+    },
+    'gmail_body_hint': {
+      'tr': 'Mesaj metni',
+      'en': 'Message body',
+    },
+    'gmail_send': {
+      'tr': 'E-posta Taslağını Aç',
+      'en': 'Open Email Draft',
+    },
+    'gmail_opened': {
+      'tr': 'E-posta oluşturucu açıldı',
+      'en': 'Email composer opened',
+    },
+    'opening_app': {
+      'tr': '%s uygulaması açılıyor',
+      'en': 'Opening %s app',
+    },
+    'opening_in_browser': {
+      'tr': '%s tarayıcıda açılıyor',
+      'en': 'Opening %s in browser',
+    },
+    'unexpected_error': {
+      'tr': 'Beklenmeyen hata: %s',
+      'en': 'Unexpected error: %s',
+    },
+    'could_not_open_platform': {
+      'tr': '%s açılamadı',
+      'en': 'Could not open %s',
+    },
+    'failed_to_open_platform': {
+      'tr': '%s açılamadı: %s',
+      'en': 'Failed to open %s: %s',
+    },
+    'platform_error': {
+      'tr': '%s hatası: %s',
+      'en': '%s error: %s',
+    },
+    'could_not_open_platform_retry': {
+      'tr':
+          '%s açılamadı. Uygulamanın yüklü olduğundan emin olup tekrar deneyin.',
+      'en':
+          'Could not open %s. Make sure the app is installed and try again.',
+    },
+    'discord_copied_opened': {
+      'tr': 'Kullanıcı adı kopyalandı, Discord açıldı',
+      'en': 'Username copied, Discord opened',
+    },
+    'discord_copied_browser': {
+      'tr': 'Kullanıcı adı kopyalandı, Discord tarayıcıda açılıyor',
+      'en': 'Username copied, opening Discord in browser',
+    },
+    'wechat_copied_opened': {
+      'tr': 'WeChat ID kopyalandı, WeChat açıldı',
+      'en': 'WeChat ID copied, WeChat opened',
+    },
+    'wechat_copied_browser': {
+      'tr': 'WeChat ID kopyalandı, WeChat web sitesi açılıyor',
+      'en': 'WeChat ID copied, opening WeChat website',
     },
     'fill_all_fields': {
       'tr': 'Lütfen tüm alanları doldurun',

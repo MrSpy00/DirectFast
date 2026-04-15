@@ -3,6 +3,7 @@ import 'package:clipboard/clipboard.dart';
 import 'package:flutter/services.dart';
 import '../constants/platform_type.dart';
 import '../constants/app_constants.dart';
+import '../../shared/constants/app_strings.dart';
 
 class UrlLauncherService {
   /// Launch chat based on platform and contact - WITH ROBUST FALLBACK
@@ -29,7 +30,7 @@ class UrlLauncherService {
     } catch (e) {
       return LaunchResult(
         success: false,
-        error: 'Unexpected error: ${e.toString()}',
+        error: AppStrings.tr('unexpected_error', args: [e.toString()]),
       );
     }
   }
@@ -58,7 +59,10 @@ class UrlLauncherService {
           if (launched) {
             return LaunchResult(
               success: true,
-              message: 'Opening ${platform.displayName} app...',
+              message: AppStrings.tr(
+                'opening_app',
+                args: [platform.displayName],
+              ),
             );
           }
         }
@@ -87,7 +91,10 @@ class UrlLauncherService {
             if (launched) {
               return LaunchResult(
                 success: true,
-                message: 'Opening ${platform.displayName} in browser...',
+                message: AppStrings.tr(
+                  'opening_in_browser',
+                  args: [platform.displayName],
+                ),
               );
             }
           }
@@ -106,7 +113,10 @@ class UrlLauncherService {
           if (forceLaunched) {
             return LaunchResult(
               success: true,
-              message: 'Opening ${platform.displayName} in browser...',
+              message: AppStrings.tr(
+                'opening_in_browser',
+                args: [platform.displayName],
+              ),
             );
           }
         } catch (forceError) {
@@ -122,7 +132,10 @@ class UrlLauncherService {
           if (lastResortLaunched) {
             return LaunchResult(
               success: true,
-              message: 'Opening ${platform.displayName}...',
+              message: AppStrings.tr(
+                'opening',
+                args: [platform.displayName],
+              ),
             );
           }
         } catch (lastResortError) {
@@ -131,20 +144,28 @@ class UrlLauncherService {
       } on PlatformException catch (e) {
         return LaunchResult(
           success: false,
-          error: 'Could not open ${platform.displayName}: ${e.message}',
+          error: AppStrings.tr(
+            'failed_to_open_platform',
+            args: [platform.displayName, e.message ?? '-'],
+          ),
         );
       } catch (e) {
         return LaunchResult(
           success: false,
-          error: 'Failed to open ${platform.displayName}: ${e.toString()}',
+          error: AppStrings.tr(
+            'failed_to_open_platform',
+            args: [platform.displayName, e.toString()],
+          ),
         );
       }
     }
 
     return LaunchResult(
       success: false,
-      error:
-          'Could not open ${platform.displayName}. Please check if the app is installed or try again.',
+      error: AppStrings.tr(
+        'could_not_open_platform_retry',
+        args: [platform.displayName],
+      ),
     );
   }
 
@@ -297,7 +318,7 @@ class UrlLauncherService {
           if (launched) {
             return LaunchResult(
               success: true,
-              message: 'Username copied! Discord opened.',
+              message: AppStrings.tr('discord_copied_opened'),
               specialAction: 'discord_copy',
             );
           }
@@ -317,19 +338,19 @@ class UrlLauncherService {
       if (launched) {
         return LaunchResult(
           success: true,
-          message: 'Username copied! Opening Discord in browser.',
+          message: AppStrings.tr('discord_copied_browser'),
           specialAction: 'discord_copy',
         );
       }
 
       return LaunchResult(
         success: false,
-        error: 'Could not open Discord',
+        error: AppStrings.tr('could_not_open_platform', args: ['Discord']),
       );
     } catch (e) {
       return LaunchResult(
         success: false,
-        error: 'Discord error: ${e.toString()}',
+        error: AppStrings.tr('platform_error', args: ['Discord', e.toString()]),
       );
     }
   }
@@ -355,7 +376,7 @@ class UrlLauncherService {
           if (launched) {
             return LaunchResult(
               success: true,
-              message: 'WeChat ID copied! WeChat opened.',
+              message: AppStrings.tr('wechat_copied_opened'),
               specialAction: 'wechat_copy',
             );
           }
@@ -373,19 +394,19 @@ class UrlLauncherService {
       if (launched) {
         return LaunchResult(
           success: true,
-          message: 'WeChat ID copied! Opening WeChat website.',
+          message: AppStrings.tr('wechat_copied_browser'),
           specialAction: 'wechat_copy',
         );
       }
 
       return LaunchResult(
         success: false,
-        error: 'Could not open WeChat',
+        error: AppStrings.tr('could_not_open_platform', args: ['WeChat']),
       );
     } catch (e) {
       return LaunchResult(
         success: false,
-        error: 'WeChat error: ${e.toString()}',
+        error: AppStrings.tr('platform_error', args: ['WeChat', e.toString()]),
       );
     }
   }
@@ -467,21 +488,21 @@ class UrlLauncherService {
   }) {
     if (contact.isEmpty) {
       if (platform.requiresPhoneNumber) {
-        return 'Please enter a phone number';
+        return AppStrings.tr('enter_phone_required');
       } else if (platform.requiresEmail) {
-        return 'Please enter an email address';
+        return AppStrings.tr('enter_email_required');
       } else {
-        return 'Please enter a username';
+        return AppStrings.tr('enter_username_required');
       }
     }
 
     if (!validateContact(platform: platform, contact: contact)) {
       if (platform.requiresPhoneNumber) {
-        return 'Please enter a valid phone number (7-15 digits)';
+        return AppStrings.tr('enter_valid_phone');
       } else if (platform.requiresEmail) {
-        return 'Please enter a valid email address';
+        return AppStrings.tr('enter_valid_email');
       } else {
-        return 'Please enter a valid username (3-30 characters)';
+        return AppStrings.tr('enter_valid_username');
       }
     }
 

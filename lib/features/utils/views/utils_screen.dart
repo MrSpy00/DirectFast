@@ -12,6 +12,8 @@ import 'package:gal/gal.dart';
 import 'package:encrypt/encrypt.dart' as encrypt_lib;
 import 'package:crypto/crypto.dart';
 import 'package:flutter/rendering.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../../../core/constants/app_constants.dart';
 import '../../../shared/constants/app_strings.dart';
 import '../../../shared/widgets/glassmorphic_container.dart';
 import '../../../shared/theme/app_theme.dart';
@@ -37,12 +39,13 @@ class _UtilsScreenState extends State<UtilsScreen> {
     _Segment(icon: Icons.link_off_rounded, labelKey: 'tab_links'),
     _Segment(icon: Icons.lock_outline_rounded, labelKey: 'tab_encrypt'),
     _Segment(icon: Icons.bookmarks_outlined, labelKey: 'tab_templates'),
+    _Segment(icon: Icons.email_outlined, labelKey: 'tab_gmail'),
   ];
 
   @override
   void initState() {
     super.initState();
-    _currentPage = widget.initialTab.clamp(0, 3);
+    _currentPage = widget.initialTab.clamp(0, 4);
     _pageController = PageController(initialPage: _currentPage);
   }
 
@@ -96,6 +99,7 @@ class _UtilsScreenState extends State<UtilsScreen> {
                     _LinkCleanerPage(),
                     _MessageEncryptorPage(),
                     _TemplatesPage(),
+                    _GmailComposerPage(),
                   ],
                 ),
               ),
@@ -355,8 +359,11 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
       );
     } catch (e) {
       if (mounted) {
-        _showSnackBar(context, '${AppStrings.tr('error_sharing')}: $e',
-            isError: true,);
+        _showSnackBar(
+          context,
+          '${AppStrings.tr('error_sharing')}: $e',
+          isError: true,
+        );
       }
     }
   }
@@ -378,8 +385,11 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
       }
     } catch (e) {
       if (mounted) {
-        _showSnackBar(context, '${AppStrings.tr('error_saving')}: $e',
-            isError: true,);
+        _showSnackBar(
+          context,
+          '${AppStrings.tr('error_saving')}: $e',
+          isError: true,
+        );
       }
     }
   }
@@ -662,8 +672,11 @@ class _LinkCleanerPageState extends State<_LinkCleanerPage> {
                         gradient: AppTheme.accentGradient,
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Icon(Icons.link_off_rounded,
-                          color: Colors.white, size: 22,),
+                      child: const Icon(
+                        Icons.link_off_rounded,
+                        color: Colors.white,
+                        size: 22,
+                      ),
                     ),
                     const SizedBox(width: 14),
                     Expanded(
@@ -725,9 +738,11 @@ class _LinkCleanerPageState extends State<_LinkCleanerPage> {
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.check_circle_rounded,
-                          color: Theme.of(context).colorScheme.primary,
-                          size: 20,),
+                      Icon(
+                        Icons.check_circle_rounded,
+                        color: Theme.of(context).colorScheme.primary,
+                        size: 20,
+                      ),
                       const SizedBox(width: 10),
                       Text(
                         AppStrings.tr('cleaned_url'),
@@ -827,7 +842,8 @@ class _MessageEncryptorPageState extends State<_MessageEncryptorPage> {
 
   void _encrypt(String message, String password) {
     final key = encrypt_lib.Key.fromUtf8(
-        sha256.convert(utf8.encode(password)).toString().substring(0, 32),);
+      sha256.convert(utf8.encode(password)).toString().substring(0, 32),
+    );
     final iv = encrypt_lib.IV.fromLength(16);
     final encrypter = encrypt_lib.Encrypter(encrypt_lib.AES(key));
 
@@ -846,7 +862,8 @@ class _MessageEncryptorPageState extends State<_MessageEncryptorPage> {
     }
 
     final key = encrypt_lib.Key.fromUtf8(
-        sha256.convert(utf8.encode(password)).toString().substring(0, 32),);
+      sha256.convert(utf8.encode(password)).toString().substring(0, 32),
+    );
     final iv = encrypt_lib.IV.fromBase64(parts[0]);
     final encrypter = encrypt_lib.Encrypter(encrypt_lib.AES(key));
 
@@ -915,9 +932,11 @@ class _MessageEncryptorPageState extends State<_MessageEncryptorPage> {
                     hintText: AppStrings.tr('enter_password'),
                     prefixIcon: const Icon(Icons.key_rounded),
                     suffixIcon: IconButton(
-                      icon: Icon(_obscurePassword
-                          ? Icons.visibility_off_rounded
-                          : Icons.visibility_rounded,),
+                      icon: Icon(
+                        _obscurePassword
+                            ? Icons.visibility_off_rounded
+                            : Icons.visibility_rounded,
+                      ),
                       onPressed: () =>
                           setState(() => _obscurePassword = !_obscurePassword),
                     ),
@@ -961,9 +980,11 @@ class _MessageEncryptorPageState extends State<_MessageEncryptorPage> {
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.check_circle_rounded,
-                          color: Theme.of(context).colorScheme.primary,
-                          size: 20,),
+                      Icon(
+                        Icons.check_circle_rounded,
+                        color: Theme.of(context).colorScheme.primary,
+                        size: 20,
+                      ),
                       const SizedBox(width: 10),
                       Text(
                         _isEncryptMode
@@ -1288,7 +1309,9 @@ class _TemplatesPageState extends ConsumerState<_TemplatesPage> {
                             .deleteTemplate(tpl.id);
                         if (mounted) {
                           _showSnackBar(
-                              this.context, AppStrings.tr('template_deleted'),);
+                            this.context,
+                            AppStrings.tr('template_deleted'),
+                          );
                         }
                       }
                     },
@@ -1352,7 +1375,7 @@ class _TemplateCard extends StatelessWidget {
                         fontWeight: FontWeight.w700,
                       ),
                   maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                  overflow: TextOverflow.fade,
                 ),
                 const SizedBox(height: 3),
                 Text(
@@ -1364,7 +1387,7 @@ class _TemplateCard extends StatelessWidget {
                             .withValues(alpha: 0.6),
                       ),
                   maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
+                  overflow: TextOverflow.fade,
                 ),
               ],
             ),
@@ -1554,10 +1577,265 @@ class _AddTemplateSheetState extends State<_AddTemplateSheet> {
   }
 }
 
+// ── Gmail Composer Page ─────────────────────────────────────────────────────
+
+class _GmailComposerPage extends StatefulWidget {
+  const _GmailComposerPage();
+
+  @override
+  State<_GmailComposerPage> createState() => _GmailComposerPageState();
+}
+
+class _GmailComposerPageState extends State<_GmailComposerPage> {
+  final TextEditingController _recipientController = TextEditingController();
+  final TextEditingController _ccController = TextEditingController();
+  final TextEditingController _bccController = TextEditingController();
+  final TextEditingController _subjectController = TextEditingController();
+  final TextEditingController _messageController = TextEditingController();
+
+  @override
+  void dispose() {
+    _recipientController.dispose();
+    _ccController.dispose();
+    _bccController.dispose();
+    _subjectController.dispose();
+    _messageController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _sendEmail() async {
+    unawaited(HapticFeedback.mediumImpact());
+
+    final recipient = _recipientController.text.trim();
+    final cc = _ccController.text.trim();
+    final bcc = _bccController.text.trim();
+    final subject = _subjectController.text.trim();
+    final message = _messageController.text.trim();
+
+    if (!AppConstants.emailRegex.hasMatch(recipient)) {
+      _showSnackBar(context, AppStrings.tr('enter_valid_email'), isError: true);
+      return;
+    }
+
+    if (cc.isNotEmpty && !AppConstants.emailRegex.hasMatch(cc)) {
+      _showSnackBar(context, AppStrings.tr('enter_valid_email'), isError: true);
+      return;
+    }
+
+    if (bcc.isNotEmpty && !AppConstants.emailRegex.hasMatch(bcc)) {
+      _showSnackBar(context, AppStrings.tr('enter_valid_email'), isError: true);
+      return;
+    }
+
+    final mailtoUri = Uri(
+      scheme: 'mailto',
+      path: recipient,
+      queryParameters: {
+        if (cc.isNotEmpty) 'cc': cc,
+        if (bcc.isNotEmpty) 'bcc': bcc,
+        if (subject.isNotEmpty) 'subject': subject,
+        if (message.isNotEmpty) 'body': message,
+      },
+    );
+
+    final gmailWebUri = Uri.https('mail.google.com', '/mail/u/0/', {
+      'view': 'cm',
+      'fs': '1',
+      'to': recipient,
+      if (cc.isNotEmpty) 'cc': cc,
+      if (bcc.isNotEmpty) 'bcc': bcc,
+      if (subject.isNotEmpty) 'su': subject,
+      if (message.isNotEmpty) 'body': message,
+    });
+
+    try {
+      var launched = await launchUrl(
+        mailtoUri,
+        mode: LaunchMode.externalApplication,
+      );
+
+      if (!launched) {
+        launched = await launchUrl(
+          gmailWebUri,
+          mode: LaunchMode.externalApplication,
+        );
+      }
+
+      if (!mounted) {
+        return;
+      }
+
+      if (launched) {
+        _showSnackBar(context, AppStrings.tr('gmail_opened'));
+      } else {
+        _showSnackBar(
+          context,
+          AppStrings.tr('could_not_open_link'),
+          isError: true,
+        );
+      }
+    } catch (_) {
+      if (!mounted) {
+        return;
+      }
+      _showSnackBar(
+        context,
+        AppStrings.tr('could_not_open_link'),
+        isError: true,
+      );
+    }
+  }
+
+  Widget _buildFieldLabel(BuildContext context, String labelKey) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 2, bottom: 6),
+      child: Text(
+        AppStrings.tr(labelKey),
+        style: Theme.of(context).textTheme.labelLarge?.copyWith(
+              fontWeight: FontWeight.w700,
+              color:
+                  Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
+            ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
+      physics: const BouncingScrollPhysics(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          GlassmorphicContainer.flat(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFFEA4335), Color(0xFFFBBC05)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.mark_email_read_rounded,
+                        color: Colors.white,
+                        size: 22,
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            AppStrings.tr('gmail_sender'),
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium
+                                ?.copyWith(fontWeight: FontWeight.w700),
+                          ),
+                          Text(
+                            AppStrings.tr('gmail_sender_desc'),
+                            style:
+                                Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface
+                                          .withValues(alpha: 0.55),
+                                    ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                _buildFieldLabel(context, 'gmail_recipient_label'),
+                TextField(
+                  controller: _recipientController,
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: InputDecoration(
+                    hintText: AppStrings.tr('gmail_recipient_hint'),
+                    prefixIcon: const Icon(Icons.alternate_email_rounded),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                _buildFieldLabel(context, 'gmail_cc_label'),
+                TextField(
+                  controller: _ccController,
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: InputDecoration(
+                    hintText: AppStrings.tr('gmail_cc_hint'),
+                    prefixIcon: const Icon(Icons.people_outline_rounded),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                _buildFieldLabel(context, 'gmail_bcc_label'),
+                TextField(
+                  controller: _bccController,
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: InputDecoration(
+                    hintText: AppStrings.tr('gmail_bcc_hint'),
+                    prefixIcon: const Icon(Icons.visibility_off_outlined),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                _buildFieldLabel(context, 'gmail_subject_label'),
+                TextField(
+                  controller: _subjectController,
+                  decoration: InputDecoration(
+                    hintText: AppStrings.tr('gmail_subject_hint'),
+                    prefixIcon: const Icon(Icons.title_rounded),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                _buildFieldLabel(context, 'gmail_body_label'),
+                TextField(
+                  controller: _messageController,
+                  maxLines: 6,
+                  textCapitalization: TextCapitalization.sentences,
+                  decoration: InputDecoration(
+                    hintText: AppStrings.tr('gmail_body_hint'),
+                    prefixIcon: const Icon(Icons.edit_note_rounded),
+                    alignLabelWithHint: true,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                _GradientButton(
+                  onPressed: _sendEmail,
+                  icon: Icons.send_rounded,
+                  label: AppStrings.tr('gmail_send'),
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFFEA4335), Color(0xFFFBBC05)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
+              ],
+            ),
+          ).animate().fadeIn(duration: 500.ms),
+        ],
+      ),
+    );
+  }
+}
+
 // ── Global helper ─────────────────────────────────────────────────────────────
 
-void _showSnackBar(BuildContext context, String message,
-    {bool isError = false,}) {
+void _showSnackBar(
+  BuildContext context,
+  String message, {
+  bool isError = false,
+}) {
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
       content: Text(message),
