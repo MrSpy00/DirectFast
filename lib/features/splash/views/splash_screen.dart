@@ -115,7 +115,8 @@ class _SplashScreenState extends State<SplashScreen>
                               letterSpacing: 2.0,
                               foreground: Paint()
                                 ..shader =
-                                    AppTheme.primaryGradient.createShader(
+                                    AppTheme.primaryGradientFor(context)
+                                        .createShader(
                                   const Rect.fromLTWH(0, 0, 200, 70),
                                 ),
                             ),
@@ -206,6 +207,13 @@ class _CyberGridBackground extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colorScheme = Theme.of(context).colorScheme;
+    final darkColors = AppTheme.darkGradientFromSeed(colorScheme.primary).colors;
+    final lightColors = [
+      colorScheme.surface,
+      colorScheme.primaryContainer.withValues(alpha: 0.45),
+      colorScheme.secondaryContainer.withValues(alpha: 0.35),
+    ];
 
     return AnimatedBuilder(
       animation: controller,
@@ -214,18 +222,9 @@ class _CyberGridBackground extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            // OLED-correct: use true blacks in dark mode, not navy-blue tones.
             colors: isDark
-                ? const [
-                    Color(0xFF000000),
-                    Color(0xFF0D0D0D),
-                    Color(0xFF161616),
-                  ]
-                : const [
-                    Color(0xFFFFFBFE),
-                    Color(0xFFF5F0FF),
-                    Color(0xFFEDE7F6),
-                  ],
+                ? darkColors
+                : lightColors,
             stops: [
               0.0,
               // Slight mid-stop oscillation driven by the controller.
@@ -238,6 +237,7 @@ class _CyberGridBackground extends StatelessWidget {
           painter: _CyberGridPainter(
             animationValue: controller.value,
             isDark: isDark,
+            gridColor: colorScheme.primary,
           ),
           child: const SizedBox.expand(),
         ),
@@ -249,19 +249,16 @@ class _CyberGridBackground extends StatelessWidget {
 class _CyberGridPainter extends CustomPainter {
   final double animationValue;
   final bool isDark;
+  final Color gridColor;
 
   const _CyberGridPainter({
     required this.animationValue,
     required this.isDark,
+    required this.gridColor,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
-    // Primary grid — matches the app's purple/violet palette.
-    // Previously this was hardcoded to cyan, which clashed with every other
-    // screen in the app. Now aligned with AppTheme.primaryGradient start stop.
-    const gridColor = Color(0xFF667EEA); // same as AppTheme.primaryGradient
-
     final paint = Paint()
       ..color = gridColor.withValues(alpha: isDark ? 0.12 : 0.08)
       ..strokeWidth = 1
@@ -301,5 +298,7 @@ class _CyberGridPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_CyberGridPainter old) =>
-      old.animationValue != animationValue;
+      old.animationValue != animationValue ||
+      old.isDark != isDark ||
+      old.gridColor != gridColor;
 }

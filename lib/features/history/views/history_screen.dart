@@ -33,7 +33,7 @@ class HistoryScreen extends ConsumerWidget {
       body: Container(
         decoration: BoxDecoration(
           gradient: Theme.of(context).brightness == Brightness.dark
-              ? AppTheme.darkGradient
+              ? AppTheme.darkGradientFor(context)
               : LinearGradient(
                   colors: [
                     Theme.of(context).colorScheme.surface,
@@ -211,7 +211,7 @@ class _AnalyticsHeader extends StatelessWidget {
               Expanded(
                 child: _StatPill(
                   icon: Icons.link_rounded,
-                  gradient: AppTheme.primaryGradient,
+                  gradient: AppTheme.primaryGradientFor(context),
                   label: AppStrings.tr('total_connections'),
                   value: history.length.toString(),
                 ),

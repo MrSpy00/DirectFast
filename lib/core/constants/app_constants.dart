@@ -28,6 +28,7 @@ class AppConstants {
   static const String historyBoxName = 'chat_history';
   static const String settingsBoxName = 'app_settings';
   static const String themeKey = 'theme_mode';
+  static const String themeColorKey = 'theme_color_id';
   static const String localeKey = 'app_locale';
 
   // Animation Durations

@@ -2,15 +2,65 @@ class AppStrings {
   // Supported locales
   static const String turkish = 'tr';
   static const String english = 'en';
+  static const String spanish = 'es';
+  static const String arabic = 'ar';
+  static const String hindi = 'hi';
+
+  static const List<String> supportedLocales = [
+    turkish,
+    english,
+    spanish,
+    arabic,
+    hindi,
+  ];
+
+  static const String fallbackLocale = english;
+
+  static const Map<String, String> localeNativeNames = {
+    turkish: 'Türkçe',
+    english: 'English',
+    spanish: 'Español',
+    arabic: 'العربية',
+    hindi: 'हिन्दी',
+  };
 
   // Current locale
   static String _currentLocale = turkish;
 
+  static bool isSupportedLocale(String locale) {
+    return supportedLocales.contains(locale);
+  }
+
+  static String normalizeLocale(String locale) {
+    return isSupportedLocale(locale) ? locale : fallbackLocale;
+  }
+
   static void setLocale(String locale) {
-    _currentLocale = locale;
+    _currentLocale = normalizeLocale(locale);
   }
 
   static String get currentLocale => _currentLocale;
+
+  static String localeNativeName(String locale) {
+    return localeNativeNames[locale] ?? locale;
+  }
+
+  static String localeLabelKey(String locale) {
+    switch (locale) {
+      case turkish:
+        return 'turkish';
+      case english:
+        return 'english';
+      case spanish:
+        return 'spanish';
+      case arabic:
+        return 'arabic';
+      case hindi:
+        return 'hindi';
+      default:
+        return 'english';
+    }
+  }
 
   // Translations map
   static final Map<String, Map<String, String>> _translations = {
@@ -376,44 +426,165 @@ class AppStrings {
     'appearance': {
       'tr': 'Görünüm',
       'en': 'Appearance',
+      'es': 'Apariencia',
+      'ar': 'المظهر',
+      'hi': 'रूप',
     },
     'language': {
       'tr': 'Dil',
       'en': 'Language',
+      'es': 'Idioma',
+      'ar': 'اللغة',
+      'hi': 'भाषा',
     },
     'theme': {
       'tr': 'Tema',
       'en': 'Theme',
+      'es': 'Tema',
+      'ar': 'السمة',
+      'hi': 'थीम',
     },
     'light_mode': {
       'tr': 'Aydınlık Mod',
       'en': 'Light Mode',
+      'es': 'Modo Claro',
+      'ar': 'الوضع الفاتح',
+      'hi': 'लाइट मोड',
     },
     'dark_mode': {
       'tr': 'Karanlık Mod',
       'en': 'Dark Mode',
+      'es': 'Modo Oscuro',
+      'ar': 'الوضع الداكن',
+      'hi': 'डार्क मोड',
     },
     'system_default': {
       'tr': 'Sistem Varsayılanı',
       'en': 'System Default',
+      'es': 'Predeterminado del Sistema',
+      'ar': 'إعداد النظام',
+      'hi': 'सिस्टम डिफ़ॉल्ट',
+    },
+    'theme_colors': {
+      'tr': 'Tema Renkleri',
+      'en': 'Theme Colors',
+      'es': 'Colores del Tema',
+      'ar': 'ألوان السمة',
+      'hi': 'थीम रंग',
+    },
+    'choose_theme_color': {
+      'tr': 'Uygulama ana rengini seçin',
+      'en': 'Choose app accent color',
+      'es': 'Elige el color principal de la app',
+      'ar': 'اختر اللون الرئيسي للتطبيق',
+      'hi': 'ऐप का मुख्य रंग चुनें',
     },
     'turkish': {
       'tr': 'Türkçe',
       'en': 'Turkish',
+      'es': 'Turco',
+      'ar': 'التركية',
+      'hi': 'तुर्की',
     },
     'english': {
       'tr': 'İngilizce',
       'en': 'English',
+      'es': 'Inglés',
+      'ar': 'الإنجليزية',
+      'hi': 'अंग्रेज़ी',
+    },
+    'spanish': {
+      'tr': 'İspanyolca',
+      'en': 'Spanish',
+      'es': 'Español',
+      'ar': 'الإسبانية',
+      'hi': 'स्पेनिश',
+    },
+    'arabic': {
+      'tr': 'Arapça',
+      'en': 'Arabic',
+      'es': 'Árabe',
+      'ar': 'العربية',
+      'hi': 'अरबी',
+    },
+    'hindi': {
+      'tr': 'Hintçe',
+      'en': 'Hindi',
+      'es': 'Hindi',
+      'ar': 'الهندية',
+      'hi': 'हिन्दी',
+    },
+    'color_violet': {
+      'tr': 'Menekşe',
+      'en': 'Violet',
+      'es': 'Violeta',
+      'ar': 'بنفسجي',
+      'hi': 'बैंगनी',
+    },
+    'color_blue': {
+      'tr': 'Mavi',
+      'en': 'Blue',
+      'es': 'Azul',
+      'ar': 'أزرق',
+      'hi': 'नीला',
+    },
+    'color_teal': {
+      'tr': 'Turkuaz',
+      'en': 'Teal',
+      'es': 'Verde Azulado',
+      'ar': 'تركوازي',
+      'hi': 'टील',
+    },
+    'color_green': {
+      'tr': 'Yeşil',
+      'en': 'Green',
+      'es': 'Verde',
+      'ar': 'أخضر',
+      'hi': 'हरा',
+    },
+    'color_orange': {
+      'tr': 'Turuncu',
+      'en': 'Orange',
+      'es': 'Naranja',
+      'ar': 'برتقالي',
+      'hi': 'नारंगी',
+    },
+    'color_red': {
+      'tr': 'Kırmızı',
+      'en': 'Red',
+      'es': 'Rojo',
+      'ar': 'أحمر',
+      'hi': 'लाल',
+    },
+    'color_rose': {
+      'tr': 'Gül',
+      'en': 'Rose',
+      'es': 'Rosa',
+      'ar': 'وردي',
+      'hi': 'गुलाबी',
+    },
+    'color_indigo': {
+      'tr': 'İndigo',
+      'en': 'Indigo',
+      'es': 'Índigo',
+      'ar': 'نيلي',
+      'hi': 'इंडिगो',
     },
 
     // About
     'about': {
       'tr': 'Hakkında',
       'en': 'About',
+      'es': 'Acerca de',
+      'ar': 'حول',
+      'hi': 'परिचय',
     },
     'version': {
       'tr': 'Sürüm',
       'en': 'Version',
+      'es': 'Versión',
+      'ar': 'الإصدار',
+      'hi': 'संस्करण',
     },
     'developed_by': {
       'tr': 'Geliştiren: %s',
@@ -426,6 +597,22 @@ class AppStrings {
     'buy_coffee': {
       'tr': 'aegis\'e Kahve Ismarla',
       'en': 'Buy aegis a Coffee',
+    },
+    'open_source_licenses': {
+      'tr': 'Açık Kaynak Lisansları',
+      'en': 'Open Source Licenses',
+      'es': 'Licencias de Código Abierto',
+      'ar': 'تراخيص المصادر المفتوحة',
+      'hi': 'ओपन सोर्स लाइसेंस',
+    },
+    'open_source_notice': {
+      'tr':
+          'Uygulama, Flutter ekosistemindeki açık kaynak paketlerden yararlanır.',
+      'en': 'This app uses open-source packages from the Flutter ecosystem.',
+      'es':
+          'Esta aplicación utiliza paquetes de código abierto del ecosistema Flutter.',
+      'ar': 'يستخدم هذا التطبيق حزمًا مفتوحة المصدر من منظومة Flutter.',
+      'hi': 'यह ऐप Flutter इकोसिस्टम के ओपन-सोर्स पैकेज का उपयोग करता है।',
     },
     'privacy_notice': {
       'tr':
@@ -671,9 +858,11 @@ class AppStrings {
 
   // Get translated string
   static String get(String key, {List<String>? args}) {
-    final translation = _translations[key]?[_currentLocale] ??
-        _translations[key]?[english] ??
-        key;
+    final locale = normalizeLocale(_currentLocale);
+    final translation = _translations[key]?[locale] ??
+      _translations[key]?[fallbackLocale] ??
+      _translations[key]?[turkish] ??
+      key;
 
     if (args != null && args.isNotEmpty) {
       String result = translation;

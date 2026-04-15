@@ -1,18 +1,65 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+class ThemeColorOption {
+  final String id;
+  final String labelKey;
+  final Color seedColor;
+
+  const ThemeColorOption({
+    required this.id,
+    required this.labelKey,
+    required this.seedColor,
+  });
+}
+
 class AppTheme {
   AppTheme._();
 
-  // ── Light palette ──────────────────────────────────────────────────────────
-  static const _primaryLight = Color(0xFF6750A4);
-  static const _secondaryLight = Color(0xFF625B71);
-  static const _tertiaryLight = Color(0xFF5E5AAE);
+  static const String defaultColorId = 'violet';
 
-  // ── Dark palette ───────────────────────────────────────────────────────────
-  static const _primaryDark = Color(0xFFD0BCFF);
-  static const _secondaryDark = Color(0xFFCCC2DC);
-  static const _tertiaryDark = Color(0xFFD2C6FF);
+  static const List<ThemeColorOption> colorOptions = [
+    ThemeColorOption(
+      id: 'violet',
+      labelKey: 'color_violet',
+      seedColor: Color(0xFF6750A4),
+    ),
+    ThemeColorOption(
+      id: 'blue',
+      labelKey: 'color_blue',
+      seedColor: Color(0xFF1565C0),
+    ),
+    ThemeColorOption(
+      id: 'teal',
+      labelKey: 'color_teal',
+      seedColor: Color(0xFF00897B),
+    ),
+    ThemeColorOption(
+      id: 'green',
+      labelKey: 'color_green',
+      seedColor: Color(0xFF2E7D32),
+    ),
+    ThemeColorOption(
+      id: 'orange',
+      labelKey: 'color_orange',
+      seedColor: Color(0xFFEF6C00),
+    ),
+    ThemeColorOption(
+      id: 'red',
+      labelKey: 'color_red',
+      seedColor: Color(0xFFC62828),
+    ),
+    ThemeColorOption(
+      id: 'rose',
+      labelKey: 'color_rose',
+      seedColor: Color(0xFFAD1457),
+    ),
+    ThemeColorOption(
+      id: 'indigo',
+      labelKey: 'color_indigo',
+      seedColor: Color(0xFF3949AB),
+    ),
+  ];
 
   // ── True-Black OLED surface hierarchy ──────────────────────────────────────
   static const _darkSurface = Color(0xFF000000);
@@ -21,25 +68,65 @@ class AppTheme {
   static const _darkSurfaceContainerHigh = Color(0xFF1C1C1C);
   static const _darkSurfaceContainerHighest = Color(0xFF242424);
 
-  // ── Gradients ──────────────────────────────────────────────────────────────
-  static const primaryGradient = LinearGradient(
-    colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-  );
+  static ThemeColorOption optionById(String id) {
+    return colorOptions.firstWhere(
+      (option) => option.id == id,
+      orElse: () => colorOptions.first,
+    );
+  }
 
-  static const accentGradient = LinearGradient(
-    colors: [Color(0xFF8A6BFF), Color(0xFF5D76FF)],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-  );
+  static Color colorById(String id) => optionById(id).seedColor;
 
-  // Pure-black gradient — replaces the teal/blue version that polluted dark UI
-  static const darkGradient = LinearGradient(
-    colors: [Color(0xFF000000), Color(0xFF0D0D0D), Color(0xFF161616)],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-  );
+  static double _clamp01(double value) {
+    return value.clamp(0.0, 1.0).toDouble();
+  }
+
+  static LinearGradient primaryGradientFromSeed(Color seedColor) {
+    final hsl = HSLColor.fromColor(seedColor);
+    final start = hsl.withLightness(_clamp01(hsl.lightness + 0.14)).toColor();
+    final end = hsl.withLightness(_clamp01(hsl.lightness - 0.08)).toColor();
+
+    return LinearGradient(
+      colors: [start, end],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    );
+  }
+
+  static LinearGradient accentGradientFromSeed(Color seedColor) {
+    final hsl = HSLColor.fromColor(seedColor);
+    final shifted = hsl.withHue((hsl.hue + 28) % 360);
+
+    return LinearGradient(
+      colors: [
+        shifted.withLightness(_clamp01(hsl.lightness + 0.1)).toColor(),
+        hsl.withLightness(_clamp01(hsl.lightness - 0.02)).toColor(),
+      ],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    );
+  }
+
+  static LinearGradient darkGradientFromSeed(Color seedColor) {
+    final tint = Color.lerp(_darkSurfaceContainerLow, seedColor, 0.14)!;
+    return LinearGradient(
+      colors: [_darkSurface, tint, _darkSurfaceContainer],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    );
+  }
+
+  static LinearGradient primaryGradientFor(BuildContext context) {
+    return primaryGradientFromSeed(Theme.of(context).colorScheme.primary);
+  }
+
+  static LinearGradient accentGradientFor(BuildContext context) {
+    return accentGradientFromSeed(Theme.of(context).colorScheme.primary);
+  }
+
+  static LinearGradient darkGradientFor(BuildContext context) {
+    return darkGradientFromSeed(Theme.of(context).colorScheme.primary);
+  }
 
   // ── Text Theme ─────────────────────────────────────────────────────────────
   static TextTheme _buildTextTheme(Brightness brightness) {
@@ -136,12 +223,9 @@ class AppTheme {
   }
 
   // ── Light Theme ────────────────────────────────────────────────────────────
-  static ThemeData get lightTheme {
+  static ThemeData lightTheme({required Color seedColor}) {
     final colorScheme = ColorScheme.fromSeed(
-      seedColor: _primaryLight,
-      primary: _primaryLight,
-      secondary: _secondaryLight,
-      tertiary: _tertiaryLight,
+      seedColor: seedColor,
     );
 
     return ThemeData(
@@ -176,8 +260,13 @@ class AppTheme {
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
+        isDense: true,
         filled: true,
         fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+        prefixIconColor: colorScheme.primary,
+        suffixIconColor: colorScheme.onSurfaceVariant,
+        prefixIconConstraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+        suffixIconConstraints: const BoxConstraints(minWidth: 44, minHeight: 44),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide.none,
@@ -195,7 +284,7 @@ class AppTheme {
           borderSide: BorderSide(color: colorScheme.error),
         ),
         contentPadding:
-            const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+          const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       ),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
         elevation: 0,
@@ -215,16 +304,17 @@ class AppTheme {
   }
 
   // ── Dark Theme (True Black / OLED) ─────────────────────────────────────────
-  static ThemeData get darkTheme {
+  static ThemeData darkTheme({required Color seedColor}) {
     // Seed gives us the accent/primary palette; we override all surfaces to
     // true black so OLED panels display pure pixels.
+    final hsl = HSLColor.fromColor(seedColor);
     final colorScheme = ColorScheme.fromSeed(
-      seedColor: _primaryDark,
+      seedColor: seedColor,
       brightness: Brightness.dark,
-      primary: _primaryDark,
-      secondary: _secondaryDark,
-      tertiary: _tertiaryDark,
     ).copyWith(
+      primary: hsl.withLightness(_clamp01(hsl.lightness + 0.35)).toColor(),
+      secondary: hsl.withHue((hsl.hue + 20) % 360).withLightness(0.75).toColor(),
+      tertiary: hsl.withHue((hsl.hue + 35) % 360).withLightness(0.8).toColor(),
       surface: _darkSurface,
       surfaceContainerLowest: _darkSurface,
       surfaceContainerLow: _darkSurfaceContainerLow,
@@ -267,9 +357,14 @@ class AppTheme {
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
+        isDense: true,
         filled: true,
         // Use a fixed dark fill so the field is always legible on black
         fillColor: _darkSurfaceContainerHighest.withValues(alpha: 0.8),
+        prefixIconColor: colorScheme.primary,
+        suffixIconColor: colorScheme.onSurfaceVariant,
+        prefixIconConstraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+        suffixIconConstraints: const BoxConstraints(minWidth: 44, minHeight: 44),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide.none,
@@ -287,7 +382,7 @@ class AppTheme {
           borderSide: BorderSide(color: colorScheme.error),
         ),
         contentPadding:
-            const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+          const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       ),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
         elevation: 0,

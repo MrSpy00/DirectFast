@@ -17,6 +17,7 @@ class SettingsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeModeProvider);
+    final themeColorId = ref.watch(themeColorIdProvider);
     final currentLocale = ref.watch(localeProvider);
 
     return Scaffold(
@@ -58,31 +59,30 @@ class SettingsScreen extends ConsumerWidget {
               padding: EdgeInsets.zero,
               child: Column(
                 children: [
-                  _LanguageOption(
-                    icon: Icons.language,
-                    title: AppStrings.tr('turkish'),
-                    subtitle: 'Türkçe',
-                    isSelected: currentLocale == AppStrings.turkish,
-                    onTap: () {
-                      HapticFeedback.lightImpact();
-                      ref
-                          .read(localeProvider.notifier)
-                          .setLocale(AppStrings.turkish);
-                    },
-                  ),
-                  const _Divider(),
-                  _LanguageOption(
-                    icon: Icons.language,
-                    title: AppStrings.tr('english'),
-                    subtitle: 'English',
-                    isSelected: currentLocale == AppStrings.english,
-                    onTap: () {
-                      HapticFeedback.lightImpact();
-                      ref
-                          .read(localeProvider.notifier)
-                          .setLocale(AppStrings.english);
-                    },
-                  ),
+                  for (int i = 0; i < AppStrings.supportedLocales.length; i++)
+                    ...[
+                      _LanguageOption(
+                        icon: Icons.language,
+                        title: AppStrings.tr(
+                          AppStrings.localeLabelKey(
+                            AppStrings.supportedLocales[i],
+                          ),
+                        ),
+                        subtitle: AppStrings.localeNativeName(
+                          AppStrings.supportedLocales[i],
+                        ),
+                        isSelected:
+                            currentLocale == AppStrings.supportedLocales[i],
+                        onTap: () {
+                          HapticFeedback.lightImpact();
+                          ref.read(localeProvider.notifier).setLocale(
+                                AppStrings.supportedLocales[i],
+                              );
+                        },
+                      ),
+                      if (i != AppStrings.supportedLocales.length - 1)
+                        const _Divider(),
+                    ],
                 ],
               ),
             )
@@ -145,6 +145,51 @@ class SettingsScreen extends ConsumerWidget {
                 .fadeIn(duration: 400.ms, delay: 150.ms)
                 .slideX(begin: -0.2, end: 0),
 
+            const SizedBox(height: 24),
+
+            _SectionTitle(title: AppStrings.tr('theme_colors'))
+                .animate()
+                .fadeIn(duration: 400.ms, delay: 170.ms)
+                .slideX(begin: -0.2, end: 0),
+            const SizedBox(height: 8),
+
+            Text(
+              AppStrings.tr('choose_theme_color'),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.65),
+                  ),
+            ).animate().fadeIn(duration: 350.ms, delay: 180.ms),
+
+            const SizedBox(height: 12),
+
+            GlassmorphicContainer.flat(
+              padding: const EdgeInsets.all(14),
+              child: Wrap(
+                spacing: 10,
+                runSpacing: 10,
+                children: [
+                  for (final option in AppTheme.colorOptions)
+                    _ThemeColorOption(
+                      color: option.seedColor,
+                      label: AppStrings.tr(option.labelKey),
+                      isSelected: themeColorId == option.id,
+                      onTap: () {
+                        HapticFeedback.lightImpact();
+                        ref
+                            .read(themeColorIdProvider.notifier)
+                            .setThemeColorId(option.id);
+                      },
+                    ),
+                ],
+              ),
+            )
+                .animate()
+                .fadeIn(duration: 400.ms, delay: 200.ms)
+                .slideX(begin: -0.2, end: 0),
+
             const SizedBox(height: 32),
 
             // ── About ──────────────────────────────────────────────────────
@@ -191,7 +236,7 @@ class SettingsScreen extends ConsumerWidget {
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      gradient: AppTheme.accentGradient,
+                      gradient: AppTheme.accentGradientFor(context),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Column(
@@ -233,6 +278,23 @@ class SettingsScreen extends ConsumerWidget {
                           icon: Icons.local_cafe,
                           label: AppStrings.tr('buy_coffee'),
                           onTap: () => _launchCoffee(context),
+                        ),
+                        const SizedBox(height: 12),
+
+                        _LinkButton(
+                          icon: Icons.source_outlined,
+                          label: AppStrings.tr('open_source_licenses'),
+                          onTap: () => _openLicenses(context),
+                        ),
+
+                        const SizedBox(height: 10),
+                        Text(
+                          AppStrings.tr('open_source_notice'),
+                          textAlign: TextAlign.center,
+                          style:
+                              Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: Colors.white.withValues(alpha: 0.88),
+                                  ),
                         ),
                       ],
                     ),
@@ -309,6 +371,14 @@ class SettingsScreen extends ConsumerWidget {
         SnackBar(content: Text(AppStrings.tr('could_not_open_link'))),
       );
     }
+  }
+
+  void _openLicenses(BuildContext context) {
+    showLicensePage(
+      context: context,
+      applicationName: AppConstants.appName,
+      applicationVersion: AppConstants.appVersion,
+    );
   }
 }
 
@@ -395,20 +465,18 @@ class _LanguageOption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final primary = Theme.of(context).colorScheme.primary;
+    final onSurface = Theme.of(context).colorScheme.onSurface;
+
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
         child: Row(
           children: [
             Icon(
               icon,
-              color: isSelected
-                  ? Theme.of(context).colorScheme.primary
-                  : Theme.of(context)
-                      .colorScheme
-                      .onSurface
-                      .withValues(alpha: 0.6),
+              color: isSelected ? primary : onSurface.withValues(alpha: 0.6),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -420,28 +488,29 @@ class _LanguageOption extends StatelessWidget {
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                           fontWeight:
                               isSelected ? FontWeight.w600 : FontWeight.normal,
-                          color: isSelected
-                              ? Theme.of(context).colorScheme.primary
-                              : null,
+                          color: isSelected ? primary : null,
                         ),
                   ),
                   Text(
                     subtitle,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSurface
-                              .withValues(alpha: 0.6),
+                          color: onSurface.withValues(alpha: 0.62),
                         ),
                   ),
                 ],
               ),
             ),
-            if (isSelected)
-              Icon(
-                Icons.check_circle,
-                color: Theme.of(context).colorScheme.primary,
+            SizedBox(
+              width: 24,
+              child: AnimatedOpacity(
+                opacity: isSelected ? 1 : 0,
+                duration: const Duration(milliseconds: 140),
+                child: Icon(
+                  Icons.check_circle,
+                  color: primary,
+                ),
               ),
+            ),
           ],
         ),
       ),
@@ -464,20 +533,18 @@ class _ThemeOption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final primary = Theme.of(context).colorScheme.primary;
+    final onSurface = Theme.of(context).colorScheme.onSurface;
+
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
         child: Row(
           children: [
             Icon(
               icon,
-              color: isSelected
-                  ? Theme.of(context).colorScheme.primary
-                  : Theme.of(context)
-                      .colorScheme
-                      .onSurface
-                      .withValues(alpha: 0.6),
+              color: isSelected ? primary : onSurface.withValues(alpha: 0.6),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -486,17 +553,89 @@ class _ThemeOption extends StatelessWidget {
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       fontWeight:
                           isSelected ? FontWeight.w600 : FontWeight.normal,
-                      color: isSelected
-                          ? Theme.of(context).colorScheme.primary
-                          : null,
+                      color: isSelected ? primary : null,
                     ),
               ),
             ),
-            if (isSelected)
-              Icon(
-                Icons.check_circle,
-                color: Theme.of(context).colorScheme.primary,
+            SizedBox(
+              width: 24,
+              child: AnimatedOpacity(
+                opacity: isSelected ? 1 : 0,
+                duration: const Duration(milliseconds: 140),
+                child: Icon(
+                  Icons.check_circle,
+                  color: primary,
+                ),
               ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ThemeColorOption extends StatelessWidget {
+  final Color color;
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _ThemeColorOption({
+    required this.color,
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final primary = Theme.of(context).colorScheme.primary;
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: Theme.of(context)
+              .colorScheme
+              .surfaceContainerHighest
+              .withValues(alpha: 0.35),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? primary : Colors.transparent,
+            width: 1.8,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 180),
+              width: isSelected ? 14 : 12,
+              height: isSelected ? 14 : 12,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: color,
+                boxShadow: [
+                  BoxShadow(
+                    color: color.withValues(alpha: 0.45),
+                    blurRadius: 6,
+                    spreadRadius: 1,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                    color: isSelected ? primary : null,
+                  ),
+            ),
           ],
         ),
       ),

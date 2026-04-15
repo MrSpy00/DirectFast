@@ -250,7 +250,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          gradient: AppTheme.primaryGradient,
+          gradient: AppTheme.primaryGradientFor(context),
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
@@ -429,7 +429,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 margin: const EdgeInsets.symmetric(horizontal: 4),
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
-                  gradient: isSelected ? AppTheme.primaryGradient : null,
+                  gradient: isSelected
+                      ? AppTheme.primaryGradientFor(context)
+                      : null,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Column(
@@ -589,6 +591,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
               errorText: _errorMessage,
             ),
+            textAlignVertical: TextAlignVertical.center,
             keyboardType: platform.requiresPhoneNumber
                 ? TextInputType.phone
                 : platform.requiresEmail
@@ -654,7 +657,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  gradient: AppTheme.primaryGradient,
+                  gradient: AppTheme.primaryGradientFor(context),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(
@@ -704,7 +707,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     child: _UtilityShortcutCard(
                       icon: Icons.qr_code_2,
                       label: AppStrings.tr('qr_generator'),
-                      gradient: AppTheme.primaryGradient,
+                      gradient: AppTheme.primaryGradientFor(context),
                       onTap: () {
                         HapticFeedback.lightImpact();
                         context.push(AppRouter.utils);
@@ -716,7 +719,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     child: _UtilityShortcutCard(
                       icon: Icons.link_off,
                       label: AppStrings.tr('link_cleaner'),
-                      gradient: AppTheme.accentGradient,
+                      gradient: AppTheme.accentGradientFor(context),
                       onTap: () {
                         HapticFeedback.lightImpact();
                         context.push(AppRouter.utils, extra: 1);
@@ -873,8 +876,8 @@ class _SmartClipboardBanner extends StatelessWidget {
                 Container(
                   width: 30,
                   height: 30,
-                  decoration: const BoxDecoration(
-                    gradient: AppTheme.accentGradient,
+                  decoration: BoxDecoration(
+                    gradient: AppTheme.accentGradientFor(context),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(

@@ -10,6 +10,7 @@ class StorageService {
   static const String _historyKey = 'chat_history';
   static const String _templatesKey = 'templates_v1';
   static const String _themeKey = 'theme_mode';
+  static const String _themeColorKey = 'theme_color_id';
 
   /// Initialize SharedPreferences
   static Future<void> init() async {
@@ -141,6 +142,16 @@ class StorageService {
   /// Set theme mode
   static Future<void> setThemeMode(String mode) async {
     await prefs.setString(_themeKey, mode);
+  }
+
+  /// Get theme color id
+  static String getThemeColorId() {
+    return prefs.getString(_themeColorKey) ?? 'violet';
+  }
+
+  /// Set theme color id
+  static Future<void> setThemeColorId(String colorId) async {
+    await prefs.setString(_themeColorKey, colorId);
   }
 
   /// Get locale

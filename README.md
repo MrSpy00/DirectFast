@@ -21,7 +21,8 @@ Chat on messaging platforms without saving contacts.
 - **Message Encryptor**: Encrypt/decrypt messages locally on device
 - **Beautiful UI**: Material 3 design with smooth animations
 - **Chat History**: Track your recent conversations
-- **Dark Mode & Localization**: Full dark/light support with Turkish/English language options
+- **Localization**: Turkish, English, Spanish, Arabic, and Hindi language options
+- **Theme Colors**: 8 selectable accent color themes with persistent preference
 - **Privacy First**: All data stored locally on your device
 
 ---
@@ -59,6 +60,15 @@ lib/
 - **Local Storage**: SharedPreferences
 - **Animations**: flutter_animate
 - **Fonts**: Google Fonts
+
+---
+
+## 🌍 Languages & Themes
+
+- **Supported Languages (5)**: Turkish (Türkçe), English, Spanish (Español), Arabic (العربية), Hindi (हिन्दी)
+- **Theme Modes**: Light, Dark, System Default
+- **Theme Colors (8)**: Violet, Blue, Teal, Green, Orange, Red, Rose, Indigo
+- **In-App Controls**: Language, theme mode, and theme color can be changed from Settings and are persisted locally
 
 ---
 
@@ -131,6 +141,16 @@ flutter run
 - **Input Sanitization**: Protection against XSS and injection attacks
 - **Local Storage**: History and templates stored locally in SharedPreferences
 - **No Tracking**: Zero analytics or telemetry
+
+---
+
+## 📚 Open Source Acknowledgements
+
+DirectFast is built on top of the Flutter open-source ecosystem.
+
+- Core dependency list and attribution notes: [OPEN_SOURCE_NOTICES.md](OPEN_SOURCE_NOTICES.md)
+- Full package licenses can be viewed directly in app via:
+    Settings → About → Open Source Licenses
 
 ---
 

@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/services/storage_service.dart';
+import '../../../shared/theme/app_theme.dart';
 
 // Provider for theme mode
 final themeModeProvider =
     StateNotifierProvider<ThemeModeNotifier, ThemeMode>((ref) {
   return ThemeModeNotifier();
+});
+
+final themeColorIdProvider =
+    StateNotifierProvider<ThemeColorNotifier, String>((ref) {
+  return ThemeColorNotifier();
 });
 
 class ThemeModeNotifier extends StateNotifier<ThemeMode> {
@@ -43,5 +49,22 @@ class ThemeModeNotifier extends StateNotifier<ThemeMode> {
     } else {
       setThemeMode(ThemeMode.light);
     }
+  }
+}
+
+class ThemeColorNotifier extends StateNotifier<String> {
+  ThemeColorNotifier() : super(AppTheme.defaultColorId) {
+    _loadThemeColorId();
+  }
+
+  void _loadThemeColorId() {
+    final savedId = StorageService.getThemeColorId();
+    state = AppTheme.optionById(savedId).id;
+  }
+
+  Future<void> setThemeColorId(String colorId) async {
+    final normalizedId = AppTheme.optionById(colorId).id;
+    state = normalizedId;
+    await StorageService.setThemeColorId(normalizedId);
   }
 }

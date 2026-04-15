@@ -47,14 +47,16 @@ class DirectFastApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeModeProvider);
+    final themeColorId = ref.watch(themeColorIdProvider);
     // Watch the locale provider to trigger rebuild when locale changes
     final currentLocale = ref.watch(localeProvider);
+    final seedColor = AppTheme.colorById(themeColorId);
 
     return MaterialApp.router(
       title: 'DirectFast',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
+      theme: AppTheme.lightTheme(seedColor: seedColor),
+      darkTheme: AppTheme.darkTheme(seedColor: seedColor),
       themeMode: themeMode,
       routerConfig: AppRouter.router,
       // This key ensures MaterialApp rebuilds when locale changes

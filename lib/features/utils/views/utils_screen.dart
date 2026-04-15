@@ -72,7 +72,7 @@ class _UtilsScreenState extends State<UtilsScreen> {
       body: Container(
         decoration: BoxDecoration(
           gradient: isDark
-              ? AppTheme.darkGradient
+              ? AppTheme.darkGradientFor(context)
               : LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -154,7 +154,7 @@ class _UtilsScreenState extends State<UtilsScreen> {
               children: [
                 ShaderMask(
                   shaderCallback: (bounds) =>
-                      AppTheme.primaryGradient.createShader(bounds),
+                      AppTheme.primaryGradientFor(context).createShader(bounds),
                   child: Text(
                     AppStrings.tr('utilities'),
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
@@ -467,6 +467,7 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
                     hintText: AppStrings.tr('enter_text'),
                     prefixIcon: const Icon(Icons.qr_code_2_rounded),
                   ),
+                  textAlignVertical: TextAlignVertical.center,
                   onSubmitted: (_) => _generateQR(),
                 ),
                 const SizedBox(height: 16),
@@ -669,7 +670,7 @@ class _LinkCleanerPageState extends State<_LinkCleanerPage> {
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        gradient: AppTheme.accentGradient,
+                        gradient: AppTheme.accentGradientFor(context),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Icon(
@@ -717,6 +718,7 @@ class _LinkCleanerPageState extends State<_LinkCleanerPage> {
                       tooltip: AppStrings.tr('quick_paste'),
                     ),
                   ),
+                  textAlignVertical: TextAlignVertical.center,
                   maxLines: 2,
                 ),
                 const SizedBox(height: 16),
@@ -724,7 +726,7 @@ class _LinkCleanerPageState extends State<_LinkCleanerPage> {
                   onPressed: _cleanLink,
                   icon: Icons.auto_fix_high_rounded,
                   label: AppStrings.tr('clean_link'),
-                  gradient: AppTheme.accentGradient,
+                  gradient: AppTheme.accentGradientFor(context),
                 ),
               ],
             ),
@@ -941,6 +943,7 @@ class _MessageEncryptorPageState extends State<_MessageEncryptorPage> {
                           setState(() => _obscurePassword = !_obscurePassword),
                     ),
                   ),
+                  textAlignVertical: TextAlignVertical.center,
                   obscureText: _obscurePassword,
                 ),
                 const SizedBox(height: 14),
@@ -952,6 +955,7 @@ class _MessageEncryptorPageState extends State<_MessageEncryptorPage> {
                         : AppStrings.tr('enter_encrypted_message'),
                     prefixIcon: const Icon(Icons.message_rounded),
                   ),
+                  textAlignVertical: TextAlignVertical.top,
                   maxLines: 4,
                 ),
                 const SizedBox(height: 16),
@@ -1042,7 +1046,7 @@ class _GradientButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final grad = gradient ?? AppTheme.primaryGradient;
+    final grad = gradient ?? AppTheme.primaryGradientFor(context);
 
     return _TappableScale(
       onTap: onPressed,
@@ -1252,8 +1256,8 @@ class _TemplatesPageState extends ConsumerState<_TemplatesPage> {
                   children: [
                     Container(
                       padding: const EdgeInsets.all(24),
-                      decoration: const BoxDecoration(
-                        gradient: AppTheme.primaryGradient,
+                      decoration: BoxDecoration(
+                        gradient: AppTheme.primaryGradientFor(context),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
@@ -1354,7 +1358,7 @@ class _TemplateCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              gradient: AppTheme.primaryGradient,
+              gradient: AppTheme.primaryGradientFor(context),
               borderRadius: BorderRadius.circular(10),
             ),
             child: const Icon(
@@ -1536,7 +1540,8 @@ class _AddTemplateSheetState extends State<_AddTemplateSheet> {
             ),
             const SizedBox(height: 20),
             ShaderMask(
-              shaderCallback: (b) => AppTheme.primaryGradient.createShader(b),
+              shaderCallback: (b) =>
+                  AppTheme.primaryGradientFor(context).createShader(b),
               child: Text(
                 AppStrings.tr('add_template'),
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
@@ -1552,6 +1557,7 @@ class _AddTemplateSheetState extends State<_AddTemplateSheet> {
                 hintText: AppStrings.tr('template_name'),
                 prefixIcon: const Icon(Icons.label_outline_rounded),
               ),
+              textAlignVertical: TextAlignVertical.center,
               textCapitalization: TextCapitalization.words,
             ),
             const SizedBox(height: 14),
@@ -1561,6 +1567,7 @@ class _AddTemplateSheetState extends State<_AddTemplateSheet> {
                 hintText: AppStrings.tr('template_message'),
                 prefixIcon: const Icon(Icons.message_outlined),
               ),
+              textAlignVertical: TextAlignVertical.top,
               maxLines: 4,
               textCapitalization: TextCapitalization.sentences,
             ),
@@ -1767,6 +1774,7 @@ class _GmailComposerPageState extends State<_GmailComposerPage> {
                     hintText: AppStrings.tr('gmail_recipient_hint'),
                     prefixIcon: const Icon(Icons.alternate_email_rounded),
                   ),
+                  textAlignVertical: TextAlignVertical.center,
                 ),
                 const SizedBox(height: 14),
                 _buildFieldLabel(context, 'gmail_cc_label'),
@@ -1777,6 +1785,7 @@ class _GmailComposerPageState extends State<_GmailComposerPage> {
                     hintText: AppStrings.tr('gmail_cc_hint'),
                     prefixIcon: const Icon(Icons.people_outline_rounded),
                   ),
+                  textAlignVertical: TextAlignVertical.center,
                 ),
                 const SizedBox(height: 14),
                 _buildFieldLabel(context, 'gmail_bcc_label'),
@@ -1787,6 +1796,7 @@ class _GmailComposerPageState extends State<_GmailComposerPage> {
                     hintText: AppStrings.tr('gmail_bcc_hint'),
                     prefixIcon: const Icon(Icons.visibility_off_outlined),
                   ),
+                  textAlignVertical: TextAlignVertical.center,
                 ),
                 const SizedBox(height: 14),
                 _buildFieldLabel(context, 'gmail_subject_label'),
@@ -1796,6 +1806,7 @@ class _GmailComposerPageState extends State<_GmailComposerPage> {
                     hintText: AppStrings.tr('gmail_subject_hint'),
                     prefixIcon: const Icon(Icons.title_rounded),
                   ),
+                  textAlignVertical: TextAlignVertical.center,
                 ),
                 const SizedBox(height: 14),
                 _buildFieldLabel(context, 'gmail_body_label'),
@@ -1808,6 +1819,7 @@ class _GmailComposerPageState extends State<_GmailComposerPage> {
                     prefixIcon: const Icon(Icons.edit_note_rounded),
                     alignLabelWithHint: true,
                   ),
+                  textAlignVertical: TextAlignVertical.top,
                 ),
                 const SizedBox(height: 16),
                 _GradientButton(

@@ -16,21 +16,26 @@ class LocaleNotifier extends StateNotifier<String> {
 
   Future<void> _loadLocale() async {
     final prefs = await SharedPreferences.getInstance();
-    final savedLocale = prefs.getString(_localeKey) ?? AppStrings.turkish;
+    final savedLocale =
+        AppStrings.normalizeLocale(prefs.getString(_localeKey) ?? AppStrings.turkish);
     state = savedLocale;
     AppStrings.setLocale(savedLocale);
   }
 
   Future<void> setLocale(String locale) async {
-    state = locale;
-    AppStrings.setLocale(locale);
+    final normalized = AppStrings.normalizeLocale(locale);
+    state = normalized;
+    AppStrings.setLocale(normalized);
 
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_localeKey, locale);
+    await prefs.setString(_localeKey, normalized);
   }
 
   String get currentLocale => state;
 
   bool get isTurkish => state == AppStrings.turkish;
   bool get isEnglish => state == AppStrings.english;
+  bool get isSpanish => state == AppStrings.spanish;
+  bool get isArabic => state == AppStrings.arabic;
+  bool get isHindi => state == AppStrings.hindi;
 }
