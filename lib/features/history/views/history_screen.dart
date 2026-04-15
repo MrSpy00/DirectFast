@@ -78,10 +78,12 @@ class HistoryScreen extends ConsumerWidget {
                                   SnackBar(
                                     content: Text(
                                       result.error ??
-                                          AppStrings.tr('failed_to_open',
-                                              args: [
-                                                item.platform.displayName,
-                                              ],),
+                                          AppStrings.tr(
+                                            'failed_to_open',
+                                            args: [
+                                              item.platform.displayName,
+                                            ],
+                                          ),
                                     ),
                                     backgroundColor:
                                         Theme.of(context).colorScheme.error,
@@ -121,7 +123,10 @@ class HistoryScreen extends ConsumerWidget {
 
     for (final item in history) {
       final d = DateTime(
-          item.timestamp.year, item.timestamp.month, item.timestamp.day,);
+        item.timestamp.year,
+        item.timestamp.month,
+        item.timestamp.day,
+      );
       if (d == today) {
         todayItems.add(item);
       } else if (d == yesterday) {
@@ -237,7 +242,10 @@ class _StatPill extends StatelessWidget {
   final String value;
 
   const _StatPill({
-    required this.gradient, required this.label, required this.value, this.icon,
+    required this.gradient,
+    required this.label,
+    required this.value,
+    this.icon,
     this.platformType,
   });
 
@@ -291,7 +299,7 @@ class _StatPill extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                   ),
                   maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                  overflow: TextOverflow.fade,
                 ),
               ],
             ),
@@ -428,7 +436,8 @@ class _HistoryCard extends StatelessWidget {
                   title: Text(AppStrings.tr('delete')),
                   content: Text(AppStrings.tr('delete_this_chat')),
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.pop(ctx, false),
@@ -480,7 +489,7 @@ class _HistoryCard extends StatelessWidget {
                                 .titleMedium
                                 ?.copyWith(fontWeight: FontWeight.bold),
                             maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                            overflow: TextOverflow.fade,
                           ),
                           const SizedBox(height: 4),
                           Row(
@@ -496,8 +505,10 @@ class _HistoryCard extends StatelessWidget {
                                     ),
                               ),
                               const SizedBox(width: 8),
-                              Text('•',
-                                  style: Theme.of(context).textTheme.bodySmall,),
+                              Text(
+                                '•',
+                                style: Theme.of(context).textTheme.bodySmall,
+                              ),
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
@@ -512,7 +523,7 @@ class _HistoryCard extends StatelessWidget {
                                             .withValues(alpha: 0.6),
                                       ),
                                   maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
+                                  overflow: TextOverflow.fade,
                                 ),
                               ),
                             ],

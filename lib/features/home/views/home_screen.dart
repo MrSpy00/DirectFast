@@ -553,7 +553,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             isSelected ? FontWeight.bold : FontWeight.w500,
                       ),
                       maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+                      overflow: TextOverflow.fade,
                     ),
                   ],
                 ),
@@ -755,6 +755,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       },
                     ),
                   ),
+                  SizedBox(
+                    width: constraints.maxWidth,
+                    child: _UtilityShortcutCard(
+                      icon: Icons.email_outlined,
+                      label: AppStrings.tr('gmail_sender'),
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFFEA4335), Color(0xFFFBBC05)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      onTap: () {
+                        HapticFeedback.lightImpact();
+                        context.push(AppRouter.utils, extra: 4);
+                      },
+                    ),
+                  ),
                 ],
               );
             },
@@ -889,7 +905,7 @@ class _SmartClipboardBanner extends StatelessWidget {
                               fontWeight: FontWeight.w500,
                             ),
                         maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                        overflow: TextOverflow.fade,
                       ),
                     ],
                   ),
@@ -1056,7 +1072,7 @@ class _UtilityShortcutCard extends StatelessWidget {
                         fontWeight: FontWeight.w700,
                       ),
                   maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
+                  overflow: TextOverflow.fade,
                 ),
               ),
               Icon(
