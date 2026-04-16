@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:math' as math;
+import '../../../core/services/storage_service.dart';
 import '../../../core/utils/app_router.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../shared/widgets/app_logo.dart';
@@ -68,7 +69,8 @@ class _SplashScreenState extends State<SplashScreen>
     await _logoController.forward();
     await Future.delayed(const Duration(milliseconds: 1200));
     if (mounted) {
-      context.go(AppRouter.home);
+      final onboardingDone = StorageService.isOnboardingCompleted();
+      context.go(onboardingDone ? AppRouter.home : AppRouter.welcome);
     }
   }
 
@@ -114,9 +116,8 @@ class _SplashScreenState extends State<SplashScreen>
                               fontWeight: FontWeight.bold,
                               letterSpacing: 2.0,
                               foreground: Paint()
-                                ..shader =
-                                    AppTheme.primaryGradientFor(context)
-                                        .createShader(
+                                ..shader = AppTheme.primaryGradientFor(context)
+                                    .createShader(
                                   const Rect.fromLTWH(0, 0, 200, 70),
                                 ),
                             ),
@@ -167,8 +168,10 @@ class _SplashScreenState extends State<SplashScreen>
             child: Column(
               children: [
                 Text(
-                  AppStrings.tr('developed_by',
-                      args: [AppConstants.developerName],),
+                  AppStrings.tr(
+                    'developed_by',
+                    args: [AppConstants.developerName],
+                  ),
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: Theme.of(context)
                             .colorScheme
@@ -179,8 +182,10 @@ class _SplashScreenState extends State<SplashScreen>
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  AppStrings.tr('copyright',
-                      args: [AppConstants.developerName],),
+                  AppStrings.tr(
+                    'copyright',
+                    args: [AppConstants.developerName],
+                  ),
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: Theme.of(context)
                             .colorScheme
@@ -208,7 +213,8 @@ class _CyberGridBackground extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final colorScheme = Theme.of(context).colorScheme;
-    final darkColors = AppTheme.darkGradientFromSeed(colorScheme.primary).colors;
+    final darkColors =
+        AppTheme.darkGradientFromSeed(colorScheme.primary).colors;
     final lightColors = [
       colorScheme.surface,
       colorScheme.primaryContainer.withValues(alpha: 0.45),
@@ -222,9 +228,7 @@ class _CyberGridBackground extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: isDark
-                ? darkColors
-                : lightColors,
+            colors: isDark ? darkColors : lightColors,
             stops: [
               0.0,
               // Slight mid-stop oscillation driven by the controller.

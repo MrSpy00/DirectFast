@@ -12,6 +12,7 @@ class StorageService {
   static const String _themeKey = 'theme_mode';
   static const String _themeColorKey = 'theme_color_id';
   static const String _customThemeColorKey = 'custom_theme_color_value';
+  static const String _onboardingCompletedKey = 'onboarding_completed';
 
   /// Initialize SharedPreferences
   static Future<void> init() async {
@@ -178,6 +179,16 @@ class StorageService {
   /// Set locale
   static Future<void> setLocale(String locale) async {
     await prefs.setString(AppConstants.localeKey, locale);
+  }
+
+  /// Check whether onboarding has been completed.
+  static bool isOnboardingCompleted() {
+    return prefs.getBool(_onboardingCompletedKey) ?? false;
+  }
+
+  /// Mark onboarding state.
+  static Future<void> setOnboardingCompleted(bool completed) async {
+    await prefs.setBool(_onboardingCompletedKey, completed);
   }
 
   // ===========================

@@ -214,6 +214,60 @@ class AppStrings {
       'tr': 'Platformu seç, anında bağlantı kur.',
       'en': 'Choose a platform and connect instantly.',
     },
+    'welcome_title': {
+      'tr': 'DirectFast\'e Hoş Geldin',
+      'en': 'Welcome to DirectFast',
+      'es': 'Bienvenido a DirectFast',
+      'ar': 'مرحبًا بك في DirectFast',
+      'hi': 'DirectFast में आपका स्वागत है',
+    },
+    'welcome_subtitle': {
+      'tr':
+          'İlk kurulumunu birkaç adımda tamamla. Dilersen bu ayarları sonra değiştirebilirsin.',
+      'en':
+          'Complete your first setup in a few steps. You can change these settings later anytime.',
+      'es':
+          'Completa tu configuración inicial en unos pasos. Puedes cambiar estos ajustes después.',
+      'ar':
+          'أكمل الإعداد الأولي في بضع خطوات. يمكنك تغيير هذه الإعدادات لاحقًا في أي وقت.',
+      'hi':
+          'कुछ चरणों में प्रारंभिक सेटअप पूरा करें। आप इन सेटिंग्स को बाद में कभी भी बदल सकते हैं।',
+    },
+    'setup_language': {
+      'tr': 'Dil Seçimi',
+      'en': 'Language Selection',
+      'es': 'Selección de Idioma',
+      'ar': 'اختيار اللغة',
+      'hi': 'भाषा चयन',
+    },
+    'setup_theme': {
+      'tr': 'Tema Seçimi',
+      'en': 'Theme Selection',
+      'es': 'Selección de Tema',
+      'ar': 'اختيار السمة',
+      'hi': 'थीम चयन',
+    },
+    'setup_theme_color': {
+      'tr': 'Tema Rengi Seçimi',
+      'en': 'Theme Color Selection',
+      'es': 'Selección de Color del Tema',
+      'ar': 'اختيار لون السمة',
+      'hi': 'थीम रंग चयन',
+    },
+    'continue_to_app': {
+      'tr': 'Uygulamaya Devam Et',
+      'en': 'Continue to App',
+      'es': 'Continuar a la App',
+      'ar': 'المتابعة إلى التطبيق',
+      'hi': 'ऐप में जारी रखें',
+    },
+    'skip_for_now': {
+      'tr': 'Şimdilik Geç',
+      'en': 'Skip for now',
+      'es': 'Omitir por ahora',
+      'ar': 'تخطي الآن',
+      'hi': 'अभी छोड़ें',
+    },
 
     // Navigation
     'home': {

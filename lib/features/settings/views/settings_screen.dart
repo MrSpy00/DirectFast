@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -83,12 +85,12 @@ class SettingsScreen extends ConsumerWidget {
                         ),
                       ),
                   ],
-                  onChanged: (value) {
+                  onChanged: (value) async {
                     if (value == null || value == currentLocale) {
                       return;
                     }
-                    HapticFeedback.lightImpact();
-                    ref.read(localeProvider.notifier).setLocale(value);
+                    await HapticFeedback.lightImpact();
+                    await ref.read(localeProvider.notifier).setLocale(value);
                   },
                 ),
               ),
@@ -114,9 +116,9 @@ class SettingsScreen extends ConsumerWidget {
                     icon: Icons.light_mode,
                     title: AppStrings.tr('light_mode'),
                     isSelected: appThemeMode == AppThemeMode.light,
-                    onTap: () {
-                      HapticFeedback.lightImpact();
-                      ref
+                    onTap: () async {
+                      await HapticFeedback.lightImpact();
+                      await ref
                           .read(appThemeModeProvider.notifier)
                           .setThemeMode(AppThemeMode.light);
                     },
@@ -126,9 +128,9 @@ class SettingsScreen extends ConsumerWidget {
                     icon: Icons.dark_mode,
                     title: AppStrings.tr('dark_mode'),
                     isSelected: appThemeMode == AppThemeMode.dark,
-                    onTap: () {
-                      HapticFeedback.lightImpact();
-                      ref
+                    onTap: () async {
+                      await HapticFeedback.lightImpact();
+                      await ref
                           .read(appThemeModeProvider.notifier)
                           .setThemeMode(AppThemeMode.dark);
                     },
@@ -138,9 +140,9 @@ class SettingsScreen extends ConsumerWidget {
                     icon: Icons.dark_mode_outlined,
                     title: AppStrings.tr('amoled_mode'),
                     isSelected: appThemeMode == AppThemeMode.amoled,
-                    onTap: () {
-                      HapticFeedback.lightImpact();
-                      ref
+                    onTap: () async {
+                      await HapticFeedback.lightImpact();
+                      await ref
                           .read(appThemeModeProvider.notifier)
                           .setThemeMode(AppThemeMode.amoled);
                     },
@@ -150,9 +152,9 @@ class SettingsScreen extends ConsumerWidget {
                     icon: Icons.brightness_auto,
                     title: AppStrings.tr('system_default'),
                     isSelected: appThemeMode == AppThemeMode.system,
-                    onTap: () {
-                      HapticFeedback.lightImpact();
-                      ref
+                    onTap: () async {
+                      await HapticFeedback.lightImpact();
+                      await ref
                           .read(appThemeModeProvider.notifier)
                           .setThemeMode(AppThemeMode.system);
                     },
@@ -186,39 +188,97 @@ class SettingsScreen extends ConsumerWidget {
 
             GlassmorphicContainer.flat(
               padding: const EdgeInsets.all(14),
-              child: Wrap(
-                spacing: 10,
-                runSpacing: 10,
-                children: [
+              child: DropdownButtonFormField<String>(
+                key: ValueKey(themeColorId),
+                initialValue: themeColorId == AppTheme.customColorId
+                    ? AppTheme.customColorId
+                    : AppTheme.optionById(themeColorId).id,
+                isExpanded: true,
+                decoration: InputDecoration(
+                  labelText: AppStrings.tr('theme_colors'),
+                  prefixIcon: const Icon(Icons.palette_rounded),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 12,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                items: [
                   for (final option in AppTheme.colorOptions)
-                    _ThemeColorOption(
-                      color: option.seedColor,
-                      label: AppStrings.tr(option.labelKey),
-                      isSelected: themeColorId == option.id,
-                      onTap: () {
-                        HapticFeedback.lightImpact();
-                        ref
-                            .read(themeColorIdProvider.notifier)
-                            .setThemeColorId(option.id);
-                      },
+                    DropdownMenuItem<String>(
+                      value: option.id,
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 16,
+                            height: 16,
+                            decoration: BoxDecoration(
+                              color: option.seedColor,
+                              borderRadius: BorderRadius.circular(99),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              AppStrings.tr(option.labelKey),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  _ThemeColorOption(
-                    color: customThemeColor ??
-                        Theme.of(context).colorScheme.primary,
-                    label: AppStrings.tr('custom_color'),
-                    isSelected: themeColorId == AppTheme.customColorId,
-                    onTap: () {
-                      HapticFeedback.lightImpact();
-                      final baseColor = customThemeColor ??
-                          Theme.of(context).colorScheme.primary;
-                      _showCustomColorPicker(
-                        context: context,
-                        ref: ref,
-                        initialColor: baseColor,
-                      );
-                    },
+                  DropdownMenuItem<String>(
+                    value: AppTheme.customColorId,
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 16,
+                          height: 16,
+                          decoration: BoxDecoration(
+                            color: customThemeColor ??
+                                Theme.of(context).colorScheme.primary,
+                            borderRadius: BorderRadius.circular(99),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            AppStrings.tr('custom_color'),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
+                onChanged: (value) async {
+                  if (value == null) {
+                    return;
+                  }
+                  await HapticFeedback.lightImpact();
+                  if (!context.mounted) {
+                    return;
+                  }
+
+                  if (value == AppTheme.customColorId) {
+                    final baseColor = customThemeColor ??
+                        Theme.of(context).colorScheme.primary;
+                    await _showCustomColorPicker(
+                      context: context,
+                      ref: ref,
+                      initialColor: baseColor,
+                    );
+                    return;
+                  }
+
+                  await ref
+                      .read(themeColorIdProvider.notifier)
+                      .setThemeColorId(value);
+                },
               ),
             )
                 .animate()
@@ -615,7 +675,7 @@ class _LinkButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        HapticFeedback.lightImpact();
+        unawaited(HapticFeedback.lightImpact());
         onTap();
       },
       borderRadius: BorderRadius.circular(12),
@@ -699,90 +759,6 @@ class _ThemeOption extends StatelessWidget {
                 ),
               ),
             ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _ThemeColorOption extends StatelessWidget {
-  final Color color;
-  final String label;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  const _ThemeColorOption({
-    required this.color,
-    required this.label,
-    required this.isSelected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final primary = Theme.of(context).colorScheme.primary;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final borderColor = isDark
-        ? Colors.white.withValues(alpha: 0.2)
-        : Colors.black.withValues(alpha: 0.15);
-
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        width: 138,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        decoration: BoxDecoration(
-          color: Theme.of(context)
-              .colorScheme
-              .surfaceContainerHighest
-              .withValues(alpha: 0.35),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isSelected ? primary : Colors.transparent,
-            width: 1.8,
-          ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 24,
-              height: 24,
-              decoration: BoxDecoration(
-                color: color,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: borderColor),
-                boxShadow: [
-                  BoxShadow(
-                    color: color.withValues(alpha: 0.38),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      fontWeight:
-                          isSelected ? FontWeight.w700 : FontWeight.w500,
-                      color: isSelected ? primary : null,
-                    ),
-              ),
-            ),
-            if (isSelected) ...[
-              const SizedBox(width: 6),
-              Icon(Icons.check_circle_rounded, size: 16, color: primary),
-            ] else ...[
-              const SizedBox(width: 6),
-            ],
           ],
         ),
       ),

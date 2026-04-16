@@ -1,5 +1,7 @@
 # DirectFast
 
+Current release: **v1.0.0**
+
 ## 🚀 Quick Connect to Your Contacts
 
 Chat on messaging platforms without saving contacts.
@@ -22,7 +24,8 @@ Chat on messaging platforms without saving contacts.
 - **Beautiful UI**: Material 3 design with smooth animations
 - **Chat History**: Track your recent conversations
 - **Localization**: 25-language infrastructure with graceful fallback order and core manual translations
-- **Smart Theming**: Light, Dark, System, and AMOLED modes + selectable preset colors and custom RGB color palette
+- **First-Run Welcome Setup**: New installations are greeted with a welcome flow for language, theme, and theme-color selection
+- **Smart Theming**: Light, Dark, System, and AMOLED modes + theme colors selectable via dropdown + custom RGB palette
 - **Faster Tool Navigation**: Cleaner segmented quick-switch with adaptive multi-row layout
 - **Privacy First**: All data stored locally on your device
 
@@ -44,6 +47,7 @@ lib/
 ├── features/
 │   ├── home/            # Home screen feature
 │   ├── history/         # History feature
+│   ├── onboarding/      # First-run welcome setup
 │   ├── settings/        # Settings feature
 │   └── utils/           # Utility tools feature
 └── shared/
