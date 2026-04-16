@@ -37,6 +37,9 @@ dependencies:
   # QR Code
   qr_flutter: ^4.1.0
 
+  # Image picker (for custom QR center image)
+  image_picker: ^1.1.2
+
   # UUID
   uuid: ^4.3.3
 

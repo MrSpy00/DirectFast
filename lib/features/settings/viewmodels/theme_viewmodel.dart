@@ -121,6 +121,7 @@ class CustomThemeColorNotifier extends StateNotifier<Color?> {
   Future<void> setColor(Color color) async {
     state = color;
     await StorageService.setCustomThemeColorValue(color.toARGB32());
+    await StorageService.setThemeColorId(AppTheme.customColorId);
   }
 
   Future<void> clearColor() async {

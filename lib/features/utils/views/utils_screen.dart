@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:gal/gal.dart';
@@ -340,6 +341,12 @@ class _SegmentPill extends StatelessWidget {
   }
 }
 
+enum _QrCenterImageSource {
+  none,
+  appLogo,
+  custom,
+}
+
 // ── QR Generator Page ─────────────────────────────────────────────────────────
 
 class _QRGeneratorPage extends StatefulWidget {
@@ -352,6 +359,7 @@ class _QRGeneratorPage extends StatefulWidget {
 class _QRGeneratorPageState extends State<_QRGeneratorPage> {
   final TextEditingController _textController = TextEditingController();
   final GlobalKey _qrKey = GlobalKey();
+  final ImagePicker _imagePicker = ImagePicker();
   String _qrData = 'https://github.com/MrSpy00/DirectFast';
   Color _fgColor = Colors.black;
   Color _bgColor = Colors.white;
@@ -360,7 +368,9 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
   double _logoScale = 0.18;
   double _exportPixelRatio = 4.0;
   bool _gapless = true;
-  bool _embedLogo = false;
+  bool _isPickingCenterImage = false;
+  _QrCenterImageSource _centerImageSource = _QrCenterImageSource.none;
+  Uint8List? _customCenterImageBytes;
   QrEyeShape _eyeShape = QrEyeShape.square;
   QrDataModuleShape _moduleShape = QrDataModuleShape.square;
   int _errorLevel = QrErrorCorrectLevel.H;
@@ -426,10 +436,103 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
       _logoScale = 0.18;
       _exportPixelRatio = 4.0;
       _gapless = true;
-      _embedLogo = false;
+      _isPickingCenterImage = false;
+      _centerImageSource = _QrCenterImageSource.none;
+      _customCenterImageBytes = null;
       _eyeShape = QrEyeShape.square;
       _moduleShape = QrDataModuleShape.square;
       _errorLevel = QrErrorCorrectLevel.H;
+    });
+  }
+
+  ImageProvider<Object>? _embeddedImageProvider() {
+    switch (_centerImageSource) {
+      case _QrCenterImageSource.appLogo:
+        return const AssetImage('assets/images/logo.png');
+      case _QrCenterImageSource.custom:
+        if (_customCenterImageBytes == null) {
+          return null;
+        }
+        return MemoryImage(_customCenterImageBytes!);
+      case _QrCenterImageSource.none:
+        return null;
+    }
+  }
+
+  Future<void> _pickCenterImage() async {
+    if (_isPickingCenterImage) {
+      return;
+    }
+
+    setState(() => _isPickingCenterImage = true);
+    try {
+      final file = await _imagePicker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 95,
+        maxWidth: 1200,
+        maxHeight: 1200,
+      );
+
+      if (file == null) {
+        if (mounted) {
+          _showSnackBar(context, AppStrings.tr('qr_image_pick_cancelled'));
+        }
+        return;
+      }
+
+      final bytes = await file.readAsBytes();
+      if (bytes.isEmpty) {
+        if (mounted) {
+          _showSnackBar(
+            context,
+            AppStrings.tr('qr_image_pick_failed'),
+            isError: true,
+          );
+        }
+        return;
+      }
+
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _customCenterImageBytes = bytes;
+        _centerImageSource = _QrCenterImageSource.custom;
+      });
+      _showSnackBar(context, AppStrings.tr('qr_image_selected'));
+    } catch (e) {
+      if (mounted) {
+        _showSnackBar(
+          context,
+          '${AppStrings.tr('qr_image_pick_failed')}: $e',
+          isError: true,
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isPickingCenterImage = false);
+      }
+    }
+  }
+
+  void _setCenterImageSource(_QrCenterImageSource source) {
+    HapticFeedback.selectionClick();
+    if (source == _QrCenterImageSource.custom &&
+        _customCenterImageBytes == null) {
+      _pickCenterImage();
+      return;
+    }
+
+    setState(() => _centerImageSource = source);
+  }
+
+  void _removeCustomCenterImage() {
+    HapticFeedback.selectionClick();
+    setState(() {
+      _customCenterImageBytes = null;
+      if (_centerImageSource == _QrCenterImageSource.custom) {
+        _centerImageSource = _QrCenterImageSource.none;
+      }
     });
   }
 
@@ -603,6 +706,8 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
   @override
   Widget build(BuildContext context) {
     final contrast = _contrastRatio();
+    final embeddedImageProvider = _embeddedImageProvider();
+    final hasCenterImage = embeddedImageProvider != null;
     final levelLabel = switch (_errorLevel) {
       QrErrorCorrectLevel.L => AppStrings.tr('qr_error_level_l'),
       QrErrorCorrectLevel.M => AppStrings.tr('qr_error_level_m'),
@@ -634,10 +739,8 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
                       backgroundColor: _bgColor,
                       errorCorrectionLevel: _errorLevel,
                       gapless: _gapless,
-                      embeddedImage: _embedLogo
-                          ? const AssetImage('assets/images/logo.png')
-                          : null,
-                      embeddedImageStyle: _embedLogo
+                      embeddedImage: embeddedImageProvider,
+                      embeddedImageStyle: hasCenterImage
                           ? QrEmbeddedImageStyle(
                               size: Size(
                                 _qrSize * _logoScale,
@@ -912,13 +1015,126 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
                   value: _gapless,
                   onChanged: (value) => setState(() => _gapless = value),
                 ),
-                SwitchListTile.adaptive(
-                  contentPadding: EdgeInsets.zero,
-                  title: Text(AppStrings.tr('qr_logo')),
-                  value: _embedLogo,
-                  onChanged: (value) => setState(() => _embedLogo = value),
+                const SizedBox(height: 6),
+                Text(
+                  AppStrings.tr(
+                    'qr_content_length',
+                    args: [_qrData.length.toString()],
+                  ),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.68),
+                      ),
                 ),
-                if (_embedLogo) ...[
+                const SizedBox(height: 10),
+                Text(
+                  AppStrings.tr('qr_center_image'),
+                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    ChoiceChip(
+                      label: Text(AppStrings.tr('qr_center_none')),
+                      selected: _centerImageSource == _QrCenterImageSource.none,
+                      onSelected: (_) =>
+                          _setCenterImageSource(_QrCenterImageSource.none),
+                    ),
+                    ChoiceChip(
+                      label: Text(AppStrings.tr('qr_center_logo')),
+                      selected:
+                          _centerImageSource == _QrCenterImageSource.appLogo,
+                      onSelected: (_) =>
+                          _setCenterImageSource(_QrCenterImageSource.appLogo),
+                    ),
+                    ChoiceChip(
+                      label: Text(AppStrings.tr('qr_center_custom')),
+                      selected:
+                          _centerImageSource == _QrCenterImageSource.custom,
+                      onSelected: (_) =>
+                          _setCenterImageSource(_QrCenterImageSource.custom),
+                    ),
+                  ],
+                ),
+                if (_centerImageSource == _QrCenterImageSource.custom ||
+                    _customCenterImageBytes != null) ...[
+                  const SizedBox(height: 10),
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .surfaceContainerHighest
+                          .withValues(alpha: 0.45),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Row(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Container(
+                            width: 46,
+                            height: 46,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .surface
+                                .withValues(alpha: 0.7),
+                            child: _customCenterImageBytes != null
+                                ? Image.memory(
+                                    _customCenterImageBytes!,
+                                    fit: BoxFit.cover,
+                                  )
+                                : Icon(
+                                    Icons.image_outlined,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withValues(alpha: 0.5),
+                                  ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            _customCenterImageBytes != null
+                                ? AppStrings.tr('qr_image_selected')
+                                : AppStrings.tr('qr_no_custom_image'),
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      OutlinedButton.icon(
+                        onPressed: _isPickingCenterImage ? null : _pickCenterImage,
+                        icon: const Icon(Icons.photo_library_outlined),
+                        label: Text(
+                          _customCenterImageBytes == null
+                              ? AppStrings.tr('qr_pick_image')
+                              : AppStrings.tr('qr_change_image'),
+                        ),
+                      ),
+                      if (_customCenterImageBytes != null)
+                        TextButton.icon(
+                          onPressed: _removeCustomCenterImage,
+                          icon: const Icon(Icons.delete_outline_rounded),
+                          label: Text(AppStrings.tr('qr_remove_image')),
+                        ),
+                    ],
+                  ),
+                ],
+                if (hasCenterImage) ...[
                   Text(
                     '${AppStrings.tr('qr_logo_size')}: ${(_logoScale * 100).round()}%',
                     style: Theme.of(context).textTheme.bodySmall,
@@ -931,6 +1147,16 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
                     label: '${(_logoScale * 100).round()}%',
                     onChanged: (value) => setState(() => _logoScale = value),
                   ),
+                  Text(
+                    AppStrings.tr('qr_center_image_hint'),
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.64),
+                        ),
+                  ),
+                  const SizedBox(height: 8),
                 ],
                 Text(
                   '${AppStrings.tr('qr_export_quality')}: x${_exportPixelRatio.toStringAsFixed(1)}',
