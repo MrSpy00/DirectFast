@@ -192,48 +192,61 @@ class _UtilsScreenState extends ConsumerState<UtilsScreen> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Text(
-                AppStrings.tr('quick_switch'),
-                style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: Theme.of(context)
-                          .colorScheme
-                          .onSurface
-                          .withValues(alpha: 0.7),
-                    ),
-              ),
-              const Spacer(),
-              PopupMenuButton<int>(
-                tooltip: AppStrings.tr('quick_switch'),
-                icon: const Icon(Icons.tune_rounded),
-                initialValue: _currentPage,
-                onSelected: _onSegmentTap,
-                itemBuilder: (context) {
-                  return List.generate(_segments.length, (index) {
-                    final item = _segments[index];
-                    return PopupMenuItem<int>(
-                      value: index,
-                      child: Row(
-                        children: [
-                          Icon(item.icon, size: 18),
-                          const SizedBox(width: 10),
-                          Text(AppStrings.tr(item.labelKey)),
-                        ],
-                      ),
-                    );
-                  });
-                },
-              ),
-            ],
+          Text(
+            AppStrings.tr('quick_switch'),
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.72),
+                ),
           ),
           const SizedBox(height: 8),
-          _ScrollableSegmentedControl(
-            segments: _segments,
-            selectedIndex: _currentPage,
-            onChanged: _onSegmentTap,
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Theme.of(context)
+                  .colorScheme
+                  .surfaceContainerHighest
+                  .withValues(alpha: 0.5),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: Theme.of(context)
+                    .colorScheme
+                    .outline
+                    .withValues(alpha: 0.16),
+              ),
+            ),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final columns = constraints.maxWidth < 540 ? 2 : 3;
+                const spacing = 8.0;
+                final itemWidth =
+                    (constraints.maxWidth - ((columns - 1) * spacing)) /
+                        columns;
+
+                return Wrap(
+                  spacing: spacing,
+                  runSpacing: spacing,
+                  children: List.generate(_segments.length, (index) {
+                    final segment = _segments[index];
+                    return SizedBox(
+                      width: itemWidth,
+                      child: _SegmentPill(
+                        icon: segment.icon,
+                        label: AppStrings.tr(segment.labelKey),
+                        isSelected: _currentPage == index,
+                        onTap: () => _onSegmentTap(index),
+                      ),
+                    );
+                  }),
+                );
+              },
+            ),
           ),
         ],
       ),
@@ -249,109 +262,79 @@ class _Segment {
   const _Segment({required this.icon, required this.labelKey});
 }
 
-class _ScrollableSegmentedControl extends StatelessWidget {
-  final List<_Segment> segments;
-  final int selectedIndex;
-  final ValueChanged<int> onChanged;
+class _SegmentPill extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
 
-  const _ScrollableSegmentedControl({
-    required this.segments,
-    required this.selectedIndex,
-    required this.onChanged,
+  const _SegmentPill({
+    required this.icon,
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 58,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.symmetric(horizontal: 4),
-        itemCount: segments.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 8),
-        itemBuilder: (context, index) {
-          final segment = segments[index];
-          final isSelected = selectedIndex == index;
+    final onSurface = Theme.of(context).colorScheme.onSurface;
 
-          return InkWell(
-            onTap: () => onChanged(index),
-            borderRadius: BorderRadius.circular(14),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 220),
-              curve: Curves.easeOutCubic,
-              constraints: const BoxConstraints(minWidth: 98),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              decoration: BoxDecoration(
-                gradient:
-                    isSelected ? AppTheme.primaryGradientFor(context) : null,
-                color: isSelected
-                    ? null
-                    : Theme.of(context)
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOutCubic,
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+        decoration: BoxDecoration(
+          gradient: isSelected ? AppTheme.primaryGradientFor(context) : null,
+          color: isSelected
+              ? null
+              : Theme.of(context).colorScheme.surface.withValues(alpha: 0.86),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected
+                ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.5)
+                : Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+          ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: Theme.of(context)
                         .colorScheme
-                        .surfaceContainerHighest
-                        .withValues(alpha: 0.88),
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(
+                        .primary
+                        .withValues(alpha: 0.25),
+                    blurRadius: 10,
+                    offset: const Offset(0, 3),
+                  ),
+                ]
+              : null,
+        ),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              size: 17,
+              color:
+                  isSelected ? Colors.white : onSurface.withValues(alpha: 0.7),
+            ),
+            const SizedBox(width: 7),
+            Expanded(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
                   color: isSelected
-                      ? Theme.of(context)
-                          .colorScheme
-                          .primary
-                          .withValues(alpha: 0.55)
-                      : Theme.of(context)
-                          .colorScheme
-                          .outline
-                          .withValues(alpha: 0.2),
+                      ? Colors.white
+                      : onSurface.withValues(alpha: 0.82),
                 ),
-                boxShadow: isSelected
-                    ? [
-                        BoxShadow(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .primary
-                              .withValues(alpha: 0.24),
-                          blurRadius: 10,
-                          offset: const Offset(0, 3),
-                        ),
-                      ]
-                    : null,
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    segment.icon,
-                    size: 18,
-                    color: isSelected
-                        ? Colors.white
-                        : Theme.of(context)
-                            .colorScheme
-                            .onSurface
-                            .withValues(alpha: 0.7),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    AppStrings.tr(segment.labelKey),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight:
-                          isSelected ? FontWeight.w700 : FontWeight.w600,
-                      color: isSelected
-                          ? Colors.white
-                          : Theme.of(context)
-                              .colorScheme
-                              .onSurface
-                              .withValues(alpha: 0.82),
-                    ),
-                  ),
-                ],
               ),
             ),
-          );
-        },
+          ],
+        ),
       ),
     );
   }
@@ -374,6 +357,8 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
   Color _bgColor = Colors.white;
   double _qrSize = 220;
   double _qrPadding = 16;
+  double _logoScale = 0.18;
+  double _exportPixelRatio = 4.0;
   bool _gapless = true;
   bool _embedLogo = false;
   QrEyeShape _eyeShape = QrEyeShape.square;
@@ -389,6 +374,14 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
     Color(0xFFC62828),
     Color(0xFFE65100),
   ];
+
+  static const Map<String, String> _payloadTemplates = {
+    'qr_template_url': 'https://example.com',
+    'qr_template_email': 'mailto:hello@example.com',
+    'qr_template_phone': 'tel:+905551112233',
+    'qr_template_sms': 'sms:+905551112233?body=Merhaba',
+    'qr_template_wifi': 'WIFI:T:WPA;S:DirectFast;P:supersecret123;;',
+  };
 
   @override
   void dispose() {
@@ -430,12 +423,34 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
       _bgColor = Colors.white;
       _qrSize = 220;
       _qrPadding = 16;
+      _logoScale = 0.18;
+      _exportPixelRatio = 4.0;
       _gapless = true;
       _embedLogo = false;
       _eyeShape = QrEyeShape.square;
       _moduleShape = QrDataModuleShape.square;
       _errorLevel = QrErrorCorrectLevel.H;
     });
+  }
+
+  void _applyPayloadTemplate(String key) {
+    final value = _payloadTemplates[key];
+    if (value == null) {
+      return;
+    }
+    HapticFeedback.selectionClick();
+    setState(() {
+      _textController.text = value;
+      _qrData = value;
+    });
+  }
+
+  double _contrastRatio() {
+    final fg = _fgColor.computeLuminance();
+    final bg = _bgColor.computeLuminance();
+    final light = math.max(fg, bg);
+    final dark = math.min(fg, bg);
+    return (light + 0.05) / (dark + 0.05);
   }
 
   Future<void> _pickColor({
@@ -541,7 +556,7 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
     try {
       final boundary =
           _qrKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
-      final image = await boundary.toImage(pixelRatio: 4.0);
+      final image = await boundary.toImage(pixelRatio: _exportPixelRatio);
       final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
       final png = bytes!.buffer.asUint8List();
       await Share.shareXFiles(
@@ -564,7 +579,7 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
     try {
       final boundary =
           _qrKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
-      final image = await boundary.toImage(pixelRatio: 4.0);
+      final image = await boundary.toImage(pixelRatio: _exportPixelRatio);
       final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
       final png = bytes!.buffer.asUint8List();
       await Gal.putImageBytes(
@@ -587,11 +602,12 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
 
   @override
   Widget build(BuildContext context) {
+    final contrast = _contrastRatio();
     final levelLabel = switch (_errorLevel) {
-      QrErrorCorrectLevel.L => 'L (7%)',
-      QrErrorCorrectLevel.M => 'M (15%)',
-      QrErrorCorrectLevel.Q => 'Q (25%)',
-      _ => 'H (30%)',
+      QrErrorCorrectLevel.L => AppStrings.tr('qr_error_level_l'),
+      QrErrorCorrectLevel.M => AppStrings.tr('qr_error_level_m'),
+      QrErrorCorrectLevel.Q => AppStrings.tr('qr_error_level_q'),
+      _ => AppStrings.tr('qr_error_level_h'),
     };
 
     return SingleChildScrollView(
@@ -623,7 +639,10 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
                           : null,
                       embeddedImageStyle: _embedLogo
                           ? QrEmbeddedImageStyle(
-                              size: Size(_qrSize * 0.18, _qrSize * 0.18),
+                              size: Size(
+                                _qrSize * _logoScale,
+                                _qrSize * _logoScale,
+                              ),
                             )
                           : null,
                       eyeStyle: QrEyeStyle(
@@ -663,6 +682,44 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
                     );
                   },
                 ),
+                const SizedBox(height: 10),
+                Container(
+                  width: double.infinity,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .surfaceContainerHighest
+                        .withValues(alpha: 0.45),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        contrast >= 3
+                            ? Icons.verified_rounded
+                            : Icons.warning_amber_rounded,
+                        size: 18,
+                        color: contrast >= 3
+                            ? Colors.lightGreen
+                            : Theme.of(context).colorScheme.error,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          AppStrings.tr(
+                            contrast >= 3
+                                ? 'qr_contrast_good'
+                                : 'qr_contrast_low',
+                            args: [contrast.toStringAsFixed(2)],
+                          ),
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
           )
@@ -685,13 +742,28 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
                 TextField(
                   controller: _textController,
                   maxLines: 3,
+                  minLines: 3,
                   decoration: InputDecoration(
                     hintText: AppStrings.tr('enter_text'),
-                    prefixIcon: const Icon(Icons.qr_code_2_rounded),
-                    alignLabelWithHint: true,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
                   ),
                   textAlignVertical: TextAlignVertical.top,
                   onSubmitted: (_) => _generateQR(),
+                ),
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: _payloadTemplates.keys.map((key) {
+                    return ActionChip(
+                      avatar: const Icon(Icons.bolt_rounded, size: 16),
+                      label: Text(AppStrings.tr(key)),
+                      onPressed: () => _applyPayloadTemplate(key),
+                    );
+                  }).toList(),
                 ),
                 const SizedBox(height: 16),
                 Wrap(
@@ -749,22 +821,22 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
                           labelText: AppStrings.tr('qr_error_level'),
                           prefixIcon: const Icon(Icons.security_rounded),
                         ),
-                        items: const <DropdownMenuItem<int>>[
+                        items: <DropdownMenuItem<int>>[
                           DropdownMenuItem<int>(
                             value: QrErrorCorrectLevel.L,
-                            child: Text('L (7%)'),
+                            child: Text(AppStrings.tr('qr_error_level_l')),
                           ),
                           DropdownMenuItem<int>(
                             value: QrErrorCorrectLevel.M,
-                            child: Text('M (15%)'),
+                            child: Text(AppStrings.tr('qr_error_level_m')),
                           ),
                           DropdownMenuItem<int>(
                             value: QrErrorCorrectLevel.Q,
-                            child: Text('Q (25%)'),
+                            child: Text(AppStrings.tr('qr_error_level_q')),
                           ),
                           DropdownMenuItem<int>(
                             value: QrErrorCorrectLevel.H,
-                            child: Text('H (30%)'),
+                            child: Text(AppStrings.tr('qr_error_level_h')),
                           ),
                         ],
                         onChanged: (value) {
@@ -806,26 +878,26 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
                   runSpacing: 8,
                   children: [
                     ChoiceChip(
-                      label: const Text('Eye ■'),
+                      label: Text(AppStrings.tr('qr_eye_square')),
                       selected: _eyeShape == QrEyeShape.square,
                       onSelected: (_) =>
                           setState(() => _eyeShape = QrEyeShape.square),
                     ),
                     ChoiceChip(
-                      label: const Text('Eye ●'),
+                      label: Text(AppStrings.tr('qr_eye_circle')),
                       selected: _eyeShape == QrEyeShape.circle,
                       onSelected: (_) =>
                           setState(() => _eyeShape = QrEyeShape.circle),
                     ),
                     ChoiceChip(
-                      label: const Text('Data ■'),
+                      label: Text(AppStrings.tr('qr_data_square')),
                       selected: _moduleShape == QrDataModuleShape.square,
                       onSelected: (_) => setState(
                         () => _moduleShape = QrDataModuleShape.square,
                       ),
                     ),
                     ChoiceChip(
-                      label: const Text('Data ●'),
+                      label: Text(AppStrings.tr('qr_data_circle')),
                       selected: _moduleShape == QrDataModuleShape.circle,
                       onSelected: (_) => setState(
                         () => _moduleShape = QrDataModuleShape.circle,
@@ -845,6 +917,33 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
                   title: Text(AppStrings.tr('qr_logo')),
                   value: _embedLogo,
                   onChanged: (value) => setState(() => _embedLogo = value),
+                ),
+                if (_embedLogo) ...[
+                  Text(
+                    '${AppStrings.tr('qr_logo_size')}: ${(_logoScale * 100).round()}%',
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                  Slider(
+                    value: _logoScale,
+                    min: 0.12,
+                    max: 0.28,
+                    divisions: 16,
+                    label: '${(_logoScale * 100).round()}%',
+                    onChanged: (value) => setState(() => _logoScale = value),
+                  ),
+                ],
+                Text(
+                  '${AppStrings.tr('qr_export_quality')}: x${_exportPixelRatio.toStringAsFixed(1)}',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+                Slider(
+                  value: _exportPixelRatio,
+                  min: 2.0,
+                  max: 6.0,
+                  divisions: 8,
+                  label: 'x${_exportPixelRatio.toStringAsFixed(1)}',
+                  onChanged: (value) =>
+                      setState(() => _exportPixelRatio = value),
                 ),
                 OutlinedButton.icon(
                   onPressed: _resetStyle,
@@ -1108,15 +1207,18 @@ class _LinkCleanerPageState extends State<_LinkCleanerPage> {
                   controller: _urlController,
                   decoration: InputDecoration(
                     hintText: AppStrings.tr('enter_url'),
-                    prefixIcon: const Icon(Icons.link_rounded),
                     suffixIcon: IconButton(
                       icon: const Icon(Icons.content_paste_rounded),
                       onPressed: _pasteFromClipboard,
                       tooltip: AppStrings.tr('quick_paste'),
                     ),
-                    alignLabelWithHint: true,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
                   ),
                   textAlignVertical: TextAlignVertical.top,
+                  minLines: 2,
                   maxLines: 2,
                 ),
                 const SizedBox(height: 16),
@@ -2135,9 +2237,13 @@ class _AddTemplateSheetState extends State<_AddTemplateSheet> {
               controller: _messageController,
               decoration: InputDecoration(
                 hintText: AppStrings.tr('template_message'),
-                prefixIcon: const Icon(Icons.message_outlined),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 14,
+                ),
               ),
               textAlignVertical: TextAlignVertical.top,
+              minLines: 4,
               maxLines: 4,
               textCapitalization: TextCapitalization.sentences,
             ),
@@ -2382,12 +2488,15 @@ class _GmailComposerPageState extends State<_GmailComposerPage> {
                 _buildFieldLabel(context, 'gmail_body_label'),
                 TextField(
                   controller: _messageController,
+                  minLines: 6,
                   maxLines: 6,
                   textCapitalization: TextCapitalization.sentences,
                   decoration: InputDecoration(
                     hintText: AppStrings.tr('gmail_body_hint'),
-                    prefixIcon: const Icon(Icons.edit_note_rounded),
-                    alignLabelWithHint: true,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
                   ),
                   textAlignVertical: TextAlignVertical.top,
                 ),
@@ -2723,13 +2832,16 @@ class _SecurityToolkitPageState extends State<_SecurityToolkitPage> {
                 const SizedBox(height: 12),
                 TextField(
                   controller: _cipherInputController,
+                  minLines: 3,
                   maxLines: 3,
                   decoration: InputDecoration(
                     hintText: _cipherEncryptMode
                         ? AppStrings.tr('enter_message_to_encrypt')
                         : AppStrings.tr('enter_encrypted_message'),
-                    prefixIcon: const Icon(Icons.message_rounded),
-                    alignLabelWithHint: true,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
                   ),
                   textAlignVertical: TextAlignVertical.top,
                 ),
@@ -2784,10 +2896,13 @@ class _SecurityToolkitPageState extends State<_SecurityToolkitPage> {
                   controller: _hashInputController,
                   decoration: InputDecoration(
                     hintText: AppStrings.tr('security_input_hint'),
-                    prefixIcon: const Icon(Icons.text_fields_rounded),
-                    alignLabelWithHint: true,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
                   ),
                   textAlignVertical: TextAlignVertical.top,
+                  minLines: 2,
                   maxLines: 2,
                 ),
                 const SizedBox(height: 12),
@@ -2908,10 +3023,13 @@ class _SecurityToolkitPageState extends State<_SecurityToolkitPage> {
                   controller: _transformInputController,
                   decoration: InputDecoration(
                     hintText: AppStrings.tr('security_input_hint'),
-                    prefixIcon: const Icon(Icons.swap_horiz_rounded),
-                    alignLabelWithHint: true,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
                   ),
                   textAlignVertical: TextAlignVertical.top,
+                  minLines: 3,
                   maxLines: 3,
                 ),
                 const SizedBox(height: 14),

@@ -16,14 +16,14 @@ Chat on messaging platforms without saving contacts.
 - **No Contact Saving**: Directly open chats without cluttering your contacts
 - **Smart Clipboard**: Automatic detection of phone numbers and usernames
 - **Quick Templates**: Save and reuse frequently sent messages
-- **Advanced QR Studio**: Highly customizable QR generation (foreground/background colors, module/eye shape, error correction, size/padding, logo embed, payload copy, high-quality share/save)
+- **Advanced QR Studio**: Highly customizable QR generation with payload templates (URL/Email/Phone/SMS/Wi-Fi), foreground/background controls, module/eye shape, error correction, logo scale, contrast guidance, and export quality control
 - **Link Cleaner**: Remove tracking parameters from URLs
 - **Security Toolkit**: Hashing, Base64/URL encode-decode, token generation, and local encrypt/decrypt utilities in one place
 - **Beautiful UI**: Material 3 design with smooth animations
 - **Chat History**: Track your recent conversations
-- **Localization**: Turkish, English, Spanish, Arabic, and Hindi language options
+- **Localization**: 25-language infrastructure with graceful fallback order and core manual translations
 - **Smart Theming**: Light, Dark, System, and AMOLED modes + selectable preset colors and custom RGB color palette
-- **Faster Tool Navigation**: Improved quick-switch experience between utility tools
+- **Faster Tool Navigation**: Cleaner segmented quick-switch with adaptive multi-row layout
 - **Privacy First**: All data stored locally on your device
 
 ---
@@ -67,9 +67,9 @@ lib/
 
 ## 🌍 Languages & Themes
 
-- **Supported Languages (5)**: Turkish (Türkçe), English, Spanish (Español), Arabic (العربية), Hindi (हिन्दी)
+- **Supported Languages (25)**: Turkish, English, Spanish, Arabic, Hindi, French, German, Russian, Portuguese, Chinese, Japanese, Korean, Italian, Indonesian, Bengali, Urdu, Vietnamese, Polish, Dutch, Thai, Persian, Malay, Telugu, Tamil, Punjabi
 - **Theme Modes**: Light, Dark, AMOLED, System Default
-- **Theme Colors**: 8 preset accents (Violet, Blue, Teal, Green, Orange, Red, Rose, Indigo) + custom RGB palette
+- **Theme Colors**: Multi-color preset palette + custom RGB palette
 - **In-App Controls**: Language, theme mode, and theme color can be changed from Settings and are persisted locally
 
 ---
