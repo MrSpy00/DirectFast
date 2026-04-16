@@ -9,12 +9,14 @@ import '../viewmodels/history_viewmodel.dart';
 import '../../home/viewmodels/home_viewmodel.dart';
 import '../../../data/models/chat_history_item.dart';
 import '../../../core/constants/platform_type.dart';
+import '../../../core/services/locale_service.dart';
 
 class HistoryScreen extends ConsumerWidget {
   const HistoryScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(localeProvider);
     final history = ref.watch(historyProvider);
     final groupedHistory = _groupHistoryByDate(history);
 

@@ -16,8 +16,9 @@ class SettingsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final themeMode = ref.watch(themeModeProvider);
+    final appThemeMode = ref.watch(appThemeModeProvider);
     final themeColorId = ref.watch(themeColorIdProvider);
+    final customThemeColor = ref.watch(customThemeColorProvider);
     final currentLocale = ref.watch(localeProvider);
 
     return Scaffold(
@@ -56,34 +57,40 @@ class SettingsScreen extends ConsumerWidget {
             // GlassmorphicContainer.flat — option lists do not benefit from
             // BackdropFilter; flat avoids the GPU compositing layer entirely.
             GlassmorphicContainer.flat(
-              padding: EdgeInsets.zero,
-              child: Column(
-                children: [
-                  for (int i = 0; i < AppStrings.supportedLocales.length; i++)
-                    ...[
-                      _LanguageOption(
-                        icon: Icons.language,
-                        title: AppStrings.tr(
-                          AppStrings.localeLabelKey(
-                            AppStrings.supportedLocales[i],
-                          ),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<String>(
+                  value: currentLocale,
+                  isExpanded: true,
+                  borderRadius: BorderRadius.circular(14),
+                  icon: const Icon(Icons.keyboard_arrow_down_rounded),
+                  items: [
+                    for (final locale in AppStrings.supportedLocales)
+                      DropdownMenuItem<String>(
+                        value: locale,
+                        child: Row(
+                          children: [
+                            const Icon(Icons.language_rounded, size: 18),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                '${AppStrings.tr(AppStrings.localeLabelKey(locale))} • ${AppStrings.localeNativeName(locale)}',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
                         ),
-                        subtitle: AppStrings.localeNativeName(
-                          AppStrings.supportedLocales[i],
-                        ),
-                        isSelected:
-                            currentLocale == AppStrings.supportedLocales[i],
-                        onTap: () {
-                          HapticFeedback.lightImpact();
-                          ref.read(localeProvider.notifier).setLocale(
-                                AppStrings.supportedLocales[i],
-                              );
-                        },
                       ),
-                      if (i != AppStrings.supportedLocales.length - 1)
-                        const _Divider(),
-                    ],
-                ],
+                  ],
+                  onChanged: (value) {
+                    if (value == null || value == currentLocale) {
+                      return;
+                    }
+                    HapticFeedback.lightImpact();
+                    ref.read(localeProvider.notifier).setLocale(value);
+                  },
+                ),
               ),
             )
                 .animate()
@@ -106,36 +113,48 @@ class SettingsScreen extends ConsumerWidget {
                   _ThemeOption(
                     icon: Icons.light_mode,
                     title: AppStrings.tr('light_mode'),
-                    isSelected: themeMode == ThemeMode.light,
+                    isSelected: appThemeMode == AppThemeMode.light,
                     onTap: () {
                       HapticFeedback.lightImpact();
                       ref
-                          .read(themeModeProvider.notifier)
-                          .setThemeMode(ThemeMode.light);
+                          .read(appThemeModeProvider.notifier)
+                          .setThemeMode(AppThemeMode.light);
                     },
                   ),
                   const _Divider(),
                   _ThemeOption(
                     icon: Icons.dark_mode,
                     title: AppStrings.tr('dark_mode'),
-                    isSelected: themeMode == ThemeMode.dark,
+                    isSelected: appThemeMode == AppThemeMode.dark,
                     onTap: () {
                       HapticFeedback.lightImpact();
                       ref
-                          .read(themeModeProvider.notifier)
-                          .setThemeMode(ThemeMode.dark);
+                          .read(appThemeModeProvider.notifier)
+                          .setThemeMode(AppThemeMode.dark);
+                    },
+                  ),
+                  const _Divider(),
+                  _ThemeOption(
+                    icon: Icons.dark_mode_outlined,
+                    title: AppStrings.tr('amoled_mode'),
+                    isSelected: appThemeMode == AppThemeMode.amoled,
+                    onTap: () {
+                      HapticFeedback.lightImpact();
+                      ref
+                          .read(appThemeModeProvider.notifier)
+                          .setThemeMode(AppThemeMode.amoled);
                     },
                   ),
                   const _Divider(),
                   _ThemeOption(
                     icon: Icons.brightness_auto,
                     title: AppStrings.tr('system_default'),
-                    isSelected: themeMode == ThemeMode.system,
+                    isSelected: appThemeMode == AppThemeMode.system,
                     onTap: () {
                       HapticFeedback.lightImpact();
                       ref
-                          .read(themeModeProvider.notifier)
-                          .setThemeMode(ThemeMode.system);
+                          .read(appThemeModeProvider.notifier)
+                          .setThemeMode(AppThemeMode.system);
                     },
                   ),
                 ],
@@ -183,12 +202,47 @@ class SettingsScreen extends ConsumerWidget {
                             .setThemeColorId(option.id);
                       },
                     ),
+                  _ThemeColorOption(
+                    color: customThemeColor ??
+                        Theme.of(context).colorScheme.primary,
+                    label: AppStrings.tr('custom_color'),
+                    isSelected: themeColorId == AppTheme.customColorId,
+                    onTap: () {
+                      HapticFeedback.lightImpact();
+                      final baseColor = customThemeColor ??
+                          Theme.of(context).colorScheme.primary;
+                      _showCustomColorPicker(
+                        context: context,
+                        ref: ref,
+                        initialColor: baseColor,
+                      );
+                    },
+                  ),
                 ],
               ),
             )
                 .animate()
                 .fadeIn(duration: 400.ms, delay: 200.ms)
                 .slideX(begin: -0.2, end: 0),
+
+            const SizedBox(height: 10),
+
+            Align(
+              alignment: Alignment.centerRight,
+              child: OutlinedButton.icon(
+                onPressed: () async {
+                  final baseColor =
+                      customThemeColor ?? Theme.of(context).colorScheme.primary;
+                  await _showCustomColorPicker(
+                    context: context,
+                    ref: ref,
+                    initialColor: baseColor,
+                  );
+                },
+                icon: const Icon(Icons.palette_outlined),
+                label: Text(AppStrings.tr('pick_custom_color')),
+              ),
+            ).animate().fadeIn(duration: 350.ms, delay: 220.ms),
 
             const SizedBox(height: 32),
 
@@ -351,6 +405,151 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
+  Future<void> _showCustomColorPicker({
+    required BuildContext context,
+    required WidgetRef ref,
+    required Color initialColor,
+  }) async {
+    var red = (initialColor.r * 255).roundToDouble();
+    var green = (initialColor.g * 255).roundToDouble();
+    var blue = (initialColor.b * 255).roundToDouble();
+
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      showDragHandle: true,
+      builder: (sheetContext) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            final pickedColor = Color.fromARGB(
+              0xFF,
+              red.round(),
+              green.round(),
+              blue.round(),
+            );
+            final hex =
+                '#${pickedColor.toARGB32().toRadixString(16).padLeft(8, '0').substring(2).toUpperCase()}';
+
+            Widget slider({
+              required String label,
+              required double value,
+              required Color activeColor,
+              required ValueChanged<double> onChanged,
+            }) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          label,
+                          style:
+                              Theme.of(context).textTheme.labelLarge?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                        ),
+                      ),
+                      Text(
+                        value.round().toString(),
+                        style: Theme.of(context).textTheme.labelMedium,
+                      ),
+                    ],
+                  ),
+                  Slider(
+                    value: value,
+                    max: 255,
+                    activeColor: activeColor,
+                    onChanged: onChanged,
+                  ),
+                ],
+              );
+            }
+
+            return Padding(
+              padding: EdgeInsets.fromLTRB(
+                20,
+                10,
+                20,
+                20 + MediaQuery.of(context).viewInsets.bottom,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    AppStrings.tr('pick_custom_color'),
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    height: 72,
+                    decoration: BoxDecoration(
+                      color: pickedColor,
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      hex,
+                      style: TextStyle(
+                        color:
+                            ThemeData.estimateBrightnessForColor(pickedColor) ==
+                                    Brightness.dark
+                                ? Colors.white
+                                : Colors.black,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.8,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  slider(
+                    label: 'R',
+                    value: red,
+                    activeColor: Colors.red,
+                    onChanged: (v) => setModalState(() => red = v),
+                  ),
+                  slider(
+                    label: 'G',
+                    value: green,
+                    activeColor: Colors.green,
+                    onChanged: (v) => setModalState(() => green = v),
+                  ),
+                  slider(
+                    label: 'B',
+                    value: blue,
+                    activeColor: Colors.blue,
+                    onChanged: (v) => setModalState(() => blue = v),
+                  ),
+                  const SizedBox(height: 8),
+                  FilledButton.icon(
+                    onPressed: () async {
+                      await ref
+                          .read(customThemeColorProvider.notifier)
+                          .setColor(pickedColor);
+                      await ref
+                          .read(themeColorIdProvider.notifier)
+                          .setThemeColorId(AppTheme.customColorId);
+                      if (context.mounted) {
+                        Navigator.of(context).pop();
+                      }
+                    },
+                    icon: const Icon(Icons.check_circle_outline_rounded),
+                    label: Text(AppStrings.tr('apply_color')),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   Future<void> _launchGitHub(BuildContext context) async {
     final uri = Uri.parse(AppConstants.githubUrl);
     if (await canLaunchUrl(uri)) {
@@ -448,76 +647,6 @@ class _LinkButton extends StatelessWidget {
   }
 }
 
-class _LanguageOption extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  const _LanguageOption({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.isSelected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final primary = Theme.of(context).colorScheme.primary;
-    final onSurface = Theme.of(context).colorScheme.onSurface;
-
-    return InkWell(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              color: isSelected ? primary : onSurface.withValues(alpha: 0.6),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          fontWeight:
-                              isSelected ? FontWeight.w600 : FontWeight.normal,
-                          color: isSelected ? primary : null,
-                        ),
-                  ),
-                  Text(
-                    subtitle,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: onSurface.withValues(alpha: 0.62),
-                        ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(
-              width: 24,
-              child: AnimatedOpacity(
-                opacity: isSelected ? 1 : 0,
-                duration: const Duration(milliseconds: 140),
-                child: Icon(
-                  Icons.check_circle,
-                  color: primary,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class _ThemeOption extends StatelessWidget {
   final IconData icon;
   final String title;
@@ -550,6 +679,8 @@ class _ThemeOption extends StatelessWidget {
             Expanded(
               child: Text(
                 title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       fontWeight:
                           isSelected ? FontWeight.w600 : FontWeight.normal,
@@ -591,12 +722,17 @@ class _ThemeColorOption extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final primary = Theme.of(context).colorScheme.primary;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final borderColor = isDark
+        ? Colors.white.withValues(alpha: 0.2)
+        : Colors.black.withValues(alpha: 0.15);
 
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
+        width: 138,
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
           color: Theme.of(context)
@@ -612,30 +748,41 @@ class _ThemeColorOption extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 180),
-              width: isSelected ? 14 : 12,
-              height: isSelected ? 14 : 12,
+            Container(
+              width: 24,
+              height: 24,
               decoration: BoxDecoration(
-                shape: BoxShape.circle,
                 color: color,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: borderColor),
                 boxShadow: [
                   BoxShadow(
-                    color: color.withValues(alpha: 0.45),
-                    blurRadius: 6,
-                    spreadRadius: 1,
+                    color: color.withValues(alpha: 0.38),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
                   ),
                 ],
               ),
             ),
             const SizedBox(width: 8),
-            Text(
-              label,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                    color: isSelected ? primary : null,
-                  ),
+            Expanded(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      fontWeight:
+                          isSelected ? FontWeight.w700 : FontWeight.w500,
+                      color: isSelected ? primary : null,
+                    ),
+              ),
             ),
+            if (isSelected) ...[
+              const SizedBox(width: 6),
+              Icon(Icons.check_circle_rounded, size: 16, color: primary),
+            ] else ...[
+              const SizedBox(width: 6),
+            ],
           ],
         ),
       ),

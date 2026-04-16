@@ -15,6 +15,7 @@ import '../../../data/models/chat_history_item.dart';
 import '../../../shared/theme/app_theme.dart';
 import '../../../core/utils/app_router.dart';
 import '../../../core/services/clipboard_service.dart';
+import '../../../core/services/locale_service.dart';
 
 /// HomeScreen — premium micro-interactions, smart clipboard overlay,
 /// recent contacts carousel, haptic feedback throughout.
@@ -107,6 +108,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(localeProvider);
     final selectedPlatform = ref.watch(selectedPlatformProvider);
     final selectedCategory = ref.watch(selectedCategoryProvider);
     final clipboardSuggestion = ref.watch(clipboardSuggestionProvider);
@@ -288,7 +290,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   const SizedBox(height: 4),
                   Text(
                     AppStrings.tr('chat_without_saving'),
-                    maxLines: 2,
+                    maxLines: 3,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       color: Colors.white.withValues(alpha: 0.9),
@@ -681,6 +683,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     const SizedBox(height: 2),
                     Text(
                       AppStrings.tr('utils_subtitle'),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: Theme.of(context)
                                 .colorScheme
@@ -730,25 +734,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   SizedBox(
                     width: cardWidth,
                     child: _UtilityShortcutCard(
-                      icon: Icons.lock_outline,
-                      label: AppStrings.tr('message_encryptor'),
-                      gradient: LinearGradient(
-                        colors: [
-                          Theme.of(context).colorScheme.tertiary,
-                          Theme.of(context).colorScheme.primary,
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      onTap: () {
-                        HapticFeedback.lightImpact();
-                        context.push(AppRouter.utils, extra: 2);
-                      },
-                    ),
-                  ),
-                  SizedBox(
-                    width: cardWidth,
-                    child: _UtilityShortcutCard(
                       icon: Icons.bookmarks_outlined,
                       label: AppStrings.tr('templates'),
                       gradient: LinearGradient(
@@ -761,7 +746,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
                       onTap: () {
                         HapticFeedback.lightImpact();
-                        context.push(AppRouter.utils, extra: 3);
+                        context.push(AppRouter.utils, extra: 2);
                       },
                     ),
                   ),
@@ -780,7 +765,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
                       onTap: () {
                         HapticFeedback.lightImpact();
-                        context.push(AppRouter.utils, extra: 4);
+                        context.push(AppRouter.utils, extra: 3);
                       },
                     ),
                   ),
@@ -793,6 +778,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         colors: [
                           Theme.of(context).colorScheme.tertiary,
                           Theme.of(context).colorScheme.secondary,
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      onTap: () {
+                        HapticFeedback.lightImpact();
+                        context.push(AppRouter.utils, extra: 4);
+                      },
+                    ),
+                  ),
+                  SizedBox(
+                    width: cardWidth,
+                    child: _UtilityShortcutCard(
+                      icon: Icons.lock_person_rounded,
+                      label: AppStrings.tr('security_toolkit'),
+                      gradient: LinearGradient(
+                        colors: [
+                          Theme.of(context).colorScheme.primary,
+                          Theme.of(context).colorScheme.tertiary,
                         ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
@@ -1102,8 +1106,9 @@ class _UtilityShortcutCard extends StatelessWidget {
                   label,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         fontWeight: FontWeight.w700,
+                        height: 1.2,
                       ),
-                  maxLines: 2,
+                  maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),

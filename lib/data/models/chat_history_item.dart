@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'package:intl/intl.dart';
 import '../../core/constants/platform_type.dart';
+import '../../shared/constants/app_strings.dart';
 
 class ChatHistoryItem {
   final String id;
@@ -64,15 +66,17 @@ class ChatHistoryItem {
   String get formattedDate {
     final now = DateTime.now();
     final difference = now.difference(timestamp);
+    final locale = AppStrings.currentLocale;
+    final time = DateFormat.Hm(locale).format(timestamp);
 
     if (difference.inDays == 0) {
-      return 'Today ${timestamp.hour}:${timestamp.minute.toString().padLeft(2, '0')}';
+      return '${AppStrings.tr('today')} $time';
     } else if (difference.inDays == 1) {
-      return 'Yesterday ${timestamp.hour}:${timestamp.minute.toString().padLeft(2, '0')}';
+      return '${AppStrings.tr('yesterday')} $time';
     } else if (difference.inDays < 7) {
-      return '${difference.inDays} days ago';
+      return AppStrings.tr('days_ago', args: [difference.inDays.toString()]);
     } else {
-      return '${timestamp.day}/${timestamp.month}/${timestamp.year}';
+      return DateFormat.yMd(locale).format(timestamp);
     }
   }
 

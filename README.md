@@ -16,13 +16,14 @@ Chat on messaging platforms without saving contacts.
 - **No Contact Saving**: Directly open chats without cluttering your contacts
 - **Smart Clipboard**: Automatic detection of phone numbers and usernames
 - **Quick Templates**: Save and reuse frequently sent messages
-- **QR Generator**: Create and save QR codes for shareable contact details
+- **Advanced QR Studio**: Highly customizable QR generation (foreground/background colors, module/eye shape, error correction, size/padding, logo embed, payload copy, high-quality share/save)
 - **Link Cleaner**: Remove tracking parameters from URLs
-- **Message Encryptor**: Encrypt/decrypt messages locally on device
+- **Security Toolkit**: Hashing, Base64/URL encode-decode, token generation, and local encrypt/decrypt utilities in one place
 - **Beautiful UI**: Material 3 design with smooth animations
 - **Chat History**: Track your recent conversations
 - **Localization**: Turkish, English, Spanish, Arabic, and Hindi language options
-- **Theme Colors**: 8 selectable accent color themes with persistent preference
+- **Smart Theming**: Light, Dark, System, and AMOLED modes + selectable preset colors and custom RGB color palette
+- **Faster Tool Navigation**: Improved quick-switch experience between utility tools
 - **Privacy First**: All data stored locally on your device
 
 ---
@@ -43,7 +44,8 @@ lib/
 ├── features/
 │   ├── home/            # Home screen feature
 │   ├── history/         # History feature
-│   └── settings/        # Settings feature
+│   ├── settings/        # Settings feature
+│   └── utils/           # Utility tools feature
 └── shared/
     ├── theme/           # App theming
     └── widgets/         # Reusable widgets
@@ -66,8 +68,8 @@ lib/
 ## 🌍 Languages & Themes
 
 - **Supported Languages (5)**: Turkish (Türkçe), English, Spanish (Español), Arabic (العربية), Hindi (हिन्दी)
-- **Theme Modes**: Light, Dark, System Default
-- **Theme Colors (8)**: Violet, Blue, Teal, Green, Orange, Red, Rose, Indigo
+- **Theme Modes**: Light, Dark, AMOLED, System Default
+- **Theme Colors**: 8 preset accents (Violet, Blue, Teal, Green, Orange, Red, Rose, Indigo) + custom RGB palette
 - **In-App Controls**: Language, theme mode, and theme color can be changed from Settings and are persisted locally
 
 ---

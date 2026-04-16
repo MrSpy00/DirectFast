@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../shared/constants/app_strings.dart';
 
 enum PlatformType {
   whatsapp,
@@ -21,43 +22,47 @@ enum PlatformType {
   email;
 
   String get displayName {
+    return AppStrings.tr(localizationKey);
+  }
+
+  String get localizationKey {
     switch (this) {
       case PlatformType.whatsapp:
-        return 'WhatsApp';
+        return 'whatsapp';
       case PlatformType.telegram:
-        return 'Telegram';
+        return 'telegram';
       case PlatformType.signal:
-        return 'Signal';
+        return 'signal';
       case PlatformType.viber:
-        return 'Viber';
+        return 'viber';
       case PlatformType.wechat:
-        return 'WeChat';
+        return 'wechat';
       case PlatformType.line:
-        return 'LINE';
+        return 'line';
       case PlatformType.messenger:
-        return 'Messenger';
+        return 'messenger';
       case PlatformType.discord:
-        return 'Discord';
+        return 'discord';
       case PlatformType.instagram:
-        return 'Instagram';
+        return 'instagram';
       case PlatformType.twitter:
-        return 'X (Twitter)';
+        return 'twitter';
       case PlatformType.snapchat:
-        return 'Snapchat';
+        return 'snapchat';
       case PlatformType.youtube:
-        return 'YouTube';
+        return 'youtube';
       case PlatformType.tiktok:
-        return 'TikTok';
+        return 'tiktok';
       case PlatformType.twitch:
-        return 'Twitch';
+        return 'twitch';
       case PlatformType.facebook:
-        return 'Facebook';
+        return 'facebook';
       case PlatformType.kick:
-        return 'Kick';
+        return 'kick';
       case PlatformType.linkedin:
-        return 'LinkedIn';
+        return 'linkedin';
       case PlatformType.email:
-        return 'Email';
+        return 'email';
     }
   }
 
@@ -204,7 +209,7 @@ enum PlatformType {
       case PlatformType.whatsapp:
       case PlatformType.signal:
       case PlatformType.viber:
-        return 'Enter phone number (e.g., +905551234567)';
+        return AppStrings.tr('enter_phone');
       case PlatformType.telegram:
       case PlatformType.wechat:
       case PlatformType.line:
@@ -219,9 +224,9 @@ enum PlatformType {
       case PlatformType.facebook:
       case PlatformType.kick:
       case PlatformType.linkedin:
-        return 'Enter username (without @)';
+        return AppStrings.tr('enter_username');
       case PlatformType.email:
-        return 'Enter email address';
+        return AppStrings.tr('enter_email');
     }
   }
 
@@ -287,11 +292,11 @@ enum PlatformCategory {
   String get displayName {
     switch (this) {
       case PlatformCategory.chat:
-        return 'Chat';
+        return AppStrings.tr('chat_apps');
       case PlatformCategory.social:
-        return 'Social';
+        return AppStrings.tr('social_media');
       case PlatformCategory.utility:
-        return 'Utilities';
+        return AppStrings.tr('utilities');
     }
   }
 

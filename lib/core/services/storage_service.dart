@@ -11,6 +11,7 @@ class StorageService {
   static const String _templatesKey = 'templates_v1';
   static const String _themeKey = 'theme_mode';
   static const String _themeColorKey = 'theme_color_id';
+  static const String _customThemeColorKey = 'custom_theme_color_value';
 
   /// Initialize SharedPreferences
   static Future<void> init() async {
@@ -21,7 +22,8 @@ class StorageService {
   static SharedPreferences get prefs {
     if (_prefs == null) {
       throw Exception(
-          'StorageService not initialized. Call StorageService.init() first.',);
+        'StorageService not initialized. Call StorageService.init() first.',
+      );
     }
     return _prefs!;
   }
@@ -152,6 +154,20 @@ class StorageService {
   /// Set theme color id
   static Future<void> setThemeColorId(String colorId) async {
     await prefs.setString(_themeColorKey, colorId);
+  }
+
+  /// Get custom theme color value (ARGB int)
+  static int? getCustomThemeColorValue() {
+    return prefs.getInt(_customThemeColorKey);
+  }
+
+  /// Set custom theme color value (ARGB int)
+  static Future<void> setCustomThemeColorValue(int? colorValue) async {
+    if (colorValue == null) {
+      await prefs.remove(_customThemeColorKey);
+      return;
+    }
+    await prefs.setInt(_customThemeColorKey, colorValue);
   }
 
   /// Get locale

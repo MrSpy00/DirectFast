@@ -18,30 +18,31 @@ import '../../../core/constants/app_constants.dart';
 import '../../../shared/constants/app_strings.dart';
 import '../../../shared/widgets/glassmorphic_container.dart';
 import '../../../shared/theme/app_theme.dart';
+import '../../../core/services/locale_service.dart';
 import '../viewmodels/templates_viewmodel.dart';
 import '../../../data/models/template_item.dart';
 
 // ── Screen ────────────────────────────────────────────────────────────────────
 
-class UtilsScreen extends StatefulWidget {
+class UtilsScreen extends ConsumerStatefulWidget {
   final int initialTab;
   const UtilsScreen({super.key, this.initialTab = 0});
 
   @override
-  State<UtilsScreen> createState() => _UtilsScreenState();
+  ConsumerState<UtilsScreen> createState() => _UtilsScreenState();
 }
 
-class _UtilsScreenState extends State<UtilsScreen> {
+class _UtilsScreenState extends ConsumerState<UtilsScreen> {
   late final PageController _pageController;
   int _currentPage = 0;
 
   static const _segments = [
     _Segment(icon: Icons.qr_code_2_rounded, labelKey: 'tab_qr'),
     _Segment(icon: Icons.link_off_rounded, labelKey: 'tab_links'),
-    _Segment(icon: Icons.lock_outline_rounded, labelKey: 'tab_encrypt'),
     _Segment(icon: Icons.bookmarks_outlined, labelKey: 'tab_templates'),
     _Segment(icon: Icons.password_rounded, labelKey: 'tab_passwords'),
     _Segment(icon: Icons.email_outlined, labelKey: 'tab_gmail'),
+    _Segment(icon: Icons.security_rounded, labelKey: 'tab_security'),
   ];
 
   @override
@@ -68,6 +69,7 @@ class _UtilsScreenState extends State<UtilsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(localeProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
@@ -99,10 +101,10 @@ class _UtilsScreenState extends State<UtilsScreen> {
                   children: const [
                     _QRGeneratorPage(),
                     _LinkCleanerPage(),
-                    _MessageEncryptorPage(),
                     _TemplatesPage(),
                     _PasswordGeneratorPage(),
                     _GmailComposerPage(),
+                    _SecurityToolkitPage(),
                   ],
                 ),
               ),
@@ -189,10 +191,51 @@ class _UtilsScreenState extends State<UtilsScreen> {
   Widget _buildSegmentedControl() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: _ScrollableSegmentedControl(
-        segments: _segments,
-        selectedIndex: _currentPage,
-        onChanged: _onSegmentTap,
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Text(
+                AppStrings.tr('quick_switch'),
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.7),
+                    ),
+              ),
+              const Spacer(),
+              PopupMenuButton<int>(
+                tooltip: AppStrings.tr('quick_switch'),
+                icon: const Icon(Icons.tune_rounded),
+                initialValue: _currentPage,
+                onSelected: _onSegmentTap,
+                itemBuilder: (context) {
+                  return List.generate(_segments.length, (index) {
+                    final item = _segments[index];
+                    return PopupMenuItem<int>(
+                      value: index,
+                      child: Row(
+                        children: [
+                          Icon(item.icon, size: 18),
+                          const SizedBox(width: 10),
+                          Text(AppStrings.tr(item.labelKey)),
+                        ],
+                      ),
+                    );
+                  });
+                },
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          _ScrollableSegmentedControl(
+            segments: _segments,
+            selectedIndex: _currentPage,
+            onChanged: _onSegmentTap,
+          ),
+        ],
       ),
     ).animate().fadeIn(duration: 350.ms, delay: 80.ms);
   }
@@ -220,7 +263,7 @@ class _ScrollableSegmentedControl extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 56,
+      height: 58,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         physics: const BouncingScrollPhysics(),
@@ -231,14 +274,14 @@ class _ScrollableSegmentedControl extends StatelessWidget {
           final segment = segments[index];
           final isSelected = selectedIndex == index;
 
-          return GestureDetector(
+          return InkWell(
             onTap: () => onChanged(index),
-            behavior: HitTestBehavior.opaque,
+            borderRadius: BorderRadius.circular(14),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 220),
               curve: Curves.easeOutCubic,
-              constraints: const BoxConstraints(minWidth: 108),
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              constraints: const BoxConstraints(minWidth: 98),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               decoration: BoxDecoration(
                 gradient:
                     isSelected ? AppTheme.primaryGradientFor(context) : null,
@@ -247,18 +290,18 @@ class _ScrollableSegmentedControl extends StatelessWidget {
                     : Theme.of(context)
                         .colorScheme
                         .surfaceContainerHighest
-                        .withValues(alpha: 0.9),
-                borderRadius: BorderRadius.circular(18),
+                        .withValues(alpha: 0.88),
+                borderRadius: BorderRadius.circular(14),
                 border: Border.all(
                   color: isSelected
                       ? Theme.of(context)
                           .colorScheme
                           .primary
-                          .withValues(alpha: 0.6)
+                          .withValues(alpha: 0.55)
                       : Theme.of(context)
                           .colorScheme
                           .outline
-                          .withValues(alpha: 0.25),
+                          .withValues(alpha: 0.2),
                 ),
                 boxShadow: isSelected
                     ? [
@@ -266,7 +309,7 @@ class _ScrollableSegmentedControl extends StatelessWidget {
                           color: Theme.of(context)
                               .colorScheme
                               .primary
-                              .withValues(alpha: 0.3),
+                              .withValues(alpha: 0.24),
                           blurRadius: 10,
                           offset: const Offset(0, 3),
                         ),
@@ -275,6 +318,7 @@ class _ScrollableSegmentedControl extends StatelessWidget {
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
                     segment.icon,
@@ -284,7 +328,7 @@ class _ScrollableSegmentedControl extends StatelessWidget {
                         : Theme.of(context)
                             .colorScheme
                             .onSurface
-                            .withValues(alpha: 0.65),
+                            .withValues(alpha: 0.7),
                   ),
                   const SizedBox(width: 8),
                   Text(
@@ -300,7 +344,7 @@ class _ScrollableSegmentedControl extends StatelessWidget {
                           : Theme.of(context)
                               .colorScheme
                               .onSurface
-                              .withValues(alpha: 0.75),
+                              .withValues(alpha: 0.82),
                     ),
                   ),
                 ],
@@ -325,11 +369,20 @@ class _QRGeneratorPage extends StatefulWidget {
 class _QRGeneratorPageState extends State<_QRGeneratorPage> {
   final TextEditingController _textController = TextEditingController();
   final GlobalKey _qrKey = GlobalKey();
-  String _qrData = 'DirectFast';
+  String _qrData = 'https://github.com/MrSpy00/DirectFast';
   Color _fgColor = Colors.black;
+  Color _bgColor = Colors.white;
+  double _qrSize = 220;
+  double _qrPadding = 16;
+  bool _gapless = true;
+  bool _embedLogo = false;
+  QrEyeShape _eyeShape = QrEyeShape.square;
+  QrDataModuleShape _moduleShape = QrDataModuleShape.square;
+  int _errorLevel = QrErrorCorrectLevel.H;
 
   static const List<Color> _colorPresets = [
     Colors.black,
+    Colors.white,
     Color(0xFF6750A4),
     Color(0xFF1565C0),
     Color(0xFF00695C),
@@ -346,9 +399,141 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
   void _generateQR() {
     final text = _textController.text.trim();
     if (text.isNotEmpty) {
+      if (text.length > 1800) {
+        _showSnackBar(
+          context,
+          AppStrings.tr('qr_data_too_long'),
+          isError: true,
+        );
+        return;
+      }
       HapticFeedback.lightImpact();
       setState(() => _qrData = text);
     }
+  }
+
+  void _copyPayload() {
+    HapticFeedback.lightImpact();
+    Clipboard.setData(ClipboardData(text: _qrData));
+    _showSnackBar(context, AppStrings.tr('qr_payload_copied'));
+  }
+
+  void _clearInput() {
+    HapticFeedback.selectionClick();
+    _textController.clear();
+  }
+
+  void _resetStyle() {
+    HapticFeedback.selectionClick();
+    setState(() {
+      _fgColor = Colors.black;
+      _bgColor = Colors.white;
+      _qrSize = 220;
+      _qrPadding = 16;
+      _gapless = true;
+      _embedLogo = false;
+      _eyeShape = QrEyeShape.square;
+      _moduleShape = QrDataModuleShape.square;
+      _errorLevel = QrErrorCorrectLevel.H;
+    });
+  }
+
+  Future<void> _pickColor({
+    required Color initialColor,
+    required ValueChanged<Color> onPicked,
+  }) async {
+    var red = (initialColor.r * 255).roundToDouble();
+    var green = (initialColor.g * 255).roundToDouble();
+    var blue = (initialColor.b * 255).roundToDouble();
+
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      showDragHandle: true,
+      builder: (sheetContext) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            final pickedColor = Color.fromARGB(
+              0xFF,
+              red.round(),
+              green.round(),
+              blue.round(),
+            );
+            final hex =
+                '#${pickedColor.toARGB32().toRadixString(16).padLeft(8, '0').substring(2).toUpperCase()}';
+
+            return Padding(
+              padding: EdgeInsets.fromLTRB(
+                20,
+                10,
+                20,
+                20 + MediaQuery.of(context).viewInsets.bottom,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    AppStrings.tr('pick_color'),
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    height: 62,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: pickedColor,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      hex,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color:
+                            ThemeData.estimateBrightnessForColor(pickedColor) ==
+                                    Brightness.dark
+                                ? Colors.white
+                                : Colors.black,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Slider(
+                    value: red,
+                    max: 255,
+                    activeColor: Colors.red,
+                    onChanged: (v) => setModalState(() => red = v),
+                  ),
+                  Slider(
+                    value: green,
+                    max: 255,
+                    activeColor: Colors.green,
+                    onChanged: (v) => setModalState(() => green = v),
+                  ),
+                  Slider(
+                    value: blue,
+                    max: 255,
+                    activeColor: Colors.blue,
+                    onChanged: (v) => setModalState(() => blue = v),
+                  ),
+                  FilledButton.icon(
+                    onPressed: () {
+                      onPicked(pickedColor);
+                      Navigator.of(context).pop();
+                    },
+                    icon: const Icon(Icons.check_rounded),
+                    label: Text(AppStrings.tr('apply_color')),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   Future<void> _shareQR() async {
@@ -356,7 +541,7 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
     try {
       final boundary =
           _qrKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
-      final image = await boundary.toImage(pixelRatio: 3.0);
+      final image = await boundary.toImage(pixelRatio: 4.0);
       final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
       final png = bytes!.buffer.asUint8List();
       await Share.shareXFiles(
@@ -379,7 +564,7 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
     try {
       final boundary =
           _qrKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
-      final image = await boundary.toImage(pixelRatio: 3.0);
+      final image = await boundary.toImage(pixelRatio: 4.0);
       final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
       final png = bytes!.buffer.asUint8List();
       await Gal.putImageBytes(
@@ -402,47 +587,80 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
 
   @override
   Widget build(BuildContext context) {
+    final levelLabel = switch (_errorLevel) {
+      QrErrorCorrectLevel.L => 'L (7%)',
+      QrErrorCorrectLevel.M => 'M (15%)',
+      QrErrorCorrectLevel.Q => 'Q (25%)',
+      _ => 'H (30%)',
+    };
+
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
       physics: const BouncingScrollPhysics(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // ── QR Display card ────────────────────────────────────────────────
           GlassmorphicContainer.flat(
             padding: const EdgeInsets.all(24),
             child: Column(
               children: [
-                // QR code — white background is mandatory for readability
                 RepaintBoundary(
                   key: _qrKey,
                   child: Container(
-                    decoration: const BoxDecoration(color: Colors.white),
-                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: _bgColor,
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    padding: EdgeInsets.all(_qrPadding),
                     child: QrImageView(
                       data: _qrData,
-                      size: 196,
-                      backgroundColor: Colors.white,
-                      errorCorrectionLevel: QrErrorCorrectLevel.H,
+                      size: _qrSize,
+                      backgroundColor: _bgColor,
+                      errorCorrectionLevel: _errorLevel,
+                      gapless: _gapless,
+                      embeddedImage: _embedLogo
+                          ? const AssetImage('assets/images/logo.png')
+                          : null,
+                      embeddedImageStyle: _embedLogo
+                          ? QrEmbeddedImageStyle(
+                              size: Size(_qrSize * 0.18, _qrSize * 0.18),
+                            )
+                          : null,
                       eyeStyle: QrEyeStyle(
-                        eyeShape: QrEyeShape.square,
+                        eyeShape: _eyeShape,
                         color: _fgColor,
                       ),
                       dataModuleStyle: QrDataModuleStyle(
-                        dataModuleShape: QrDataModuleShape.square,
+                        dataModuleShape: _moduleShape,
                         color: _fgColor,
                       ),
                     ),
                   ),
                 ),
                 const SizedBox(height: 20),
-                // ── Color picker ───────────────────────────────────────────
                 _QrColorPicker(
+                  title: AppStrings.tr('qr_foreground'),
                   presets: _colorPresets,
                   selected: _fgColor,
-                  onSelected: (c) {
-                    HapticFeedback.selectionClick();
-                    setState(() => _fgColor = c);
+                  onSelected: (c) => setState(() => _fgColor = c),
+                  onCustomTap: () async {
+                    await _pickColor(
+                      initialColor: _fgColor,
+                      onPicked: (color) => setState(() => _fgColor = color),
+                    );
+                  },
+                ),
+                const SizedBox(height: 14),
+                _QrColorPicker(
+                  title: AppStrings.tr('qr_background'),
+                  presets: _colorPresets,
+                  selected: _bgColor,
+                  onSelected: (c) => setState(() => _bgColor = c),
+                  onCustomTap: () async {
+                    await _pickColor(
+                      initialColor: _bgColor,
+                      onPicked: (color) => setState(() => _bgColor = color),
+                    );
                   },
                 ),
               ],
@@ -451,10 +669,7 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
               .animate()
               .fadeIn(duration: 500.ms)
               .scale(begin: const Offset(0.94, 0.94)),
-
           const SizedBox(height: 16),
-
-          // ── Input card ─────────────────────────────────────────────────────
           GlassmorphicContainer.flat(
             padding: const EdgeInsets.all(20),
             child: Column(
@@ -469,26 +684,187 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
                 const SizedBox(height: 12),
                 TextField(
                   controller: _textController,
+                  maxLines: 3,
                   decoration: InputDecoration(
                     hintText: AppStrings.tr('enter_text'),
                     prefixIcon: const Icon(Icons.qr_code_2_rounded),
+                    alignLabelWithHint: true,
                   ),
-                  textAlignVertical: TextAlignVertical.center,
+                  textAlignVertical: TextAlignVertical.top,
                   onSubmitted: (_) => _generateQR(),
                 ),
                 const SizedBox(height: 16),
-                _GradientButton(
-                  onPressed: _generateQR,
-                  icon: Icons.qr_code_scanner_rounded,
-                  label: AppStrings.tr('generate'),
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
+                  children: [
+                    SizedBox(
+                      width: 180,
+                      child: _GradientButton(
+                        onPressed: _generateQR,
+                        icon: Icons.qr_code_scanner_rounded,
+                        label: AppStrings.tr('generate'),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 150,
+                      child: OutlinedButton.icon(
+                        onPressed: _copyPayload,
+                        icon: const Icon(Icons.copy_rounded),
+                        label: Text(AppStrings.tr('copy_payload')),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 140,
+                      child: OutlinedButton.icon(
+                        onPressed: _clearInput,
+                        icon: const Icon(Icons.clear_rounded),
+                        label: Text(AppStrings.tr('clear')),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
           ).animate().fadeIn(duration: 500.ms, delay: 100.ms),
-
           const SizedBox(height: 14),
-
-          // ── Action row ─────────────────────────────────────────────────────
+          GlassmorphicContainer.flat(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  AppStrings.tr('qr_style'),
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    Expanded(
+                      child: DropdownButtonFormField<int>(
+                        initialValue: _errorLevel,
+                        decoration: InputDecoration(
+                          labelText: AppStrings.tr('qr_error_level'),
+                          prefixIcon: const Icon(Icons.security_rounded),
+                        ),
+                        items: const <DropdownMenuItem<int>>[
+                          DropdownMenuItem<int>(
+                            value: QrErrorCorrectLevel.L,
+                            child: Text('L (7%)'),
+                          ),
+                          DropdownMenuItem<int>(
+                            value: QrErrorCorrectLevel.M,
+                            child: Text('M (15%)'),
+                          ),
+                          DropdownMenuItem<int>(
+                            value: QrErrorCorrectLevel.Q,
+                            child: Text('Q (25%)'),
+                          ),
+                          DropdownMenuItem<int>(
+                            value: QrErrorCorrectLevel.H,
+                            child: Text('H (30%)'),
+                          ),
+                        ],
+                        onChanged: (value) {
+                          if (value != null) {
+                            setState(() => _errorLevel = value);
+                          }
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  '${AppStrings.tr('qr_size')}: ${_qrSize.round()} px',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+                Slider(
+                  value: _qrSize,
+                  min: 140,
+                  max: 340,
+                  divisions: 20,
+                  label: _qrSize.round().toString(),
+                  onChanged: (value) => setState(() => _qrSize = value),
+                ),
+                Text(
+                  '${AppStrings.tr('qr_padding')}: ${_qrPadding.round()} px',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+                Slider(
+                  value: _qrPadding,
+                  max: 36,
+                  divisions: 18,
+                  label: _qrPadding.round().toString(),
+                  onChanged: (value) => setState(() => _qrPadding = value),
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    ChoiceChip(
+                      label: const Text('Eye ■'),
+                      selected: _eyeShape == QrEyeShape.square,
+                      onSelected: (_) =>
+                          setState(() => _eyeShape = QrEyeShape.square),
+                    ),
+                    ChoiceChip(
+                      label: const Text('Eye ●'),
+                      selected: _eyeShape == QrEyeShape.circle,
+                      onSelected: (_) =>
+                          setState(() => _eyeShape = QrEyeShape.circle),
+                    ),
+                    ChoiceChip(
+                      label: const Text('Data ■'),
+                      selected: _moduleShape == QrDataModuleShape.square,
+                      onSelected: (_) => setState(
+                        () => _moduleShape = QrDataModuleShape.square,
+                      ),
+                    ),
+                    ChoiceChip(
+                      label: const Text('Data ●'),
+                      selected: _moduleShape == QrDataModuleShape.circle,
+                      onSelected: (_) => setState(
+                        () => _moduleShape = QrDataModuleShape.circle,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                SwitchListTile.adaptive(
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(AppStrings.tr('qr_smooth')),
+                  value: _gapless,
+                  onChanged: (value) => setState(() => _gapless = value),
+                ),
+                SwitchListTile.adaptive(
+                  contentPadding: EdgeInsets.zero,
+                  title: Text(AppStrings.tr('qr_logo')),
+                  value: _embedLogo,
+                  onChanged: (value) => setState(() => _embedLogo = value),
+                ),
+                OutlinedButton.icon(
+                  onPressed: _resetStyle,
+                  icon: const Icon(Icons.refresh_rounded),
+                  label: Text(AppStrings.tr('qr_reset_style')),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  '${AppStrings.tr('qr_error_level')}: $levelLabel',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.65),
+                      ),
+                ),
+              ],
+            ),
+          ).animate().fadeIn(duration: 500.ms, delay: 150.ms),
+          const SizedBox(height: 14),
           Row(
             children: [
               Expanded(
@@ -516,14 +892,18 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
 
 /// Row of colour swatches for QR foreground colour.
 class _QrColorPicker extends StatelessWidget {
+  final String title;
   final List<Color> presets;
   final Color selected;
   final ValueChanged<Color> onSelected;
+  final VoidCallback onCustomTap;
 
   const _QrColorPicker({
+    required this.title,
     required this.presets,
     required this.selected,
     required this.onSelected,
+    required this.onCustomTap,
   });
 
   @override
@@ -532,7 +912,7 @@ class _QrColorPicker extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          AppStrings.tr('qr_color'),
+          title,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: Theme.of(context)
                     .colorScheme
@@ -577,6 +957,15 @@ class _QrColorPicker extends StatelessWidget {
               ),
             );
           }).toList(),
+        ),
+        const SizedBox(height: 10),
+        Align(
+          alignment: Alignment.centerRight,
+          child: OutlinedButton.icon(
+            onPressed: onCustomTap,
+            icon: const Icon(Icons.colorize_rounded, size: 18),
+            label: Text(AppStrings.tr('pick_color')),
+          ),
         ),
       ],
     );
@@ -699,6 +1088,8 @@ class _LinkCleanerPageState extends State<_LinkCleanerPage> {
                           ),
                           Text(
                             AppStrings.tr('link_cleaner_desc'),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                             style:
                                 Theme.of(context).textTheme.bodySmall?.copyWith(
                                       color: Theme.of(context)
@@ -723,8 +1114,9 @@ class _LinkCleanerPageState extends State<_LinkCleanerPage> {
                       onPressed: _pasteFromClipboard,
                       tooltip: AppStrings.tr('quick_paste'),
                     ),
+                    alignLabelWithHint: true,
                   ),
-                  textAlignVertical: TextAlignVertical.center,
+                  textAlignVertical: TextAlignVertical.top,
                   maxLines: 2,
                 ),
                 const SizedBox(height: 16),
@@ -787,240 +1179,6 @@ class _LinkCleanerPageState extends State<_LinkCleanerPage> {
                     },
                     icon: const Icon(Icons.copy_rounded, size: 16),
                     label: Text(AppStrings.tr('copy')),
-                  ),
-                ],
-              ),
-            ).animate().fadeIn().slideY(begin: 0.08, end: 0),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-// ── Message Encryptor Page ─────────────────────────────────────────────────────
-
-class _MessageEncryptorPage extends StatefulWidget {
-  const _MessageEncryptorPage();
-
-  @override
-  State<_MessageEncryptorPage> createState() => _MessageEncryptorPageState();
-}
-
-class _MessageEncryptorPageState extends State<_MessageEncryptorPage> {
-  final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _messageController = TextEditingController();
-  String? _result;
-  bool _isEncryptMode = true;
-  bool _obscurePassword = true;
-
-  @override
-  void dispose() {
-    _passwordController.dispose();
-    _messageController.dispose();
-    super.dispose();
-  }
-
-  void _process() {
-    HapticFeedback.mediumImpact();
-    final password = _passwordController.text;
-    final message = _messageController.text.trim();
-
-    if (password.isEmpty || message.isEmpty) {
-      _showSnackBar(context, AppStrings.tr('fill_all_fields'), isError: true);
-      return;
-    }
-
-    try {
-      if (_isEncryptMode) {
-        _encrypt(message, password);
-      } else {
-        _decrypt(message, password);
-      }
-    } catch (_) {
-      _showSnackBar(
-        context,
-        _isEncryptMode
-            ? AppStrings.tr('encryption_failed')
-            : AppStrings.tr('decryption_failed'),
-        isError: true,
-      );
-    }
-  }
-
-  void _encrypt(String message, String password) {
-    final key = encrypt_lib.Key.fromUtf8(
-      sha256.convert(utf8.encode(password)).toString().substring(0, 32),
-    );
-    final iv = encrypt_lib.IV.fromLength(16);
-    final encrypter = encrypt_lib.Encrypter(encrypt_lib.AES(key));
-
-    final encrypted = encrypter.encrypt(message, iv: iv);
-    final combined = '${iv.base64}:${encrypted.base64}';
-
-    setState(() => _result = combined);
-    Clipboard.setData(ClipboardData(text: combined));
-    _showSnackBar(context, AppStrings.tr('copied_encrypted'));
-  }
-
-  void _decrypt(String message, String password) {
-    final parts = message.split(':');
-    if (parts.length != 2) {
-      throw const FormatException('bad format');
-    }
-
-    final key = encrypt_lib.Key.fromUtf8(
-      sha256.convert(utf8.encode(password)).toString().substring(0, 32),
-    );
-    final iv = encrypt_lib.IV.fromBase64(parts[0]);
-    final encrypter = encrypt_lib.Encrypter(encrypt_lib.AES(key));
-
-    final decrypted = encrypter.decrypt64(parts[1], iv: iv);
-    setState(() => _result = decrypted);
-    Clipboard.setData(ClipboardData(text: decrypted));
-    _showSnackBar(context, AppStrings.tr('copied_decrypted'));
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
-      physics: const BouncingScrollPhysics(),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // ── Mode toggle ────────────────────────────────────────────────────
-          GlassmorphicContainer.flat(
-            padding: const EdgeInsets.all(6),
-            child: Row(
-              children: [
-                Expanded(
-                  child: _ModeButton(
-                    label: AppStrings.tr('encrypt'),
-                    icon: Icons.lock_rounded,
-                    isSelected: _isEncryptMode,
-                    onTap: () {
-                      HapticFeedback.lightImpact();
-                      setState(() {
-                        _isEncryptMode = true;
-                        _result = null;
-                      });
-                    },
-                  ),
-                ),
-                Expanded(
-                  child: _ModeButton(
-                    label: AppStrings.tr('decrypt'),
-                    icon: Icons.lock_open_rounded,
-                    isSelected: !_isEncryptMode,
-                    onTap: () {
-                      HapticFeedback.lightImpact();
-                      setState(() {
-                        _isEncryptMode = false;
-                        _result = null;
-                      });
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ).animate().fadeIn(duration: 500.ms),
-
-          const SizedBox(height: 16),
-
-          // ── Input fields ───────────────────────────────────────────────────
-          GlassmorphicContainer.flat(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                TextField(
-                  controller: _passwordController,
-                  decoration: InputDecoration(
-                    hintText: AppStrings.tr('enter_password'),
-                    prefixIcon: const Icon(Icons.key_rounded),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscurePassword
-                            ? Icons.visibility_off_rounded
-                            : Icons.visibility_rounded,
-                      ),
-                      onPressed: () =>
-                          setState(() => _obscurePassword = !_obscurePassword),
-                    ),
-                  ),
-                  textAlignVertical: TextAlignVertical.center,
-                  obscureText: _obscurePassword,
-                ),
-                const SizedBox(height: 14),
-                TextField(
-                  controller: _messageController,
-                  decoration: InputDecoration(
-                    hintText: _isEncryptMode
-                        ? AppStrings.tr('enter_message_to_encrypt')
-                        : AppStrings.tr('enter_encrypted_message'),
-                    prefixIcon: const Icon(Icons.message_rounded),
-                  ),
-                  textAlignVertical: TextAlignVertical.top,
-                  maxLines: 4,
-                ),
-                const SizedBox(height: 16),
-                _GradientButton(
-                  onPressed: _process,
-                  icon: _isEncryptMode
-                      ? Icons.lock_rounded
-                      : Icons.lock_open_rounded,
-                  label: _isEncryptMode
-                      ? AppStrings.tr('encrypt')
-                      : AppStrings.tr('decrypt'),
-                  gradient: AppTheme.accentGradientFor(context),
-                ),
-              ],
-            ),
-          ).animate().fadeIn(duration: 500.ms, delay: 80.ms),
-
-          if (_result != null) ...[
-            const SizedBox(height: 16),
-            GlassmorphicContainer.flat(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.check_circle_rounded,
-                        color: Theme.of(context).colorScheme.primary,
-                        size: 20,
-                      ),
-                      const SizedBox(width: 10),
-                      Text(
-                        _isEncryptMode
-                            ? AppStrings.tr('encrypted_message')
-                            : AppStrings.tr('decrypted_message'),
-                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.w700,
-                            ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .surfaceContainerHighest
-                          .withValues(alpha: 0.5),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: SelectableText(
-                      _result!,
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodySmall
-                          ?.copyWith(fontFamily: 'monospace'),
-                    ),
                   ),
                 ],
               ),
@@ -1408,17 +1566,22 @@ class _PasswordOptionTile extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
-            child: Text(
-              label,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w500,
-                  ),
+            child: Padding(
+              padding: const EdgeInsets.only(top: 9),
+              child: Text(
+                label,
+                maxLines: 3,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w500,
+                      height: 1.2,
+                    ),
+              ),
             ),
           ),
+          const SizedBox(width: 8),
           Switch(
             value: value,
             onChanged: onChanged,
@@ -1469,13 +1632,19 @@ class _GradientButton extends StatelessWidget {
           children: [
             Icon(icon, color: Colors.white, size: 20),
             const SizedBox(width: 10),
-            Text(
-              label,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 15,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 0.3,
+            Flexible(
+              child: Text(
+                label,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.3,
+                  height: 1.15,
+                ),
               ),
             ),
           ],
@@ -2151,6 +2320,8 @@ class _GmailComposerPageState extends State<_GmailComposerPage> {
                           ),
                           Text(
                             AppStrings.tr('gmail_sender_desc'),
+                            maxLines: 3,
+                            overflow: TextOverflow.ellipsis,
                             style:
                                 Theme.of(context).textTheme.bodySmall?.copyWith(
                                       color: Theme.of(context)
@@ -2230,6 +2401,628 @@ class _GmailComposerPageState extends State<_GmailComposerPage> {
               ],
             ),
           ).animate().fadeIn(duration: 500.ms),
+        ],
+      ),
+    );
+  }
+}
+
+enum _TransformKind { base64, url }
+
+class _SecurityToolkitPage extends StatefulWidget {
+  const _SecurityToolkitPage();
+
+  @override
+  State<_SecurityToolkitPage> createState() => _SecurityToolkitPageState();
+}
+
+class _SecurityToolkitPageState extends State<_SecurityToolkitPage> {
+  final TextEditingController _cipherPasswordController =
+      TextEditingController();
+  final TextEditingController _cipherInputController = TextEditingController();
+  final TextEditingController _hashInputController = TextEditingController();
+  final TextEditingController _transformInputController =
+      TextEditingController();
+
+  bool _cipherEncryptMode = true;
+  bool _cipherObscurePassword = true;
+  String _cipherResult = '';
+
+  String _hashAlgorithm = 'SHA-256';
+  String _hashResult = '';
+  bool _encodeMode = true;
+  _TransformKind _transformKind = _TransformKind.base64;
+  String _transformResult = '';
+
+  int _tokenLength = 32;
+  String _tokenResult = '';
+  late final math.Random _random = _createRandom();
+
+  static const _tokenCharset =
+      'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~';
+
+  static final Map<String, Digest Function(List<int>)> _hashAlgorithms = {
+    'SHA-256': sha256.convert,
+    'SHA-512': sha512.convert,
+    'SHA-1': sha1.convert,
+    'MD5': md5.convert,
+  };
+
+  static math.Random _createRandom() {
+    try {
+      return math.Random.secure();
+    } catch (_) {
+      return math.Random();
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _generateToken();
+  }
+
+  @override
+  void dispose() {
+    _cipherPasswordController.dispose();
+    _cipherInputController.dispose();
+    _hashInputController.dispose();
+    _transformInputController.dispose();
+    super.dispose();
+  }
+
+  void _processCipher() {
+    HapticFeedback.mediumImpact();
+    final password = _cipherPasswordController.text;
+    final message = _cipherInputController.text.trim();
+
+    if (password.isEmpty || message.isEmpty) {
+      _showSnackBar(context, AppStrings.tr('fill_all_fields'), isError: true);
+      return;
+    }
+
+    try {
+      final result = _cipherEncryptMode
+          ? _encryptWithPassword(message, password)
+          : _decryptWithPassword(message, password);
+      setState(() => _cipherResult = result);
+      Clipboard.setData(ClipboardData(text: result));
+      _showSnackBar(
+        context,
+        _cipherEncryptMode
+            ? AppStrings.tr('copied_encrypted')
+            : AppStrings.tr('copied_decrypted'),
+      );
+    } catch (_) {
+      _showSnackBar(
+        context,
+        _cipherEncryptMode
+            ? AppStrings.tr('encryption_failed')
+            : AppStrings.tr('decryption_failed'),
+        isError: true,
+      );
+    }
+  }
+
+  String _encryptWithPassword(String message, String password) {
+    final key = encrypt_lib.Key.fromUtf8(
+      sha256.convert(utf8.encode(password)).toString().substring(0, 32),
+    );
+    final iv = encrypt_lib.IV.fromLength(16);
+    final encrypter = encrypt_lib.Encrypter(encrypt_lib.AES(key));
+    final encrypted = encrypter.encrypt(message, iv: iv);
+    return '${iv.base64}:${encrypted.base64}';
+  }
+
+  String _decryptWithPassword(String message, String password) {
+    final parts = message.split(':');
+    if (parts.length != 2) {
+      throw const FormatException('bad format');
+    }
+    final key = encrypt_lib.Key.fromUtf8(
+      sha256.convert(utf8.encode(password)).toString().substring(0, 32),
+    );
+    final iv = encrypt_lib.IV.fromBase64(parts[0]);
+    final encrypter = encrypt_lib.Encrypter(encrypt_lib.AES(key));
+    return encrypter.decrypt64(parts[1], iv: iv);
+  }
+
+  void _generateHash() {
+    final input = _hashInputController.text.trim();
+    if (input.isEmpty) {
+      _showSnackBar(context, AppStrings.tr('fill_all_fields'), isError: true);
+      return;
+    }
+
+    final hasher = _hashAlgorithms[_hashAlgorithm] ?? sha256.convert;
+    final digest = hasher(utf8.encode(input)).toString();
+
+    setState(() => _hashResult = digest);
+  }
+
+  void _runTransform() {
+    final input = _transformInputController.text;
+    if (input.trim().isEmpty) {
+      _showSnackBar(context, AppStrings.tr('fill_all_fields'), isError: true);
+      return;
+    }
+
+    try {
+      late final String result;
+      if (_transformKind == _TransformKind.base64) {
+        result = _encodeMode
+            ? base64Encode(utf8.encode(input))
+            : utf8.decode(base64Decode(input));
+      } else {
+        result = _encodeMode
+            ? Uri.encodeComponent(input)
+            : Uri.decodeComponent(input);
+      }
+      setState(() => _transformResult = result);
+    } catch (e) {
+      _showSnackBar(
+        context,
+        AppStrings.tr('security_operation_failed', args: [e.toString()]),
+        isError: true,
+      );
+    }
+  }
+
+  void _generateToken() {
+    final chars = _tokenCharset.split('');
+    final out = StringBuffer();
+    for (var i = 0; i < _tokenLength; i++) {
+      out.write(chars[_random.nextInt(chars.length)]);
+    }
+    setState(() => _tokenResult = out.toString());
+  }
+
+  void _copyToClipboard(String text, String successKey) {
+    if (text.isEmpty) {
+      _showSnackBar(context, AppStrings.tr('fill_all_fields'), isError: true);
+      return;
+    }
+    HapticFeedback.lightImpact();
+    Clipboard.setData(ClipboardData(text: text));
+    _showSnackBar(context, AppStrings.tr(successKey));
+  }
+
+  Widget _sectionLabel(String key) {
+    return Text(
+      AppStrings.tr(key),
+      style: Theme.of(context).textTheme.labelLarge?.copyWith(
+            fontWeight: FontWeight.w700,
+            color:
+                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
+          ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
+      physics: const BouncingScrollPhysics(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          GlassmorphicContainer.flat(
+            padding: const EdgeInsets.all(20),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    gradient: AppTheme.primaryGradientFor(context),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(
+                    Icons.security_rounded,
+                    color: Colors.white,
+                    size: 22,
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        AppStrings.tr('security_toolkit'),
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleMedium
+                            ?.copyWith(fontWeight: FontWeight.w700),
+                      ),
+                      Text(
+                        AppStrings.tr('security_toolkit_desc'),
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.58),
+                            ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ).animate().fadeIn(duration: 450.ms),
+          const SizedBox(height: 14),
+          GlassmorphicContainer.flat(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _sectionLabel('message_encryptor'),
+                const SizedBox(height: 8),
+                Text(
+                  AppStrings.tr('encryptor_desc'),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.6),
+                      ),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _ModeButton(
+                        label: AppStrings.tr('encrypt'),
+                        icon: Icons.lock_rounded,
+                        isSelected: _cipherEncryptMode,
+                        onTap: () {
+                          setState(() {
+                            _cipherEncryptMode = true;
+                            _cipherResult = '';
+                          });
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: _ModeButton(
+                        label: AppStrings.tr('decrypt'),
+                        icon: Icons.lock_open_rounded,
+                        isSelected: !_cipherEncryptMode,
+                        onTap: () {
+                          setState(() {
+                            _cipherEncryptMode = false;
+                            _cipherResult = '';
+                          });
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _cipherPasswordController,
+                  decoration: InputDecoration(
+                    hintText: AppStrings.tr('enter_password'),
+                    prefixIcon: const Icon(Icons.key_rounded),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _cipherObscurePassword
+                            ? Icons.visibility_off_rounded
+                            : Icons.visibility_rounded,
+                      ),
+                      onPressed: () => setState(
+                        () => _cipherObscurePassword = !_cipherObscurePassword,
+                      ),
+                    ),
+                  ),
+                  obscureText: _cipherObscurePassword,
+                  textAlignVertical: TextAlignVertical.center,
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _cipherInputController,
+                  maxLines: 3,
+                  decoration: InputDecoration(
+                    hintText: _cipherEncryptMode
+                        ? AppStrings.tr('enter_message_to_encrypt')
+                        : AppStrings.tr('enter_encrypted_message'),
+                    prefixIcon: const Icon(Icons.message_rounded),
+                    alignLabelWithHint: true,
+                  ),
+                  textAlignVertical: TextAlignVertical.top,
+                ),
+                const SizedBox(height: 14),
+                _GradientButton(
+                  onPressed: _processCipher,
+                  icon: _cipherEncryptMode
+                      ? Icons.lock_rounded
+                      : Icons.lock_open_rounded,
+                  label: _cipherEncryptMode
+                      ? AppStrings.tr('encrypt')
+                      : AppStrings.tr('decrypt'),
+                  gradient: AppTheme.accentGradientFor(context),
+                ),
+                if (_cipherResult.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  _sectionLabel(
+                    _cipherEncryptMode
+                        ? 'encrypted_message'
+                        : 'decrypted_message',
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .surfaceContainerHighest
+                          .withValues(alpha: 0.45),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: SelectableText(
+                      _cipherResult,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            fontFamily: 'monospace',
+                          ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ).animate().fadeIn(duration: 450.ms, delay: 60.ms),
+          const SizedBox(height: 14),
+          GlassmorphicContainer.flat(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _sectionLabel('security_input'),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: _hashInputController,
+                  decoration: InputDecoration(
+                    hintText: AppStrings.tr('security_input_hint'),
+                    prefixIcon: const Icon(Icons.text_fields_rounded),
+                    alignLabelWithHint: true,
+                  ),
+                  textAlignVertical: TextAlignVertical.top,
+                  maxLines: 2,
+                ),
+                const SizedBox(height: 12),
+                _sectionLabel('hash_algorithm'),
+                const SizedBox(height: 8),
+                DropdownButtonFormField<String>(
+                  initialValue: _hashAlgorithm,
+                  isExpanded: true,
+                  decoration: const InputDecoration(
+                    prefixIcon: Icon(Icons.fingerprint_rounded),
+                    contentPadding:
+                        EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  ),
+                  items: _hashAlgorithms.keys
+                      .map(
+                        (algo) => DropdownMenuItem<String>(
+                          value: algo,
+                          child: Text(algo),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() => _hashAlgorithm = value);
+                    }
+                  },
+                ),
+                const SizedBox(height: 14),
+                _GradientButton(
+                  onPressed: _generateHash,
+                  icon: Icons.fingerprint_rounded,
+                  label: AppStrings.tr('run_hash'),
+                ),
+                if (_hashResult.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  _sectionLabel('hash_result'),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .surfaceContainerHighest
+                          .withValues(alpha: 0.45),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: SelectableText(
+                      _hashResult,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            fontFamily: 'monospace',
+                            height: 1.35,
+                          ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  OutlinedButton.icon(
+                    onPressed: () => _copyToClipboard(
+                      _hashResult,
+                      'clipboard_copied',
+                    ),
+                    icon: const Icon(Icons.copy_rounded, size: 16),
+                    label: Text(AppStrings.tr('copy')),
+                  ),
+                ],
+              ],
+            ),
+          ).animate().fadeIn(duration: 450.ms, delay: 60.ms),
+          const SizedBox(height: 14),
+          GlassmorphicContainer.flat(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _sectionLabel('transform_mode'),
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 8,
+                  children: [
+                    ChoiceChip(
+                      label: Text(AppStrings.tr('base64_mode')),
+                      selected: _transformKind == _TransformKind.base64,
+                      onSelected: (_) => setState(
+                        () => _transformKind = _TransformKind.base64,
+                      ),
+                    ),
+                    ChoiceChip(
+                      label: Text(AppStrings.tr('url_mode')),
+                      selected: _transformKind == _TransformKind.url,
+                      onSelected: (_) =>
+                          setState(() => _transformKind = _TransformKind.url),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _ModeButton(
+                        label: AppStrings.tr('encode'),
+                        icon: Icons.arrow_downward_rounded,
+                        isSelected: _encodeMode,
+                        onTap: () => setState(() => _encodeMode = true),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: _ModeButton(
+                        label: AppStrings.tr('decode'),
+                        icon: Icons.arrow_upward_rounded,
+                        isSelected: !_encodeMode,
+                        onTap: () => setState(() => _encodeMode = false),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _transformInputController,
+                  decoration: InputDecoration(
+                    hintText: AppStrings.tr('security_input_hint'),
+                    prefixIcon: const Icon(Icons.swap_horiz_rounded),
+                    alignLabelWithHint: true,
+                  ),
+                  textAlignVertical: TextAlignVertical.top,
+                  maxLines: 3,
+                ),
+                const SizedBox(height: 14),
+                _GradientButton(
+                  onPressed: _runTransform,
+                  icon: Icons.auto_fix_high_rounded,
+                  label: _encodeMode
+                      ? AppStrings.tr('encode')
+                      : AppStrings.tr('decode'),
+                  gradient: AppTheme.accentGradientFor(context),
+                ),
+                if (_transformResult.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  _sectionLabel('transformed_result'),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .surfaceContainerHighest
+                          .withValues(alpha: 0.45),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: SelectableText(
+                      _transformResult,
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodySmall
+                          ?.copyWith(fontFamily: 'monospace'),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  OutlinedButton.icon(
+                    onPressed: () => _copyToClipboard(
+                      _transformResult,
+                      'clipboard_copied',
+                    ),
+                    icon: const Icon(Icons.copy_rounded, size: 16),
+                    label: Text(AppStrings.tr('copy')),
+                  ),
+                ],
+              ],
+            ),
+          ).animate().fadeIn(duration: 450.ms, delay: 140.ms),
+          const SizedBox(height: 14),
+          GlassmorphicContainer.flat(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  children: [
+                    _sectionLabel('token_length'),
+                    const Spacer(),
+                    Text(
+                      '$_tokenLength',
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                            fontWeight: FontWeight.w700,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                    ),
+                  ],
+                ),
+                Slider(
+                  value: _tokenLength.toDouble(),
+                  min: 16,
+                  max: 128,
+                  divisions: 112,
+                  label: '$_tokenLength',
+                  onChanged: (value) =>
+                      setState(() => _tokenLength = value.round()),
+                ),
+                _GradientButton(
+                  onPressed: _generateToken,
+                  icon: Icons.generating_tokens_rounded,
+                  label: AppStrings.tr('generate_token'),
+                  gradient: AppTheme.primaryGradientFor(context),
+                ),
+                if (_tokenResult.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  _sectionLabel('generated_token'),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .surfaceContainerHighest
+                          .withValues(alpha: 0.45),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: SelectableText(
+                      _tokenResult,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            fontFamily: 'monospace',
+                            height: 1.35,
+                          ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  OutlinedButton.icon(
+                    onPressed: () =>
+                        _copyToClipboard(_tokenResult, 'token_copied'),
+                    icon: const Icon(Icons.copy_rounded, size: 16),
+                    label: Text(AppStrings.tr('copy')),
+                  ),
+                ],
+              ],
+            ),
+          ).animate().fadeIn(duration: 450.ms, delay: 200.ms),
         ],
       ),
     );

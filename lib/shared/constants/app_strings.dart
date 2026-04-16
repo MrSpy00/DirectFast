@@ -17,6 +17,16 @@ class AppStrings {
   static const String italian = 'it';
   static const String indonesian = 'id';
   static const String bengali = 'bn';
+  static const String urdu = 'ur';
+  static const String vietnamese = 'vi';
+  static const String polish = 'pl';
+  static const String dutch = 'nl';
+  static const String thai = 'th';
+  static const String persian = 'fa';
+  static const String malay = 'ms';
+  static const String telugu = 'te';
+  static const String tamil = 'ta';
+  static const String punjabi = 'pa';
 
   static const List<String> supportedLocales = [
     turkish,
@@ -34,6 +44,16 @@ class AppStrings {
     italian,
     indonesian,
     bengali,
+    urdu,
+    vietnamese,
+    polish,
+    dutch,
+    thai,
+    persian,
+    malay,
+    telugu,
+    tamil,
+    punjabi,
   ];
 
   static const String fallbackLocale = english;
@@ -54,6 +74,29 @@ class AppStrings {
     italian: 'Italiano',
     indonesian: 'Bahasa Indonesia',
     bengali: 'বাংলা',
+    urdu: 'اردو',
+    vietnamese: 'Tiếng Việt',
+    polish: 'Polski',
+    dutch: 'Nederlands',
+    thai: 'ไทย',
+    persian: 'فارسی',
+    malay: 'Bahasa Melayu',
+    telugu: 'తెలుగు',
+    tamil: 'தமிழ்',
+    punjabi: 'ਪੰਜਾਬੀ',
+  };
+
+  static const Map<String, List<String>> localeFallbackChains = {
+    urdu: [arabic, hindi],
+    persian: [arabic],
+    malay: [indonesian],
+    telugu: [hindi],
+    tamil: [hindi],
+    punjabi: [hindi],
+    vietnamese: [spanish, french],
+    polish: [german, french],
+    dutch: [german, french],
+    thai: [chinese, japanese],
   };
 
   // Current locale
@@ -75,6 +118,28 @@ class AppStrings {
 
   static String localeNativeName(String locale) {
     return localeNativeNames[locale] ?? locale;
+  }
+
+  static Iterable<String> translationLookupOrder(String locale) sync* {
+    final normalized = normalizeLocale(locale);
+    final emitted = <String>{};
+
+    void emit(String candidate) {
+      final normalizedCandidate = normalizeLocale(candidate);
+      emitted.add(normalizedCandidate);
+    }
+
+    emit(normalized);
+    final chain = localeFallbackChains[normalized] ?? const <String>[];
+    for (final candidate in chain) {
+      emit(candidate);
+    }
+    emit(fallbackLocale);
+    emit(turkish);
+
+    for (final value in emitted) {
+      yield value;
+    }
   }
 
   static String localeLabelKey(String locale) {
@@ -109,6 +174,26 @@ class AppStrings {
         return 'indonesian';
       case bengali:
         return 'bengali';
+      case urdu:
+        return 'urdu';
+      case vietnamese:
+        return 'vietnamese';
+      case polish:
+        return 'polish';
+      case dutch:
+        return 'dutch';
+      case thai:
+        return 'thai';
+      case persian:
+        return 'persian';
+      case malay:
+        return 'malay';
+      case telugu:
+        return 'telugu';
+      case tamil:
+        return 'tamil';
+      case punjabi:
+        return 'punjabi';
       default:
         return 'english';
     }
@@ -171,6 +256,22 @@ class AppStrings {
       'tr': 'Signal',
       'en': 'Signal',
     },
+    'viber': {
+      'tr': 'Viber',
+      'en': 'Viber',
+    },
+    'wechat': {
+      'tr': 'WeChat',
+      'en': 'WeChat',
+    },
+    'line': {
+      'tr': 'LINE',
+      'en': 'LINE',
+    },
+    'messenger': {
+      'tr': 'Messenger',
+      'en': 'Messenger',
+    },
     'discord': {
       'tr': 'Discord',
       'en': 'Discord',
@@ -182,6 +283,34 @@ class AppStrings {
     'twitter': {
       'tr': 'X (Twitter)',
       'en': 'X (Twitter)',
+    },
+    'snapchat': {
+      'tr': 'Snapchat',
+      'en': 'Snapchat',
+    },
+    'youtube': {
+      'tr': 'YouTube',
+      'en': 'YouTube',
+    },
+    'tiktok': {
+      'tr': 'TikTok',
+      'en': 'TikTok',
+    },
+    'twitch': {
+      'tr': 'Twitch',
+      'en': 'Twitch',
+    },
+    'facebook': {
+      'tr': 'Facebook',
+      'en': 'Facebook',
+    },
+    'kick': {
+      'tr': 'Kick',
+      'en': 'Kick',
+    },
+    'linkedin': {
+      'tr': 'LinkedIn',
+      'en': 'LinkedIn',
     },
     'email': {
       'tr': 'E-posta',
@@ -204,6 +333,13 @@ class AppStrings {
     'clear_all': {
       'tr': 'Tümünü Temizle',
       'en': 'Clear All',
+    },
+    'clear': {
+      'tr': 'Temizle',
+      'en': 'Clear',
+      'es': 'Limpiar',
+      'ar': 'مسح',
+      'hi': 'साफ़ करें',
     },
     'delete': {
       'tr': 'Sil',
@@ -405,6 +541,10 @@ class AppStrings {
       'tr': 'Daha Eski',
       'en': 'Older',
     },
+    'days_ago': {
+      'tr': '%s gün önce',
+      'en': '%s days ago',
+    },
 
     // Quick Templates
     'quick_templates': {
@@ -510,6 +650,13 @@ class AppStrings {
       'ar': 'الوضع الداكن',
       'hi': 'डार्क मोड',
     },
+    'amoled_mode': {
+      'tr': 'AMOLED Modu (Saf Siyah)',
+      'en': 'AMOLED Mode (Pure Black)',
+      'es': 'Modo AMOLED (Negro Puro)',
+      'ar': 'وضع AMOLED (أسود نقي)',
+      'hi': 'AMOLED मोड (शुद्ध काला)',
+    },
     'system_default': {
       'tr': 'Sistem Varsayılanı',
       'en': 'System Default',
@@ -530,6 +677,27 @@ class AppStrings {
       'es': 'Elige el color principal de la app',
       'ar': 'اختر اللون الرئيسي للتطبيق',
       'hi': 'ऐप का मुख्य रंग चुनें',
+    },
+    'custom_color': {
+      'tr': 'Özel Renk',
+      'en': 'Custom Color',
+      'es': 'Color Personalizado',
+      'ar': 'لون مخصص',
+      'hi': 'कस्टम रंग',
+    },
+    'pick_custom_color': {
+      'tr': 'Özel Renk Paleti',
+      'en': 'Open Custom Color Palette',
+      'es': 'Abrir Paleta de Color Personalizada',
+      'ar': 'فتح لوحة الألوان المخصصة',
+      'hi': 'कस्टम रंग पैलेट खोलें',
+    },
+    'apply_color': {
+      'tr': 'Rengi Uygula',
+      'en': 'Apply Color',
+      'es': 'Aplicar Color',
+      'ar': 'تطبيق اللون',
+      'hi': 'रंग लागू करें',
     },
     'turkish': {
       'tr': 'Türkçe',
@@ -606,6 +774,46 @@ class AppStrings {
       'tr': 'Bengalce',
       'en': 'Bengali',
     },
+    'urdu': {
+      'tr': 'Urduca',
+      'en': 'Urdu',
+    },
+    'vietnamese': {
+      'tr': 'Vietnamca',
+      'en': 'Vietnamese',
+    },
+    'polish': {
+      'tr': 'Lehçe',
+      'en': 'Polish',
+    },
+    'dutch': {
+      'tr': 'Hollandaca',
+      'en': 'Dutch',
+    },
+    'thai': {
+      'tr': 'Tayca',
+      'en': 'Thai',
+    },
+    'persian': {
+      'tr': 'Farsça',
+      'en': 'Persian',
+    },
+    'malay': {
+      'tr': 'Malayca',
+      'en': 'Malay',
+    },
+    'telugu': {
+      'tr': 'Telugu',
+      'en': 'Telugu',
+    },
+    'tamil': {
+      'tr': 'Tamilce',
+      'en': 'Tamil',
+    },
+    'punjabi': {
+      'tr': 'Pencapça',
+      'en': 'Punjabi',
+    },
     'color_violet': {
       'tr': 'Menekşe',
       'en': 'Violet',
@@ -661,6 +869,46 @@ class AppStrings {
       'es': 'Índigo',
       'ar': 'نيلي',
       'hi': 'इंडिगो',
+    },
+    'color_cyan': {
+      'tr': 'Camgöbeği',
+      'en': 'Cyan',
+    },
+    'color_mint': {
+      'tr': 'Nane',
+      'en': 'Mint',
+    },
+    'color_lime': {
+      'tr': 'Lime',
+      'en': 'Lime',
+    },
+    'color_amber': {
+      'tr': 'Amber',
+      'en': 'Amber',
+    },
+    'color_gold': {
+      'tr': 'Altın',
+      'en': 'Gold',
+    },
+    'color_magenta': {
+      'tr': 'Magenta',
+      'en': 'Magenta',
+    },
+    'color_purple': {
+      'tr': 'Mor',
+      'en': 'Purple',
+    },
+    'color_brown': {
+      'tr': 'Kahverengi',
+      'en': 'Brown',
+    },
+    'color_slate': {
+      'tr': 'Arduvaz',
+      'en': 'Slate',
+    },
+    'color_coral': {
+      'tr': 'Mercan',
+      'en': 'Coral',
     },
 
     // About
@@ -783,8 +1031,20 @@ class AppStrings {
 
     // Utils Screen
     'utils_subtitle': {
-      'tr': 'QR, Link, Şifreleme, Şablonlar, Şifre ve Gmail araçları',
-      'en': 'QR, Links, Encryption, Templates, Password, and Gmail tools',
+      'tr': 'QR, Link, Şifreleme, Şablon, Şifre, Gmail ve Güvenlik araçları',
+      'en':
+          'QR, Links, Encryption, Templates, Password, Gmail, and Security tools',
+      'es':
+          'Herramientas de QR, enlaces, cifrado, plantillas, contraseñas, Gmail y seguridad',
+      'ar': 'أدوات QR والروابط والتشفير والقوالب وكلمات المرور وGmail والأمان',
+      'hi': 'QR, लिंक, एन्क्रिप्शन, टेम्पलेट, पासवर्ड, Gmail और सुरक्षा टूल',
+    },
+    'quick_switch': {
+      'tr': 'Hızlı Geçiş',
+      'en': 'Quick Switch',
+      'es': 'Cambio Rápido',
+      'ar': 'التبديل السريع',
+      'hi': 'त्वरित स्विच',
     },
     'tab_qr': {
       'tr': 'QR',
@@ -809,6 +1069,13 @@ class AppStrings {
     'tab_passwords': {
       'tr': 'Şifre',
       'en': 'Passwords',
+    },
+    'tab_security': {
+      'tr': 'Güvenlik',
+      'en': 'Security',
+      'es': 'Seguridad',
+      'ar': 'الأمان',
+      'hi': 'सुरक्षा',
     },
     'password_generator': {
       'tr': 'Gelişmiş Şifre Oluşturucu',
@@ -1001,9 +1268,223 @@ class AppStrings {
       'tr': 'Geçersiz URL formatı',
       'en': 'Invalid URL format',
     },
+    'encode': {
+      'tr': 'Kodla',
+      'en': 'Encode',
+    },
+    'decode': {
+      'tr': 'Çöz',
+      'en': 'Decode',
+    },
+    'security_toolkit': {
+      'tr': 'Güvenlik Araçları',
+      'en': 'Security Toolkit',
+      'es': 'Kit de Seguridad',
+      'ar': 'مجموعة أدوات الأمان',
+      'hi': 'सिक्योरिटी टूलकिट',
+    },
+    'security_toolkit_desc': {
+      'tr':
+          'Hash üret, Base64/URL kodlama yap ve güvenli token oluşturmayı tek ekrandan yönet',
+      'en':
+          'Generate hashes, run Base64/URL transforms, and create secure tokens from one screen',
+      'es':
+          'Genera hash, ejecuta transformaciones Base64/URL y crea tokens seguros en una sola pantalla',
+      'ar':
+          'أنشئ التجزئات، ونفّذ تحويلات Base64/URL، وأنشئ رموزًا آمنة من شاشة واحدة',
+      'hi':
+          'एक ही स्क्रीन से हैश जनरेट करें, Base64/URL ट्रांसफॉर्म चलाएँ और सुरक्षित टोकन बनाएँ',
+    },
+    'security_input': {
+      'tr': 'Giriş Metni',
+      'en': 'Input Text',
+      'es': 'Texto de Entrada',
+      'ar': 'نص الإدخال',
+      'hi': 'इनपुट टेक्स्ट',
+    },
+    'security_input_hint': {
+      'tr': 'İşlenecek metni girin',
+      'en': 'Enter text to process',
+      'es': 'Ingresa el texto a procesar',
+      'ar': 'أدخل النص المراد معالجته',
+      'hi': 'प्रोसेस करने के लिए टेक्स्ट दर्ज करें',
+    },
+    'hash_algorithm': {
+      'tr': 'Hash Algoritması',
+      'en': 'Hash Algorithm',
+      'es': 'Algoritmo Hash',
+      'ar': 'خوارزمية التجزئة',
+      'hi': 'हैश एल्गोरिदम',
+    },
+    'hash_result': {
+      'tr': 'Hash Sonucu',
+      'en': 'Hash Result',
+      'es': 'Resultado Hash',
+      'ar': 'نتيجة التجزئة',
+      'hi': 'हैश परिणाम',
+    },
+    'run_hash': {
+      'tr': 'Hash Üret',
+      'en': 'Generate Hash',
+      'es': 'Generar Hash',
+      'ar': 'إنشاء تجزئة',
+      'hi': 'हैश जनरेट करें',
+    },
+    'transform_mode': {
+      'tr': 'Dönüşüm Modu',
+      'en': 'Transform Mode',
+      'es': 'Modo de Transformación',
+      'ar': 'وضع التحويل',
+      'hi': 'ट्रांसफॉर्म मोड',
+    },
+    'base64_mode': {
+      'tr': 'Base64',
+      'en': 'Base64',
+    },
+    'url_mode': {
+      'tr': 'URL',
+      'en': 'URL',
+    },
+    'transformed_result': {
+      'tr': 'Dönüşüm Sonucu',
+      'en': 'Transform Result',
+      'es': 'Resultado de Transformación',
+      'ar': 'نتيجة التحويل',
+      'hi': 'ट्रांसफॉर्म परिणाम',
+    },
+    'token_length': {
+      'tr': 'Token Uzunluğu',
+      'en': 'Token Length',
+      'es': 'Longitud del Token',
+      'ar': 'طول الرمز',
+      'hi': 'टोकन लंबाई',
+    },
+    'generated_token': {
+      'tr': 'Üretilen Token',
+      'en': 'Generated Token',
+      'es': 'Token Generado',
+      'ar': 'الرمز المُنشأ',
+      'hi': 'जनरेटेड टोकन',
+    },
+    'generate_token': {
+      'tr': 'Token Üret',
+      'en': 'Generate Token',
+      'es': 'Generar Token',
+      'ar': 'إنشاء رمز',
+      'hi': 'टोकन जनरेट करें',
+    },
+    'token_copied': {
+      'tr': 'Token panoya kopyalandı',
+      'en': 'Token copied to clipboard',
+      'es': 'Token copiado al portapapeles',
+      'ar': 'تم نسخ الرمز إلى الحافظة',
+      'hi': 'टोकन क्लिपबोर्ड पर कॉपी किया गया',
+    },
+    'security_operation_failed': {
+      'tr': 'İşlem başarısız: %s',
+      'en': 'Operation failed: %s',
+      'es': 'Operación fallida: %s',
+      'ar': 'فشلت العملية: %s',
+      'hi': 'ऑपरेशन विफल: %s',
+    },
     'qr_color': {
       'tr': 'QR Rengi',
       'en': 'QR Color',
+      'es': 'Color QR',
+      'ar': 'لون QR',
+      'hi': 'QR रंग',
+    },
+    'qr_foreground': {
+      'tr': 'Ön Plan Rengi',
+      'en': 'Foreground Color',
+      'es': 'Color de Primer Plano',
+      'ar': 'لون المقدمة',
+      'hi': 'फोरग्राउंड रंग',
+    },
+    'qr_background': {
+      'tr': 'Arka Plan Rengi',
+      'en': 'Background Color',
+      'es': 'Color de Fondo',
+      'ar': 'لون الخلفية',
+      'hi': 'बैकग्राउंड रंग',
+    },
+    'qr_style': {
+      'tr': 'QR Stil Ayarları',
+      'en': 'QR Style Settings',
+      'es': 'Configuración de Estilo QR',
+      'ar': 'إعدادات نمط QR',
+      'hi': 'QR स्टाइल सेटिंग्स',
+    },
+    'qr_error_level': {
+      'tr': 'Hata Düzeltme Seviyesi',
+      'en': 'Error Correction Level',
+      'es': 'Nivel de Corrección de Errores',
+      'ar': 'مستوى تصحيح الخطأ',
+      'hi': 'एरर करेक्शन लेवल',
+    },
+    'qr_size': {
+      'tr': 'QR Boyutu',
+      'en': 'QR Size',
+      'es': 'Tamaño QR',
+      'ar': 'حجم QR',
+      'hi': 'QR आकार',
+    },
+    'qr_padding': {
+      'tr': 'İç Boşluk',
+      'en': 'Inner Padding',
+      'es': 'Relleno Interno',
+      'ar': 'الحشو الداخلي',
+      'hi': 'इनर पैडिंग',
+    },
+    'qr_smooth': {
+      'tr': 'Modüller Arasında Boşluk Bırakma',
+      'en': 'Seamless Modules',
+      'es': 'Módulos sin Espacios',
+      'ar': 'وحدات بدون فجوات',
+      'hi': 'सीमलेस मॉड्यूल',
+    },
+    'qr_logo': {
+      'tr': 'Ortaya Logo Ekle',
+      'en': 'Embed Logo in Center',
+      'es': 'Insertar Logo al Centro',
+      'ar': 'تضمين شعار في المنتصف',
+      'hi': 'बीच में लोगो एम्बेड करें',
+    },
+    'qr_reset_style': {
+      'tr': 'Stili Sıfırla',
+      'en': 'Reset Style',
+      'es': 'Restablecer Estilo',
+      'ar': 'إعادة ضبط النمط',
+      'hi': 'स्टाइल रीसेट करें',
+    },
+    'pick_color': {
+      'tr': 'Renk Seç',
+      'en': 'Pick Color',
+      'es': 'Elegir Color',
+      'ar': 'اختر لونًا',
+      'hi': 'रंग चुनें',
+    },
+    'copy_payload': {
+      'tr': 'İçeriği Kopyala',
+      'en': 'Copy Payload',
+      'es': 'Copiar Contenido',
+      'ar': 'نسخ المحتوى',
+      'hi': 'पेलोड कॉपी करें',
+    },
+    'qr_payload_copied': {
+      'tr': 'QR içeriği panoya kopyalandı',
+      'en': 'QR payload copied to clipboard',
+      'es': 'Contenido QR copiado al portapapeles',
+      'ar': 'تم نسخ محتوى QR إلى الحافظة',
+      'hi': 'QR पेलोड क्लिपबोर्ड पर कॉपी किया गया',
+    },
+    'qr_data_too_long': {
+      'tr': 'QR içeriği çok uzun. Daha kısa bir metin deneyin.',
+      'en': 'QR data is too long. Try a shorter text.',
+      'es':
+          'El contenido QR es demasiado largo. Intenta con un texto más corto.',
+      'ar': 'بيانات QR طويلة جدًا. جرّب نصًا أقصر.',
+      'hi': 'QR डेटा बहुत लंबा है। छोटा टेक्स्ट आज़माएँ।',
     },
 
     // History
@@ -1027,13 +1508,21 @@ class AppStrings {
   static String get(String key, {List<String>? args}) {
     final locale = normalizeLocale(_currentLocale);
     final manualTranslations = _translations[key];
-    final generatedTranslation = kGeneratedLocaleTranslations[locale]?[key];
+    String translation = key;
 
-    final translation = manualTranslations?[locale] ??
-        generatedTranslation ??
-        manualTranslations?[fallbackLocale] ??
-        manualTranslations?[turkish] ??
-        key;
+    for (final lookup in translationLookupOrder(locale)) {
+      final manual = manualTranslations?[lookup];
+      if (manual != null && manual.isNotEmpty) {
+        translation = manual;
+        break;
+      }
+
+      final generated = kGeneratedLocaleTranslations[lookup]?[key];
+      if (generated != null && generated.isNotEmpty) {
+        translation = generated;
+        break;
+      }
+    }
 
     if (args != null && args.isNotEmpty) {
       String result = translation;
