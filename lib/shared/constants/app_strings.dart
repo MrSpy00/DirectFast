@@ -1031,6 +1031,169 @@ class AppStrings {
           'Gizliliğiniz önemlidir. Tüm veriler cihazınızda yerel olarak saklanır.',
       'en': 'Your privacy matters. All data is stored locally on your device.',
     },
+    'data_privacy': {
+      'tr': 'Veri ve Gizlilik',
+      'en': 'Data & Privacy',
+    },
+    'data_backup': {
+      'tr': 'Veri Yedekleme',
+      'en': 'Data Backup',
+    },
+    'data_backup_subtitle': {
+      'tr':
+          'Geçmiş ve şablonlarınızı JSON veya şifreli yedek olarak dışa aktarın, gerektiğinde içe aktarın.',
+      'en':
+          'Export your history and templates as JSON or encrypted backup, then import when needed.',
+    },
+    'data_backup_subtitle_short': {
+      'tr': 'Yedek al, paylaş, geri yükle',
+      'en': 'Backup, share, and restore',
+    },
+    'export_json': {
+      'tr': 'JSON Dışa Aktar',
+      'en': 'Export JSON',
+    },
+    'export_encrypted_backup': {
+      'tr': 'Şifreli Yedek Dışa Aktar',
+      'en': 'Export Encrypted Backup',
+    },
+    'import_backup': {
+      'tr': 'Yedek İçe Aktar',
+      'en': 'Import Backup',
+    },
+    'backup_exported': {
+      'tr': 'Yedek panoya kopyalandı ve paylaşım açıldı.',
+      'en': 'Backup copied to clipboard and share sheet opened.',
+    },
+    'backup_imported': {
+      'tr': 'Yedek başarıyla içe aktarıldı.',
+      'en': 'Backup imported successfully.',
+    },
+    'backup_payload_hint': {
+      'tr': 'JSON veya şifreli yedek içeriğini buraya yapıştırın...',
+      'en': 'Paste JSON or encrypted backup payload here...',
+    },
+    'backup_payload_required': {
+      'tr': 'Yedek içeriği boş olamaz.',
+      'en': 'Backup payload cannot be empty.',
+    },
+    'backup_invalid': {
+      'tr': 'Yedek biçimi geçersiz veya bozuk.',
+      'en': 'Backup format is invalid or corrupted.',
+    },
+    'restore_overwrite_warning': {
+      'tr':
+          'İçe aktarma işlemi mevcut geçmiş ve şablon verilerini üzerine yazar.',
+      'en':
+          'Import operation overwrites your current history and template data.',
+    },
+    'restore_settings': {
+      'tr': 'Tema ve dil ayarlarını da geri yükle',
+      'en': 'Also restore theme and language settings',
+    },
+    'restore_settings_subtitle': {
+      'tr': 'Yedekte varsa tema modu, renk ve dil ayarları uygulanır.',
+      'en':
+          'If present in backup, theme mode, color, and language settings are applied.',
+    },
+    'enter_passphrase': {
+      'tr': 'Parola Girin',
+      'en': 'Enter Passphrase',
+    },
+    'passphrase_hint': {
+      'tr': 'En az 4 karakter',
+      'en': 'At least 4 characters',
+    },
+    'passphrase_required': {
+      'tr': 'Şifreli yedek için parola gereklidir.',
+      'en': 'Passphrase is required for encrypted backup.',
+    },
+    'wrong_passphrase': {
+      'tr': 'Parola hatalı veya yedek bozuk.',
+      'en': 'Passphrase is incorrect or backup is corrupted.',
+    },
+    'privacy_dashboard': {
+      'tr': 'Gizlilik Panosu',
+      'en': 'Privacy Dashboard',
+    },
+    'privacy_dashboard_subtitle': {
+      'tr': 'Cihazda tutulan verilerin şeffaf özeti',
+      'en': 'Transparent summary of locally stored data',
+    },
+    'local_only_storage': {
+      'tr':
+          'DirectFast verileri yalnızca cihazınızda saklar. Sunucuya gönderim yapılmaz.',
+      'en':
+          'DirectFast stores your data only on your device. Nothing is sent to servers.',
+    },
+    'history_entries': {
+      'tr': 'Geçmiş Kayıtları',
+      'en': 'History Entries',
+    },
+    'template_entries': {
+      'tr': 'Şablon Kayıtları',
+      'en': 'Template Entries',
+    },
+    'stored_keys': {
+      'tr': 'Saklanan Anahtarlar',
+      'en': 'Stored Keys',
+    },
+    'stored_keys_subtitle': {
+      'tr': 'SharedPreferences içinde bulunan anahtar listesi',
+      'en': 'Key list currently in SharedPreferences',
+    },
+    'history_preview': {
+      'tr': 'Geçmiş Önizlemesi',
+      'en': 'History Preview',
+    },
+    'history_preview_subtitle': {
+      'tr': 'Son kayıtlar maskelenmiş şekilde gösterilir',
+      'en': 'Recent entries shown in masked form',
+    },
+    'copy_privacy_report': {
+      'tr': 'Gizlilik Raporunu Kopyala',
+      'en': 'Copy Privacy Report',
+    },
+    'privacy_report_copied': {
+      'tr': 'Gizlilik raporu panoya kopyalandı.',
+      'en': 'Privacy report copied to clipboard.',
+    },
+    'no_data_available': {
+      'tr': 'Veri bulunamadı',
+      'en': 'No data available',
+    },
+    'onboarding_status': {
+      'tr': 'Onboarding Durumu',
+      'en': 'Onboarding Status',
+    },
+    'theme_mode': {
+      'tr': 'Tema Modu',
+      'en': 'Theme Mode',
+    },
+    'theme_color': {
+      'tr': 'Tema Rengi',
+      'en': 'Theme Color',
+    },
+    'encrypted': {
+      'tr': 'Şifreli',
+      'en': 'Encrypted',
+    },
+    'enabled': {
+      'tr': 'Açık',
+      'en': 'Enabled',
+    },
+    'disabled': {
+      'tr': 'Kapalı',
+      'en': 'Disabled',
+    },
+    'yes': {
+      'tr': 'Evet',
+      'en': 'Yes',
+    },
+    'no': {
+      'tr': 'Hayır',
+      'en': 'No',
+    },
     'copyright': {
       'tr': '© 2026 %s',
       'en': '© 2026 %s',

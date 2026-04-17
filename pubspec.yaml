@@ -43,6 +43,9 @@ dependencies:
   # UUID
   uuid: ^4.3.3
 
+  # Deep links
+  app_links: ^6.4.0
+
   # Share
   share_plus: ^7.2.2
 

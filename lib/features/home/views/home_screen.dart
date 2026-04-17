@@ -122,6 +122,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       }
     });
 
+    ref.listen<String?>(pendingContactProvider, (_, next) {
+      if (next == null || next.trim().isEmpty) {
+        return;
+      }
+
+      final String value = next.trim();
+      _contactController.text = value;
+      _contactController.selection = TextSelection.fromPosition(
+        TextPosition(offset: value.length),
+      );
+      ref.read(contactInputProvider.notifier).state = value;
+      ref.read(pendingContactProvider.notifier).state = null;
+
+      if (_clipboardBannerDismissed) {
+        setState(() => _clipboardBannerDismissed = false);
+      }
+    });
+
     final platformsByCategory = PlatformType.values
         .where((p) => p.category == selectedCategory)
         .toList();

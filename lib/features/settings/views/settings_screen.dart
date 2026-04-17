@@ -4,10 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../shared/constants/app_strings.dart';
 import '../../../core/services/locale_service.dart';
+import '../../../core/utils/app_router.dart';
 import '../../../shared/widgets/glassmorphic_container.dart';
 import '../../../shared/widgets/app_logo.dart';
 import '../../../shared/theme/app_theme.dart';
@@ -303,6 +305,42 @@ class SettingsScreen extends ConsumerWidget {
                 label: Text(AppStrings.tr('pick_custom_color')),
               ),
             ).animate().fadeIn(duration: 350.ms, delay: 220.ms),
+
+            const SizedBox(height: 32),
+
+            // ── Data & Privacy ─────────────────────────────────────────────
+            _SectionTitle(title: AppStrings.tr('data_privacy'))
+                .animate()
+                .fadeIn(duration: 400.ms, delay: 180.ms)
+                .slideX(begin: -0.2, end: 0),
+            const SizedBox(height: 12),
+
+            GlassmorphicContainer.flat(
+              padding: EdgeInsets.zero,
+              child: Column(
+                children: [
+                  _NavigationOption(
+                    icon: Icons.backup_outlined,
+                    title: AppStrings.tr('data_backup'),
+                    subtitle: AppStrings.tr('data_backup_subtitle_short'),
+                    onTap: () {
+                      HapticFeedback.lightImpact();
+                      context.push(AppRouter.dataBackup);
+                    },
+                  ),
+                  const _Divider(),
+                  _NavigationOption(
+                    icon: Icons.privacy_tip_outlined,
+                    title: AppStrings.tr('privacy_dashboard'),
+                    subtitle: AppStrings.tr('privacy_dashboard_subtitle'),
+                    onTap: () {
+                      HapticFeedback.lightImpact();
+                      context.push(AppRouter.privacyDashboard);
+                    },
+                  ),
+                ],
+              ),
+            ).animate().fadeIn(duration: 400.ms, delay: 220.ms),
 
             const SizedBox(height: 32),
 
@@ -700,6 +738,72 @@ class _LinkButton extends StatelessWidget {
             ),
             const SizedBox(width: 4),
             const Icon(Icons.open_in_new, color: Colors.white, size: 16),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _NavigationOption extends StatelessWidget {
+  const _NavigationOption({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.6),
+                        ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Icon(
+              Icons.chevron_right_rounded,
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.5),
+            ),
           ],
         ),
       ),

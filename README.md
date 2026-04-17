@@ -17,7 +17,11 @@ Chat on messaging platforms without saving contacts.
 - **18 Platform Support**: WhatsApp, Telegram, Signal, Viber, WeChat, LINE, Messenger, Discord, Instagram, X, Snapchat, YouTube, TikTok, Twitch, Facebook, Kick, LinkedIn, Email
 - **No Contact Saving**: Directly open chats without cluttering your contacts
 - **Smart Clipboard**: Automatic detection of phone numbers and usernames
+- **Clipboard Intelligence Upgrade**: Multi-number extraction, URL/mention-aware username parsing, and inline email discovery from mixed text
 - **Quick Templates**: Save and reuse frequently sent messages
+- **Custom Deep Links**: Open DirectFast with prefilled chat intent via `directfast://chat?...`
+- **Backup & Restore**: Export local data as plain JSON or encrypted payload, then import safely with optional settings restore
+- **Privacy Dashboard**: Inspect exactly what is stored locally (keys, counts, masked previews) and copy a privacy report
 - **Advanced QR Studio**: Highly customizable QR generation with payload templates and an advanced payload builder (Raw/URL/Email/Phone/SMS/Wi-Fi/vCard/Geo), foreground/background controls, module/eye shape, error correction, frame/shadow tuning, custom center image support (gallery/camera), contrast guidance, and export quality control
 - **Link Cleaner**: Remove tracking parameters from URLs
 - **Security Toolkit**: Hashing, Base64/URL encode-decode, token generation, local encrypt/decrypt utilities, and an Advanced Password Generator unified in one place
@@ -40,7 +44,7 @@ This app follows **Clean Architecture** principles with **MVVM** pattern:
 lib/
 ├── core/
 │   ├── constants/        # App constants and enums
-│   ├── services/         # Core services (Storage, URL launcher, Clipboard)
+│   ├── services/         # Core services (Storage, URL launcher, Clipboard, Deep Link, Backup)
 │   └── utils/            # Utilities and helpers
 ├── data/
 │   ├── models/           # Data models
@@ -76,6 +80,16 @@ lib/
 - **Theme Modes**: Light, Dark, AMOLED, System Default
 - **Theme Colors**: Multi-color preset palette + custom RGB palette
 - **In-App Controls**: Language, theme mode, and theme color can be changed from Settings and are persisted locally
+
+---
+
+## 🔗 Deep Link Examples
+
+- `directfast://chat?platform=wa&phone=+905551234567`
+- `directfast://chat?platform=telegram&username=my_handle`
+- `directfast://chat/telegram/my_handle`
+
+> Supported aliases include `wa`, `tg`, `ig`, `x`, `fb`, and full platform names.
 
 ---
 

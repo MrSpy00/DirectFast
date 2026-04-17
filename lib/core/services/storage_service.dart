@@ -84,6 +84,11 @@ class StorageService {
     await prefs.remove(_historyKey);
   }
 
+  /// Replace entire history list atomically.
+  static Future<void> replaceHistory(List<ChatHistoryItem> items) async {
+    await _saveHistory(items);
+  }
+
   /// Save history list to SharedPreferences
   static Future<void> _saveHistory(List<ChatHistoryItem> items) async {
     final jsonString = ChatHistoryItem.encodeList(items);
@@ -126,6 +131,11 @@ class StorageService {
     final current = getAllTemplates();
     current.removeWhere((t) => t.id == id);
     await _saveTemplates(current);
+  }
+
+  /// Replace entire template list atomically.
+  static Future<void> replaceTemplates(List<TemplateItem> items) async {
+    await _saveTemplates(items);
   }
 
   /// Save templates list to SharedPreferences
@@ -209,5 +219,25 @@ class StorageService {
   /// Get history count
   static int getHistoryCount() {
     return getAllHistory().length;
+  }
+
+  /// Returns all keys currently stored in SharedPreferences.
+  static List<String> getStoredKeys() {
+    final keys = prefs.getKeys().toList();
+    keys.sort();
+    return keys;
+  }
+
+  /// Lightweight privacy snapshot used by dashboard/reporting views.
+  static Map<String, Object?> getPrivacySnapshot() {
+    return <String, Object?>{
+      'historyCount': getAllHistory().length,
+      'templateCount': getAllTemplates().length,
+      'themeMode': getThemeMode(),
+      'themeColorId': getThemeColorId(),
+      'locale': getLocale(),
+      'onboardingCompleted': isOnboardingCompleted(),
+      'storedKeys': getStoredKeys(),
+    };
   }
 }

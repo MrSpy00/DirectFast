@@ -19,6 +19,11 @@ final contactInputProvider = StateProvider<String>((ref) {
   return '';
 });
 
+// One-shot prefill value (used by deep links).
+final pendingContactProvider = StateProvider<String?>((ref) {
+  return null;
+});
+
 // Provider for clipboard suggestion
 final clipboardSuggestionProvider = FutureProvider<String?>((ref) async {
   final selectedPlatform = ref.watch(selectedPlatformProvider);

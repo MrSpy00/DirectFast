@@ -35,4 +35,8 @@ class TemplatesNotifier extends StateNotifier<List<TemplateItem>> {
     await StorageService.deleteTemplate(id);
     _load();
   }
+
+  void reload() {
+    _load();
+  }
 }
