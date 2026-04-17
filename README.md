@@ -133,6 +133,47 @@ flutter run
 
 ---
 
+## 🧪 Testler
+
+- **Test Türleri**: Unit (Birim) testleri
+- **Kapsam**: Deep link parse, backup/import akışı, clipboard parsing yardımcıları
+- **Test Kütüphanesi**: `flutter_test`
+
+Testleri çalıştırmak için:
+
+```bash
+flutter test
+```
+
+Analiz + test akışı:
+
+```bash
+flutter analyze
+flutter test
+```
+
+---
+
+## ⚙️ CI/CD (GitHub Actions)
+
+Proje, `.github/workflows/main.yml` ile otomatik olarak aşağıdaki kontrolleri çalıştırır:
+
+- `flutter pub get`
+- `flutter analyze`
+- `flutter test --coverage`
+- `flutter build apk --release`
+
+Push ve Pull Request işlemlerinde build doğrulaması yapılır. `v*` tag'lerinde APK release asset olarak yayınlanır.
+
+---
+
+## 📦 APK İndir
+
+- **Release Sayfası**: [v1.0.0 Release](https://github.com/MrSpy00/DirectFast/releases/tag/1.0.0)
+- **Doğrudan APK**: [DirectFast.apk](https://github.com/MrSpy00/DirectFast/releases/download/1.0.0/DirectFast.apk)
+
+---
+
 ## 📱 Desteklenen Platformlar
 
 | Platform  | Girdi Türü     | Durum |
@@ -194,6 +235,10 @@ Aegis tarafından geliştirilmiştir
 ## 🤝 Katkıda Bulunma
 
 Katkılar, issue’lar ve özellik istekleri memnuniyetle karşılanır!
+
+- Detaylı katkı rehberi: [CONTRIBUTING.md](CONTRIBUTING.md)
+- Bug Report şablonu: [.github/ISSUE_TEMPLATE/bug_report.md](.github/ISSUE_TEMPLATE/bug_report.md)
+- Feature Request şablonu: [.github/ISSUE_TEMPLATE/feature_request.md](.github/ISSUE_TEMPLATE/feature_request.md)
 
 1. Projeyi fork edin
 2. Feature branch oluşturun (`git checkout -b feature/AmazingFeature`)
@@ -348,6 +393,47 @@ flutter run
 
 ---
 
+## 🧪 Tests
+
+- **Test Types**: Unit tests
+- **Coverage Areas**: Deep link parsing, backup/import flow, clipboard parsing helpers
+- **Test Library**: `flutter_test`
+
+To run tests:
+
+```bash
+flutter test
+```
+
+Analyze + test flow:
+
+```bash
+flutter analyze
+flutter test
+```
+
+---
+
+## ⚙️ CI/CD (GitHub Actions)
+
+The project uses `.github/workflows/main.yml` to automatically run:
+
+- `flutter pub get`
+- `flutter analyze`
+- `flutter test --coverage`
+- `flutter build apk --release`
+
+Build validation runs on Push and Pull Request. On `v*` tags, the APK is published as a release asset.
+
+---
+
+## 📦 Download APK
+
+- **Release Page**: [v1.0.0 Release](https://github.com/MrSpy00/DirectFast/releases/tag/1.0.0)
+- **Direct APK**: [DirectFast.apk](https://github.com/MrSpy00/DirectFast/releases/download/1.0.0/DirectFast.apk)
+
+---
+
 ## 📱 Supported Platforms
 
 | Platform  | Input Type    | Status |
@@ -409,6 +495,10 @@ Developed by Aegis
 ## 🤝 Contributing
 
 Contributions, issues, and feature requests are welcome!
+
+- Detailed guide: [CONTRIBUTING.md](CONTRIBUTING.md)
+- Bug Report template: [.github/ISSUE_TEMPLATE/bug_report.md](.github/ISSUE_TEMPLATE/bug_report.md)
+- Feature Request template: [.github/ISSUE_TEMPLATE/feature_request.md](.github/ISSUE_TEMPLATE/feature_request.md)
 
 1. Fork the project
 2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
