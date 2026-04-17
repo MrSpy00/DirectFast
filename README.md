@@ -11,6 +11,11 @@ Kişi kaydetmeden mesajlaşma platformlarında sohbet başlatın.
 ![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)
 ![Dart](https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white)
 ![Material Design](https://img.shields.io/badge/Material%20Design-757575?style=for-the-badge&logo=material-design&logoColor=white)
+![CI](https://img.shields.io/github/actions/workflow/status/MrSpy00/DirectFast/main.yml?branch=main&style=for-the-badge&label=CI)
+![Release](https://img.shields.io/github/v/release/MrSpy00/DirectFast?style=for-the-badge&label=Release)
+
+[![Download APK](https://img.shields.io/badge/Download-DirectFast.apk-2ea44f?style=for-the-badge)](https://github.com/MrSpy00/DirectFast/releases/download/1.0.0/DirectFast.apk)
+[![Sponsor](https://img.shields.io/badge/Sponsor-Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge)](https://buymeacoffee.com/aegissoft)
 
 ---
 
@@ -73,6 +78,8 @@ lib/
 - **Yerel Depolama**: SharedPreferences
 - **Animasyonlar**: flutter_animate
 - **Fontlar**: Google Fonts
+- **Testing**: flutter_test (Unit + Widget)
+- **CI/CD**: GitHub Actions
 
 ---
 
@@ -136,8 +143,9 @@ flutter run
 ## 🧪 Testler
 
 - **Test Türleri**: Unit (Birim) testleri
-- **Kapsam**: Deep link parse, backup/import akışı, clipboard parsing yardımcıları
+- **Kapsam**: Deep link parse, backup/import akışı, clipboard parsing yardımcıları, platform davranış doğrulamaları
 - **Test Kütüphanesi**: `flutter_test`
+- **Test Dosyaları**: `test/core/` ve `test/widget_test.dart`
 
 Testleri çalıştırmak için:
 
@@ -152,6 +160,12 @@ flutter analyze
 flutter test
 ```
 
+Coverage ile çalıştırma:
+
+```bash
+flutter test --coverage
+```
+
 ---
 
 ## ⚙️ CI/CD (GitHub Actions)
@@ -163,12 +177,13 @@ Proje, `.github/workflows/main.yml` ile otomatik olarak aşağıdaki kontrolleri
 - `flutter test --coverage`
 - `flutter build apk --release`
 
-Push ve Pull Request işlemlerinde build doğrulaması yapılır. `v*` tag'lerinde APK release asset olarak yayınlanır.
+Push ve Pull Request işlemlerinde build doğrulaması yapılır. `v*` tag'lerinde workflow, üretilen `DirectFast.apk` dosyasını otomatik olarak ilgili GitHub Release'e yükler.
 
 ---
 
 ## 📦 APK İndir
 
+- [![Download APK](https://img.shields.io/badge/Download-DirectFast.apk-2ea44f?style=for-the-badge)](https://github.com/MrSpy00/DirectFast/releases/download/1.0.0/DirectFast.apk)
 - **Release Sayfası**: [v1.0.0 Release](https://github.com/MrSpy00/DirectFast/releases/tag/1.0.0)
 - **Doğrudan APK**: [DirectFast.apk](https://github.com/MrSpy00/DirectFast/releases/download/1.0.0/DirectFast.apk)
 
@@ -239,6 +254,7 @@ Katkılar, issue’lar ve özellik istekleri memnuniyetle karşılanır!
 - Detaylı katkı rehberi: [CONTRIBUTING.md](CONTRIBUTING.md)
 - Bug Report şablonu: [.github/ISSUE_TEMPLATE/bug_report.md](.github/ISSUE_TEMPLATE/bug_report.md)
 - Feature Request şablonu: [.github/ISSUE_TEMPLATE/feature_request.md](.github/ISSUE_TEMPLATE/feature_request.md)
+- PR şablonu: [.github/pull_request_template.md](.github/pull_request_template.md)
 
 1. Projeyi fork edin
 2. Feature branch oluşturun (`git checkout -b feature/AmazingFeature`)
@@ -251,6 +267,13 @@ Katkılar, issue’lar ve özellik istekleri memnuniyetle karşılanır!
 ## ⭐ Desteğinizi Gösterin
 
 Bu proje size yardımcı olduysa bir ⭐️ verin!
+
+## ❤️ Sponsorluk
+
+Projeyi desteklemek için:
+
+- GitHub Sponsor butonu: `.github/FUNDING.yml` ile aktif
+- Buy Me a Coffee: [buymeacoffee.com/aegissoft](https://buymeacoffee.com/aegissoft)
 
 ---
 
@@ -271,6 +294,11 @@ Chat on messaging platforms without saving contacts.
 ![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)
 ![Dart](https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white)
 ![Material Design](https://img.shields.io/badge/Material%20Design-757575?style=for-the-badge&logo=material-design&logoColor=white)
+![CI](https://img.shields.io/github/actions/workflow/status/MrSpy00/DirectFast/main.yml?branch=main&style=for-the-badge&label=CI)
+![Release](https://img.shields.io/github/v/release/MrSpy00/DirectFast?style=for-the-badge&label=Release)
+
+[![Download APK](https://img.shields.io/badge/Download-DirectFast.apk-2ea44f?style=for-the-badge)](https://github.com/MrSpy00/DirectFast/releases/download/1.0.0/DirectFast.apk)
+[![Sponsor](https://img.shields.io/badge/Sponsor-Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge)](https://buymeacoffee.com/aegissoft)
 
 ---
 
@@ -333,6 +361,8 @@ lib/
 - **Local Storage**: SharedPreferences
 - **Animations**: flutter_animate
 - **Fonts**: Google Fonts
+- **Testing**: flutter_test (Unit + Widget)
+- **CI/CD**: GitHub Actions
 
 ---
 
@@ -396,8 +426,9 @@ flutter run
 ## 🧪 Tests
 
 - **Test Types**: Unit tests
-- **Coverage Areas**: Deep link parsing, backup/import flow, clipboard parsing helpers
+- **Coverage Areas**: Deep link parsing, backup/import flow, clipboard parsing helpers, platform behavior validation
 - **Test Library**: `flutter_test`
+- **Test Files**: `test/core/` and `test/widget_test.dart`
 
 To run tests:
 
@@ -412,9 +443,15 @@ flutter analyze
 flutter test
 ```
 
+Run with coverage:
+
+```bash
+flutter test --coverage
+```
+
 ---
 
-## ⚙️ CI/CD (GitHub Actions)
+## ⚙️ CI/CD (GitHub Actions, EN)
 
 The project uses `.github/workflows/main.yml` to automatically run:
 
@@ -423,12 +460,13 @@ The project uses `.github/workflows/main.yml` to automatically run:
 - `flutter test --coverage`
 - `flutter build apk --release`
 
-Build validation runs on Push and Pull Request. On `v*` tags, the APK is published as a release asset.
+Build validation runs on Push and Pull Request. On `v*` tags, the workflow automatically uploads the generated `DirectFast.apk` to the matching GitHub Release.
 
 ---
 
 ## 📦 Download APK
 
+- [![Download APK](https://img.shields.io/badge/Download-DirectFast.apk-2ea44f?style=for-the-badge)](https://github.com/MrSpy00/DirectFast/releases/download/1.0.0/DirectFast.apk)
 - **Release Page**: [v1.0.0 Release](https://github.com/MrSpy00/DirectFast/releases/tag/1.0.0)
 - **Direct APK**: [DirectFast.apk](https://github.com/MrSpy00/DirectFast/releases/download/1.0.0/DirectFast.apk)
 
@@ -499,6 +537,7 @@ Contributions, issues, and feature requests are welcome!
 - Detailed guide: [CONTRIBUTING.md](CONTRIBUTING.md)
 - Bug Report template: [.github/ISSUE_TEMPLATE/bug_report.md](.github/ISSUE_TEMPLATE/bug_report.md)
 - Feature Request template: [.github/ISSUE_TEMPLATE/feature_request.md](.github/ISSUE_TEMPLATE/feature_request.md)
+- PR template: [.github/pull_request_template.md](.github/pull_request_template.md)
 
 1. Fork the project
 2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
@@ -511,6 +550,13 @@ Contributions, issues, and feature requests are welcome!
 ## ⭐ Show Your Support
 
 Give a ⭐️ if this project helped you!
+
+## ❤️ Sponsorship
+
+To support the project:
+
+- GitHub Sponsor button: enabled via `.github/FUNDING.yml`
+- Buy Me a Coffee: [buymeacoffee.com/aegissoft](https://buymeacoffee.com/aegissoft)
 
 ---
 
