@@ -35,13 +35,13 @@ class UtilsScreen extends ConsumerStatefulWidget {
 
 class _UtilsScreenState extends ConsumerState<UtilsScreen> {
   late final PageController _pageController;
+  late final ScrollController _segmentScrollController;
   int _currentPage = 0;
 
   static const _segments = [
     _Segment(icon: Icons.qr_code_2_rounded, labelKey: 'tab_qr'),
     _Segment(icon: Icons.link_off_rounded, labelKey: 'tab_links'),
     _Segment(icon: Icons.bookmarks_outlined, labelKey: 'tab_templates'),
-    _Segment(icon: Icons.password_rounded, labelKey: 'tab_passwords'),
     _Segment(icon: Icons.email_outlined, labelKey: 'tab_gmail'),
     _Segment(icon: Icons.security_rounded, labelKey: 'tab_security'),
   ];
@@ -51,21 +51,55 @@ class _UtilsScreenState extends ConsumerState<UtilsScreen> {
     super.initState();
     _currentPage = widget.initialTab.clamp(0, _segments.length - 1);
     _pageController = PageController(initialPage: _currentPage);
+    _segmentScrollController = ScrollController();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _ensureCurrentSegmentVisible(_currentPage, animate: false);
+    });
   }
 
   @override
   void dispose() {
     _pageController.dispose();
+    _segmentScrollController.dispose();
     super.dispose();
   }
 
+  void _ensureCurrentSegmentVisible(int index, {bool animate = true}) {
+    if (!_segmentScrollController.hasClients) {
+      return;
+    }
+
+    const estimatedChipWidth = 130.0;
+    const chipSpacing = 10.0;
+    final targetOffset =
+        (index * (estimatedChipWidth + chipSpacing) - 18).clamp(
+      0,
+      _segmentScrollController.position.maxScrollExtent,
+    );
+
+    if (animate) {
+      _segmentScrollController.animateTo(
+        targetOffset.toDouble(),
+        duration: const Duration(milliseconds: 260),
+        curve: Curves.easeOutCubic,
+      );
+      return;
+    }
+
+    _segmentScrollController.jumpTo(targetOffset.toDouble());
+  }
+
   void _onSegmentTap(int index) {
+    if (index == _currentPage) {
+      return;
+    }
     HapticFeedback.lightImpact();
     _pageController.animateToPage(
       index,
       duration: const Duration(milliseconds: 380),
       curve: Curves.easeInOutCubic,
     );
+    _ensureCurrentSegmentVisible(index);
   }
 
   @override
@@ -98,12 +132,14 @@ class _UtilsScreenState extends ConsumerState<UtilsScreen> {
                 child: PageView(
                   controller: _pageController,
                   physics: const BouncingScrollPhysics(),
-                  onPageChanged: (i) => setState(() => _currentPage = i),
+                  onPageChanged: (i) {
+                    setState(() => _currentPage = i);
+                    _ensureCurrentSegmentVisible(i);
+                  },
                   children: const [
                     _QRGeneratorPage(),
                     _LinkCleanerPage(),
                     _TemplatesPage(),
-                    _PasswordGeneratorPage(),
                     _GmailComposerPage(),
                     _SecurityToolkitPage(),
                   ],
@@ -190,63 +226,70 @@ class _UtilsScreenState extends ConsumerState<UtilsScreen> {
   }
 
   Widget _buildSegmentedControl() {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            AppStrings.tr('quick_switch'),
-            style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: Theme.of(context)
-                      .colorScheme
-                      .onSurface
-                      .withValues(alpha: 0.72),
-                ),
+          Row(
+            children: [
+              Icon(
+                Icons.bolt_rounded,
+                size: 18,
+                color: colorScheme.primary,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                AppStrings.tr('quick_switch'),
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: colorScheme.onSurface.withValues(alpha: 0.78),
+                    ),
+              ),
+              const Spacer(),
+              Text(
+                '${_currentPage + 1}/${_segments.length}',
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color:
+                          colorScheme.onSurfaceVariant.withValues(alpha: 0.72),
+                      fontWeight: FontWeight.w700,
+                    ),
+              ),
+            ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.symmetric(vertical: 8),
             decoration: BoxDecoration(
-              color: Theme.of(context)
-                  .colorScheme
-                  .surfaceContainerHighest
-                  .withValues(alpha: 0.5),
-              borderRadius: BorderRadius.circular(16),
+              color:
+                  colorScheme.surfaceContainerHighest.withValues(alpha: 0.48),
+              borderRadius: BorderRadius.circular(18),
               border: Border.all(
-                color: Theme.of(context)
-                    .colorScheme
-                    .outline
-                    .withValues(alpha: 0.16),
+                color: colorScheme.outline.withValues(alpha: 0.16),
               ),
             ),
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final columns = constraints.maxWidth < 540 ? 2 : 3;
-                const spacing = 8.0;
-                final itemWidth =
-                    (constraints.maxWidth - ((columns - 1) * spacing)) /
-                        columns;
-
-                return Wrap(
-                  spacing: spacing,
-                  runSpacing: spacing,
-                  children: List.generate(_segments.length, (index) {
-                    final segment = _segments[index];
-                    return SizedBox(
-                      width: itemWidth,
-                      child: _SegmentPill(
-                        icon: segment.icon,
-                        label: AppStrings.tr(segment.labelKey),
-                        isSelected: _currentPage == index,
-                        onTap: () => _onSegmentTap(index),
-                      ),
-                    );
-                  }),
-                );
-              },
+            child: SizedBox(
+              height: 48,
+              child: ListView.separated(
+                controller: _segmentScrollController,
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                itemCount: _segments.length,
+                separatorBuilder: (_, __) => const SizedBox(width: 10),
+                itemBuilder: (context, index) {
+                  final segment = _segments[index];
+                  return _SegmentPill(
+                    icon: segment.icon,
+                    label: AppStrings.tr(segment.labelKey),
+                    isSelected: _currentPage == index,
+                    onTap: () => _onSegmentTap(index),
+                  );
+                },
+              ),
             ),
           ),
         ],
@@ -279,62 +322,71 @@ class _SegmentPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final onSurface = Theme.of(context).colorScheme.onSurface;
+    final onSurfaceVariant = Theme.of(context).colorScheme.onSurfaceVariant;
 
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeOutCubic,
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-        decoration: BoxDecoration(
-          gradient: isSelected ? AppTheme.primaryGradientFor(context) : null,
-          color: isSelected
-              ? null
-              : Theme.of(context).colorScheme.surface.withValues(alpha: 0.86),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(13),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 220),
+          curve: Curves.easeOutCubic,
+          constraints: const BoxConstraints(minWidth: 116, maxWidth: 140),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(
+            gradient: isSelected ? AppTheme.primaryGradientFor(context) : null,
             color: isSelected
-                ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.5)
-                : Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
-          ),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .primary
-                        .withValues(alpha: 0.25),
-                    blurRadius: 10,
-                    offset: const Offset(0, 3),
-                  ),
-                ]
-              : null,
-        ),
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              size: 17,
-              color:
-                  isSelected ? Colors.white : onSurface.withValues(alpha: 0.7),
+                ? null
+                : Theme.of(context).colorScheme.surface.withValues(alpha: 0.85),
+            borderRadius: BorderRadius.circular(13),
+            border: Border.all(
+              color: isSelected
+                  ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.5)
+                  : Theme.of(context)
+                      .colorScheme
+                      .outline
+                      .withValues(alpha: 0.2),
             ),
-            const SizedBox(width: 7),
-            Expanded(
-              child: Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
-                  color: isSelected
-                      ? Colors.white
-                      : onSurface.withValues(alpha: 0.82),
+            boxShadow: isSelected
+                ? [
+                    BoxShadow(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .primary
+                          .withValues(alpha: 0.24),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ]
+                : null,
+          ),
+          child: Row(
+            children: [
+              Icon(
+                icon,
+                size: 16,
+                color: isSelected
+                    ? Colors.white
+                    : onSurfaceVariant.withValues(alpha: 0.86),
+              ),
+              const SizedBox(width: 7),
+              Flexible(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                    color: isSelected
+                        ? Colors.white
+                        : onSurface.withValues(alpha: 0.86),
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -345,6 +397,38 @@ enum _QrCenterImageSource {
   none,
   appLogo,
   custom,
+}
+
+class _QrStylePreset {
+  final String id;
+  final String labelKey;
+  final Color foreground;
+  final Color background;
+  final QrEyeShape eyeShape;
+  final QrDataModuleShape moduleShape;
+  final int errorLevel;
+  final bool gapless;
+  final double padding;
+  final double cornerRadius;
+  final Color frameColor;
+  final double frameWidth;
+  final double shadowBlur;
+
+  const _QrStylePreset({
+    required this.id,
+    required this.labelKey,
+    required this.foreground,
+    required this.background,
+    required this.eyeShape,
+    required this.moduleShape,
+    required this.errorLevel,
+    required this.gapless,
+    required this.padding,
+    required this.cornerRadius,
+    required this.frameColor,
+    required this.frameWidth,
+    required this.shadowBlur,
+  });
 }
 
 // ── QR Generator Page ─────────────────────────────────────────────────────────
@@ -367,8 +451,13 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
   double _qrPadding = 16;
   double _logoScale = 0.18;
   double _exportPixelRatio = 4.0;
+  double _cornerRadius = 14;
+  double _frameWidth = 0;
+  double _frameShadow = 0;
   bool _gapless = true;
   bool _isPickingCenterImage = false;
+  Color _frameColor = Colors.black;
+  String _activePresetId = 'qr_preset_classic';
   _QrCenterImageSource _centerImageSource = _QrCenterImageSource.none;
   Uint8List? _customCenterImageBytes;
   QrEyeShape _eyeShape = QrEyeShape.square;
@@ -385,6 +474,84 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
     Color(0xFFE65100),
   ];
 
+  static const List<_QrStylePreset> _stylePresets = [
+    _QrStylePreset(
+      id: 'qr_preset_classic',
+      labelKey: 'qr_preset_classic',
+      foreground: Colors.black,
+      background: Colors.white,
+      eyeShape: QrEyeShape.square,
+      moduleShape: QrDataModuleShape.square,
+      errorLevel: QrErrorCorrectLevel.H,
+      gapless: true,
+      padding: 16,
+      cornerRadius: 14,
+      frameColor: Colors.black,
+      frameWidth: 0,
+      shadowBlur: 0,
+    ),
+    _QrStylePreset(
+      id: 'qr_preset_modern',
+      labelKey: 'qr_preset_modern',
+      foreground: Color(0xFF1E293B),
+      background: Color(0xFFF8FAFC),
+      eyeShape: QrEyeShape.circle,
+      moduleShape: QrDataModuleShape.square,
+      errorLevel: QrErrorCorrectLevel.Q,
+      gapless: true,
+      padding: 18,
+      cornerRadius: 18,
+      frameColor: Color(0xFF334155),
+      frameWidth: 1.5,
+      shadowBlur: 8,
+    ),
+    _QrStylePreset(
+      id: 'qr_preset_midnight',
+      labelKey: 'qr_preset_midnight',
+      foreground: Color(0xFFE2E8F0),
+      background: Color(0xFF0F172A),
+      eyeShape: QrEyeShape.square,
+      moduleShape: QrDataModuleShape.circle,
+      errorLevel: QrErrorCorrectLevel.H,
+      gapless: true,
+      padding: 20,
+      cornerRadius: 20,
+      frameColor: Color(0xFF1D4ED8),
+      frameWidth: 2,
+      shadowBlur: 10,
+    ),
+    _QrStylePreset(
+      id: 'qr_preset_ocean',
+      labelKey: 'qr_preset_ocean',
+      foreground: Color(0xFF0A66C2),
+      background: Color(0xFFF4FAFF),
+      eyeShape: QrEyeShape.circle,
+      moduleShape: QrDataModuleShape.circle,
+      errorLevel: QrErrorCorrectLevel.Q,
+      gapless: true,
+      padding: 16,
+      cornerRadius: 16,
+      frameColor: Color(0xFF7CC4FF),
+      frameWidth: 1,
+      shadowBlur: 6,
+    ),
+    _QrStylePreset(
+      id: 'qr_preset_neon',
+      labelKey: 'qr_preset_neon',
+      foreground: Color(0xFF39FF14),
+      background: Color(0xFF050505),
+      eyeShape: QrEyeShape.square,
+      moduleShape: QrDataModuleShape.square,
+      errorLevel: QrErrorCorrectLevel.H,
+      gapless: false,
+      padding: 18,
+      cornerRadius: 12,
+      frameColor: Color(0xFF39FF14),
+      frameWidth: 2,
+      shadowBlur: 14,
+    ),
+  ];
+
   static const Map<String, String> _payloadTemplates = {
     'qr_template_url': 'https://example.com',
     'qr_template_email': 'mailto:hello@example.com',
@@ -392,6 +559,59 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
     'qr_template_sms': 'sms:+905551112233?body=Merhaba',
     'qr_template_wifi': 'WIFI:T:WPA;S:DirectFast;P:supersecret123;;',
   };
+
+  void _markPresetAsCustom() {
+    _activePresetId = 'qr_preset_custom';
+  }
+
+  void _applyPreset(_QrStylePreset preset) {
+    HapticFeedback.selectionClick();
+    setState(() {
+      _activePresetId = preset.id;
+      _fgColor = preset.foreground;
+      _bgColor = preset.background;
+      _eyeShape = preset.eyeShape;
+      _moduleShape = preset.moduleShape;
+      _errorLevel = preset.errorLevel;
+      _gapless = preset.gapless;
+      _qrPadding = preset.padding;
+      _cornerRadius = preset.cornerRadius;
+      _frameColor = preset.frameColor;
+      _frameWidth = preset.frameWidth;
+      _frameShadow = preset.shadowBlur;
+    });
+  }
+
+  void _onForegroundColorChanged(Color color) {
+    setState(() {
+      _fgColor = color;
+      _markPresetAsCustom();
+    });
+  }
+
+  void _onBackgroundColorChanged(Color color) {
+    setState(() {
+      _bgColor = color;
+      _markPresetAsCustom();
+    });
+  }
+
+  void _onFrameColorChanged(Color color) {
+    setState(() {
+      _frameColor = color;
+      _markPresetAsCustom();
+    });
+  }
+
+  void _swapColors() {
+    HapticFeedback.selectionClick();
+    setState(() {
+      final previousForeground = _fgColor;
+      _fgColor = _bgColor;
+      _bgColor = previousForeground;
+      _markPresetAsCustom();
+    });
+  }
 
   @override
   void dispose() {
@@ -435,8 +655,13 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
       _qrPadding = 16;
       _logoScale = 0.18;
       _exportPixelRatio = 4.0;
+      _cornerRadius = 14;
+      _frameWidth = 0;
+      _frameShadow = 0;
+      _frameColor = Colors.black;
       _gapless = true;
       _isPickingCenterImage = false;
+      _activePresetId = 'qr_preset_classic';
       _centerImageSource = _QrCenterImageSource.none;
       _customCenterImageBytes = null;
       _eyeShape = QrEyeShape.square;
@@ -730,7 +955,23 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
                   child: Container(
                     decoration: BoxDecoration(
                       color: _bgColor,
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: BorderRadius.circular(_cornerRadius),
+                      border: _frameWidth > 0
+                          ? Border.all(
+                              color: _frameColor,
+                              width: _frameWidth,
+                            )
+                          : null,
+                      boxShadow: _frameShadow > 0
+                          ? [
+                              BoxShadow(
+                                color: _frameColor.withValues(alpha: 0.28),
+                                blurRadius: _frameShadow,
+                                spreadRadius: _frameShadow * 0.08,
+                                offset: const Offset(0, 4),
+                              ),
+                            ]
+                          : null,
                     ),
                     padding: EdgeInsets.all(_qrPadding),
                     child: QrImageView(
@@ -764,11 +1005,11 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
                   title: AppStrings.tr('qr_foreground'),
                   presets: _colorPresets,
                   selected: _fgColor,
-                  onSelected: (c) => setState(() => _fgColor = c),
+                  onSelected: _onForegroundColorChanged,
                   onCustomTap: () async {
                     await _pickColor(
                       initialColor: _fgColor,
-                      onPicked: (color) => setState(() => _fgColor = color),
+                      onPicked: _onForegroundColorChanged,
                     );
                   },
                 ),
@@ -777,11 +1018,11 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
                   title: AppStrings.tr('qr_background'),
                   presets: _colorPresets,
                   selected: _bgColor,
-                  onSelected: (c) => setState(() => _bgColor = c),
+                  onSelected: _onBackgroundColorChanged,
                   onCustomTap: () async {
                     await _pickColor(
                       initialColor: _bgColor,
-                      onPicked: (color) => setState(() => _bgColor = color),
+                      onPicked: _onBackgroundColorChanged,
                     );
                   },
                 ),
@@ -823,6 +1064,23 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
                     ],
                   ),
                 ),
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    OutlinedButton.icon(
+                      onPressed: _swapColors,
+                      icon: const Icon(Icons.swap_horiz_rounded),
+                      label: Text(AppStrings.tr('qr_swap_colors')),
+                    ),
+                    OutlinedButton.icon(
+                      onPressed: _resetStyle,
+                      icon: const Icon(Icons.refresh_rounded),
+                      label: Text(AppStrings.tr('qr_reset_style')),
+                    ),
+                  ],
+                ),
               ],
             ),
           )
@@ -848,10 +1106,6 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
                   minLines: 3,
                   decoration: InputDecoration(
                     hintText: AppStrings.tr('enter_text'),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 14,
-                    ),
                   ),
                   textAlignVertical: TextAlignVertical.top,
                   onSubmitted: (_) => _generateQR(),
@@ -914,7 +1168,40 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
                         fontWeight: FontWeight.w700,
                       ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 8),
+                Text(
+                  AppStrings.tr('qr_style_presets'),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.68),
+                      ),
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    ..._stylePresets.map(
+                      (preset) => ChoiceChip(
+                        label: Text(AppStrings.tr(preset.labelKey)),
+                        selected: _activePresetId == preset.id,
+                        onSelected: (_) => _applyPreset(preset),
+                      ),
+                    ),
+                    ChoiceChip(
+                      label: Text(AppStrings.tr('qr_preset_custom')),
+                      selected: _activePresetId == 'qr_preset_custom',
+                      onSelected: (_) {
+                        setState(() {
+                          _markPresetAsCustom();
+                        });
+                      },
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
                 Row(
                   children: [
                     Expanded(
@@ -944,7 +1231,10 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
                         ],
                         onChanged: (value) {
                           if (value != null) {
-                            setState(() => _errorLevel = value);
+                            setState(() {
+                              _errorLevel = value;
+                              _markPresetAsCustom();
+                            });
                           }
                         },
                       ),
@@ -962,7 +1252,12 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
                   max: 340,
                   divisions: 20,
                   label: _qrSize.round().toString(),
-                  onChanged: (value) => setState(() => _qrSize = value),
+                  onChanged: (value) {
+                    setState(() {
+                      _qrSize = value;
+                      _markPresetAsCustom();
+                    });
+                  },
                 ),
                 Text(
                   '${AppStrings.tr('qr_padding')}: ${_qrPadding.round()} px',
@@ -973,7 +1268,75 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
                   max: 36,
                   divisions: 18,
                   label: _qrPadding.round().toString(),
-                  onChanged: (value) => setState(() => _qrPadding = value),
+                  onChanged: (value) {
+                    setState(() {
+                      _qrPadding = value;
+                      _markPresetAsCustom();
+                    });
+                  },
+                ),
+                Text(
+                  '${AppStrings.tr('qr_corner_radius')}: ${_cornerRadius.round()} px',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+                Slider(
+                  value: _cornerRadius,
+                  max: 32,
+                  divisions: 16,
+                  label: _cornerRadius.round().toString(),
+                  onChanged: (value) {
+                    setState(() {
+                      _cornerRadius = value;
+                      _markPresetAsCustom();
+                    });
+                  },
+                ),
+                Text(
+                  '${AppStrings.tr('qr_frame_width')}: ${_frameWidth.toStringAsFixed(1)} px',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+                Slider(
+                  value: _frameWidth,
+                  max: 8,
+                  divisions: 16,
+                  label: _frameWidth.toStringAsFixed(1),
+                  onChanged: (value) {
+                    setState(() {
+                      _frameWidth = value;
+                      _markPresetAsCustom();
+                    });
+                  },
+                ),
+                if (_frameWidth > 0) ...[
+                  _QrColorPicker(
+                    title: AppStrings.tr('qr_frame_color'),
+                    presets: _colorPresets,
+                    selected: _frameColor,
+                    onSelected: _onFrameColorChanged,
+                    onCustomTap: () async {
+                      await _pickColor(
+                        initialColor: _frameColor,
+                        onPicked: _onFrameColorChanged,
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 10),
+                ],
+                Text(
+                  '${AppStrings.tr('qr_frame_shadow')}: ${_frameShadow.round()}',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+                Slider(
+                  value: _frameShadow,
+                  max: 24,
+                  divisions: 12,
+                  label: _frameShadow.round().toString(),
+                  onChanged: (value) {
+                    setState(() {
+                      _frameShadow = value;
+                      _markPresetAsCustom();
+                    });
+                  },
                 ),
                 const SizedBox(height: 8),
                 Wrap(
@@ -983,28 +1346,42 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
                     ChoiceChip(
                       label: Text(AppStrings.tr('qr_eye_square')),
                       selected: _eyeShape == QrEyeShape.square,
-                      onSelected: (_) =>
-                          setState(() => _eyeShape = QrEyeShape.square),
+                      onSelected: (_) {
+                        setState(() {
+                          _eyeShape = QrEyeShape.square;
+                          _markPresetAsCustom();
+                        });
+                      },
                     ),
                     ChoiceChip(
                       label: Text(AppStrings.tr('qr_eye_circle')),
                       selected: _eyeShape == QrEyeShape.circle,
-                      onSelected: (_) =>
-                          setState(() => _eyeShape = QrEyeShape.circle),
+                      onSelected: (_) {
+                        setState(() {
+                          _eyeShape = QrEyeShape.circle;
+                          _markPresetAsCustom();
+                        });
+                      },
                     ),
                     ChoiceChip(
                       label: Text(AppStrings.tr('qr_data_square')),
                       selected: _moduleShape == QrDataModuleShape.square,
-                      onSelected: (_) => setState(
-                        () => _moduleShape = QrDataModuleShape.square,
-                      ),
+                      onSelected: (_) {
+                        setState(() {
+                          _moduleShape = QrDataModuleShape.square;
+                          _markPresetAsCustom();
+                        });
+                      },
                     ),
                     ChoiceChip(
                       label: Text(AppStrings.tr('qr_data_circle')),
                       selected: _moduleShape == QrDataModuleShape.circle,
-                      onSelected: (_) => setState(
-                        () => _moduleShape = QrDataModuleShape.circle,
-                      ),
+                      onSelected: (_) {
+                        setState(() {
+                          _moduleShape = QrDataModuleShape.circle;
+                          _markPresetAsCustom();
+                        });
+                      },
                     ),
                   ],
                 ),
@@ -1013,7 +1390,12 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
                   contentPadding: EdgeInsets.zero,
                   title: Text(AppStrings.tr('qr_smooth')),
                   value: _gapless,
-                  onChanged: (value) => setState(() => _gapless = value),
+                  onChanged: (value) {
+                    setState(() {
+                      _gapless = value;
+                      _markPresetAsCustom();
+                    });
+                  },
                 ),
                 const SizedBox(height: 6),
                 Text(
@@ -1117,7 +1499,8 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
                     runSpacing: 8,
                     children: [
                       OutlinedButton.icon(
-                        onPressed: _isPickingCenterImage ? null : _pickCenterImage,
+                        onPressed:
+                            _isPickingCenterImage ? null : _pickCenterImage,
                         icon: const Icon(Icons.photo_library_outlined),
                         label: Text(
                           _customCenterImageBytes == null
@@ -1145,7 +1528,12 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
                     max: 0.28,
                     divisions: 16,
                     label: '${(_logoScale * 100).round()}%',
-                    onChanged: (value) => setState(() => _logoScale = value),
+                    onChanged: (value) {
+                      setState(() {
+                        _logoScale = value;
+                        _markPresetAsCustom();
+                      });
+                    },
                   ),
                   Text(
                     AppStrings.tr('qr_center_image_hint'),
@@ -1168,13 +1556,12 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
                   max: 6.0,
                   divisions: 8,
                   label: 'x${_exportPixelRatio.toStringAsFixed(1)}',
-                  onChanged: (value) =>
-                      setState(() => _exportPixelRatio = value),
-                ),
-                OutlinedButton.icon(
-                  onPressed: _resetStyle,
-                  icon: const Icon(Icons.refresh_rounded),
-                  label: Text(AppStrings.tr('qr_reset_style')),
+                  onChanged: (value) {
+                    setState(() {
+                      _exportPixelRatio = value;
+                      _markPresetAsCustom();
+                    });
+                  },
                 ),
                 const SizedBox(height: 8),
                 Text(
@@ -1438,10 +1825,6 @@ class _LinkCleanerPageState extends State<_LinkCleanerPage> {
                       onPressed: _pasteFromClipboard,
                       tooltip: AppStrings.tr('quick_paste'),
                     ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 14,
-                    ),
                   ),
                   textAlignVertical: TextAlignVertical.top,
                   minLines: 2,
@@ -1520,14 +1903,15 @@ class _LinkCleanerPageState extends State<_LinkCleanerPage> {
 
 // ── Password Generator Page ─────────────────────────────────────────────────
 
-class _PasswordGeneratorPage extends StatefulWidget {
-  const _PasswordGeneratorPage();
+class _PasswordGeneratorSection extends StatefulWidget {
+  const _PasswordGeneratorSection();
 
   @override
-  State<_PasswordGeneratorPage> createState() => _PasswordGeneratorPageState();
+  State<_PasswordGeneratorSection> createState() =>
+      _PasswordGeneratorSectionState();
 }
 
-class _PasswordGeneratorPageState extends State<_PasswordGeneratorPage> {
+class _PasswordGeneratorSectionState extends State<_PasswordGeneratorSection> {
   late final math.Random _random = _createRandom();
 
   int _length = 16;
@@ -1670,210 +2054,206 @@ class _PasswordGeneratorPageState extends State<_PasswordGeneratorPage> {
     final strengthKey = _strengthKey(_entropyBits);
     final strengthColor = _strengthColor(context, _entropyBits);
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
-      physics: const BouncingScrollPhysics(),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          GlassmorphicContainer.flat(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        gradient: AppTheme.primaryGradientFor(context),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Icon(
-                        Icons.password_rounded,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        GlassmorphicContainer.flat(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      gradient: AppTheme.primaryGradientFor(context),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      Icons.password_rounded,
+                      color: Colors.white,
+                      size: 22,
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          AppStrings.tr('password_generator'),
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleMedium
+                              ?.copyWith(fontWeight: FontWeight.w700),
+                        ),
+                        Text(
+                          AppStrings.tr('password_generator_desc'),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style:
+                              Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withValues(alpha: 0.55),
+                                  ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 18),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    AppStrings.tr('password_length'),
+                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
+                    decoration: BoxDecoration(
+                      gradient: AppTheme.accentGradientFor(context),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      '$_length',
+                      style: const TextStyle(
                         color: Colors.white,
-                        size: 22,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            AppStrings.tr('password_generator'),
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium
-                                ?.copyWith(fontWeight: FontWeight.w700),
-                          ),
-                          Text(
-                            AppStrings.tr('password_generator_desc'),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style:
-                                Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface
-                                          .withValues(alpha: 0.55),
-                                    ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 18),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      AppStrings.tr('password_length'),
-                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                            fontWeight: FontWeight.w700,
-                          ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 5,
-                      ),
-                      decoration: BoxDecoration(
-                        gradient: AppTheme.accentGradientFor(context),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Text(
-                        '$_length',
-                        style: const TextStyle(
-                          color: Colors.white,
+                  ),
+                ],
+              ),
+              Slider(
+                value: _length.toDouble(),
+                min: 8,
+                max: 64,
+                divisions: 56,
+                label: '$_length',
+                onChanged: (value) {
+                  _updateOptions(() => _length = value.round());
+                },
+              ),
+              const SizedBox(height: 6),
+              _PasswordOptionTile(
+                label: AppStrings.tr('include_uppercase'),
+                value: _includeUppercase,
+                onChanged: (value) =>
+                    _updateOptions(() => _includeUppercase = value),
+              ),
+              _PasswordOptionTile(
+                label: AppStrings.tr('include_lowercase'),
+                value: _includeLowercase,
+                onChanged: (value) =>
+                    _updateOptions(() => _includeLowercase = value),
+              ),
+              _PasswordOptionTile(
+                label: AppStrings.tr('include_numbers'),
+                value: _includeNumbers,
+                onChanged: (value) =>
+                    _updateOptions(() => _includeNumbers = value),
+              ),
+              _PasswordOptionTile(
+                label: AppStrings.tr('include_symbols'),
+                value: _includeSymbols,
+                onChanged: (value) =>
+                    _updateOptions(() => _includeSymbols = value),
+              ),
+              _PasswordOptionTile(
+                label: AppStrings.tr('exclude_ambiguous_chars'),
+                value: _excludeAmbiguous,
+                onChanged: (value) =>
+                    _updateOptions(() => _excludeAmbiguous = value),
+              ),
+              const SizedBox(height: 14),
+              _GradientButton(
+                onPressed: () {
+                  HapticFeedback.mediumImpact();
+                  _generatePassword();
+                },
+                icon: Icons.casino_rounded,
+                label: AppStrings.tr('generate'),
+                gradient: AppTheme.primaryGradientFor(context),
+              ),
+            ],
+          ),
+        ).animate().fadeIn(duration: 450.ms),
+        const SizedBox(height: 14),
+        GlassmorphicContainer.flat(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  Text(
+                    AppStrings.tr('generated_password'),
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.w700,
                         ),
-                      ),
-                    ),
-                  ],
-                ),
-                Slider(
-                  value: _length.toDouble(),
-                  min: 8,
-                  max: 64,
-                  divisions: 56,
-                  label: '$_length',
-                  onChanged: (value) {
-                    _updateOptions(() => _length = value.round());
-                  },
-                ),
-                const SizedBox(height: 6),
-                _PasswordOptionTile(
-                  label: AppStrings.tr('include_uppercase'),
-                  value: _includeUppercase,
-                  onChanged: (value) =>
-                      _updateOptions(() => _includeUppercase = value),
-                ),
-                _PasswordOptionTile(
-                  label: AppStrings.tr('include_lowercase'),
-                  value: _includeLowercase,
-                  onChanged: (value) =>
-                      _updateOptions(() => _includeLowercase = value),
-                ),
-                _PasswordOptionTile(
-                  label: AppStrings.tr('include_numbers'),
-                  value: _includeNumbers,
-                  onChanged: (value) =>
-                      _updateOptions(() => _includeNumbers = value),
-                ),
-                _PasswordOptionTile(
-                  label: AppStrings.tr('include_symbols'),
-                  value: _includeSymbols,
-                  onChanged: (value) =>
-                      _updateOptions(() => _includeSymbols = value),
-                ),
-                _PasswordOptionTile(
-                  label: AppStrings.tr('exclude_ambiguous_chars'),
-                  value: _excludeAmbiguous,
-                  onChanged: (value) =>
-                      _updateOptions(() => _excludeAmbiguous = value),
-                ),
-                const SizedBox(height: 14),
-                _GradientButton(
-                  onPressed: () {
-                    HapticFeedback.mediumImpact();
-                    _generatePassword();
-                  },
-                  icon: Icons.casino_rounded,
-                  label: AppStrings.tr('generate'),
-                  gradient: AppTheme.primaryGradientFor(context),
-                ),
-              ],
-            ),
-          ).animate().fadeIn(duration: 450.ms),
-          const SizedBox(height: 14),
-          GlassmorphicContainer.flat(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      AppStrings.tr('generated_password'),
-                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.w700,
-                          ),
-                    ),
-                    const Spacer(),
-                    Text(
-                      AppStrings.tr(strengthKey),
-                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                            color: strengthColor,
-                            fontWeight: FontWeight.w700,
-                          ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .surfaceContainerHighest
-                        .withValues(alpha: 0.45),
-                    borderRadius: BorderRadius.circular(10),
                   ),
-                  child: SelectableText(
-                    _password,
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          fontFamily: 'monospace',
+                  const Spacer(),
+                  Text(
+                    AppStrings.tr(strengthKey),
+                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                          color: strengthColor,
                           fontWeight: FontWeight.w700,
-                          letterSpacing: 0.5,
                         ),
                   ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Theme.of(context)
+                      .colorScheme
+                      .surfaceContainerHighest
+                      .withValues(alpha: 0.45),
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                const SizedBox(height: 10),
-                Text(
-                  AppStrings.tr(
-                    'entropy_bits',
-                    args: [_entropyBits.toStringAsFixed(0)],
-                  ),
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onSurface
-                            .withValues(alpha: 0.65),
+                child: SelectableText(
+                  _password,
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        fontFamily: 'monospace',
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.5,
                       ),
                 ),
-                const SizedBox(height: 12),
-                OutlinedButton.icon(
-                  onPressed: _copyPassword,
-                  icon: const Icon(Icons.copy_rounded),
-                  label: Text(AppStrings.tr('copy_password')),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                AppStrings.tr(
+                  'entropy_bits',
+                  args: [_entropyBits.toStringAsFixed(0)],
                 ),
-              ],
-            ),
-          ).animate().fadeIn(duration: 450.ms, delay: 80.ms),
-        ],
-      ),
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.65),
+                    ),
+              ),
+              const SizedBox(height: 12),
+              OutlinedButton.icon(
+                onPressed: _copyPassword,
+                icon: const Icon(Icons.copy_rounded),
+                label: Text(AppStrings.tr('copy_password')),
+              ),
+            ],
+          ),
+        ).animate().fadeIn(duration: 450.ms, delay: 80.ms),
+      ],
     );
   }
 }
@@ -2463,10 +2843,6 @@ class _AddTemplateSheetState extends State<_AddTemplateSheet> {
               controller: _messageController,
               decoration: InputDecoration(
                 hintText: AppStrings.tr('template_message'),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 14,
-                ),
               ),
               textAlignVertical: TextAlignVertical.top,
               minLines: 4,
@@ -2719,10 +3095,6 @@ class _GmailComposerPageState extends State<_GmailComposerPage> {
                   textCapitalization: TextCapitalization.sentences,
                   decoration: InputDecoration(
                     hintText: AppStrings.tr('gmail_body_hint'),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 14,
-                    ),
                   ),
                   textAlignVertical: TextAlignVertical.top,
                 ),
@@ -3064,10 +3436,6 @@ class _SecurityToolkitPageState extends State<_SecurityToolkitPage> {
                     hintText: _cipherEncryptMode
                         ? AppStrings.tr('enter_message_to_encrypt')
                         : AppStrings.tr('enter_encrypted_message'),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 14,
-                    ),
                   ),
                   textAlignVertical: TextAlignVertical.top,
                 ),
@@ -3122,10 +3490,6 @@ class _SecurityToolkitPageState extends State<_SecurityToolkitPage> {
                   controller: _hashInputController,
                   decoration: InputDecoration(
                     hintText: AppStrings.tr('security_input_hint'),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 14,
-                    ),
                   ),
                   textAlignVertical: TextAlignVertical.top,
                   minLines: 2,
@@ -3139,8 +3503,6 @@ class _SecurityToolkitPageState extends State<_SecurityToolkitPage> {
                   isExpanded: true,
                   decoration: const InputDecoration(
                     prefixIcon: Icon(Icons.fingerprint_rounded),
-                    contentPadding:
-                        EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                   ),
                   items: _hashAlgorithms.keys
                       .map(
@@ -3249,10 +3611,6 @@ class _SecurityToolkitPageState extends State<_SecurityToolkitPage> {
                   controller: _transformInputController,
                   decoration: InputDecoration(
                     hintText: AppStrings.tr('security_input_hint'),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 14,
-                    ),
                   ),
                   textAlignVertical: TextAlignVertical.top,
                   minLines: 3,
@@ -3367,6 +3725,8 @@ class _SecurityToolkitPageState extends State<_SecurityToolkitPage> {
               ],
             ),
           ).animate().fadeIn(duration: 450.ms, delay: 200.ms),
+          const SizedBox(height: 14),
+          const _PasswordGeneratorSection(),
         ],
       ),
     );

@@ -476,6 +476,9 @@ class AppStrings {
     'qr_generator': {
       'tr': 'QR Kod Oluşturucu',
       'en': 'QR Code Generator',
+      'es': 'Generador de QR',
+      'ar': 'مولد QR',
+      'hi': 'QR जनरेटर',
     },
     'qr_description': {
       'tr': 'Bilgileriniz için QR kod oluşturun',
@@ -488,6 +491,9 @@ class AppStrings {
     'save_qr': {
       'tr': 'QR Kaydet',
       'en': 'Save QR',
+      'es': 'Guardar QR',
+      'ar': 'حفظ رمز QR',
+      'hi': 'QR सहेजें',
     },
     'save_to_gallery': {
       'tr': 'Galeriye Kaydet',
@@ -532,18 +538,30 @@ class AppStrings {
     'message_encryptor': {
       'tr': 'Mesaj Şifreleyici',
       'en': 'Message Encryptor',
+      'es': 'Encriptador',
+      'ar': 'مشفر الرسائل',
+      'hi': 'संदेश एन्क्रिप्टर',
     },
     'encryptor_desc': {
       'tr': 'Mesajlarınızı güvenli bir şekilde şifreleyin',
       'en': 'Encrypt your messages securely',
+      'es': 'Encriptar Mensajes',
+      'ar': 'مشفر الرسائل',
+      'hi': 'संदेश एन्क्रिप्टर',
     },
     'encrypt': {
       'tr': 'Şifrele',
       'en': 'Encrypt',
+      'es': 'Encriptar',
+      'ar': 'تشفير',
+      'hi': 'एन्क्रिप्ट',
     },
     'decrypt': {
       'tr': 'Çöz',
       'en': 'Decrypt',
+      'es': 'Desencriptar',
+      'ar': 'فك التشفير',
+      'hi': 'डिक्रिप्ट',
     },
     'enter_password': {
       'tr': 'Şifre girin',
@@ -1085,12 +1103,11 @@ class AppStrings {
 
     // Utils Screen
     'utils_subtitle': {
-      'tr': 'QR, Link, Şablon, Şifre, Gmail ve Güvenlik araçları',
-      'en': 'QR, Links, Templates, Passwords, Gmail, and Security tools',
-      'es':
-          'Herramientas de QR, enlaces, plantillas, contraseñas, Gmail y seguridad',
-      'ar': 'أدوات QR والروابط والقوالب وكلمات المرور وGmail والأمان',
-      'hi': 'QR, लिंक, टेम्पलेट, पासवर्ड, Gmail और सुरक्षा टूल',
+      'tr': 'QR, Link, Şablon, Gmail ve Güvenlik araçları',
+      'en': 'QR, Links, Templates, Gmail, and Security tools',
+      'es': 'Herramientas de QR, enlaces, plantillas, Gmail y seguridad',
+      'ar': 'أدوات QR والروابط والقوالب وGmail والأمان',
+      'hi': 'QR, लिंक, टेम्पलेट, Gmail और सुरक्षा टूल',
     },
     'quick_switch': {
       'tr': 'Hızlı Geçiş',
@@ -1102,6 +1119,9 @@ class AppStrings {
     'tab_qr': {
       'tr': 'QR',
       'en': 'QR',
+      'es': 'QR',
+      'ar': 'QR',
+      'hi': 'QR',
     },
     'tab_links': {
       'tr': 'Linkler',
@@ -1133,10 +1153,16 @@ class AppStrings {
     'password_generator': {
       'tr': 'Gelişmiş Şifre Oluşturucu',
       'en': 'Advanced Password Generator',
+      'es': 'Generador de contraseñas',
+      'ar': 'مولد كلمات المرور',
+      'hi': 'पासवर्ड जेनरेटर',
     },
     'password_generator_desc': {
       'tr': 'Güçlü ve güvenli şifreleri tek dokunuşla üretin',
       'en': 'Generate strong and secure passwords in one tap',
+      'es': 'Crea contraseñas robustas',
+      'ar': 'إنشاء كلمات المرور القوية',
+      'hi': 'सुरक्षित पासवर्ड बनाएँ',
     },
     'password_length': {
       'tr': 'Şifre Uzunluğu',
@@ -1581,11 +1607,14 @@ class AppStrings {
       'hi': 'इमेज चयन रद्द किया गया',
     },
     'qr_center_image_hint': {
-      'tr': 'Tarama kalitesi için merkez görselini küçük tutun (%12-%28 önerilir).',
+      'tr':
+          'Tarama kalitesi için merkez görselini küçük tutun (%12-%28 önerilir).',
       'en': 'Keep center image small for scan quality (12%-28% recommended).',
-      'es': 'Mantén la imagen central pequeña para una mejor lectura (12%-28% recomendado).',
+      'es':
+          'Mantén la imagen central pequeña para una mejor lectura (12%-28% recomendado).',
       'ar': 'حافظ على صورة المنتصف صغيرة لجودة مسح أفضل (موصى به 12%-28%).',
-      'hi': 'बेहतर स्कैन गुणवत्ता के लिए सेंटर इमेज छोटी रखें (12%-28% अनुशंसित)।',
+      'hi':
+          'बेहतर स्कैन गुणवत्ता के लिए सेंटर इमेज छोटी रखें (12%-28% अनुशंसित)।',
     },
     'qr_content_length': {
       'tr': 'İçerik uzunluğu: %s karakter',
@@ -1699,6 +1728,90 @@ class AppStrings {
       'es': 'Calidad de Exportación',
       'ar': 'جودة التصدير',
       'hi': 'एक्सपोर्ट क्वालिटी',
+    },
+    'qr_style_presets': {
+      'tr': 'Stil Hazır Ayarları',
+      'en': 'Style Presets',
+      'es': 'Preajustes de Estilo',
+      'ar': 'الإعدادات المسبقة للنمط',
+      'hi': 'स्टाइल प्रीसेट',
+    },
+    'qr_preset_classic': {
+      'tr': 'Klasik',
+      'en': 'Classic',
+      'es': 'Clásico',
+      'ar': 'كلاسيكي',
+      'hi': 'क्लासिक',
+    },
+    'qr_preset_modern': {
+      'tr': 'Modern',
+      'en': 'Modern',
+      'es': 'Moderno',
+      'ar': 'حديث',
+      'hi': 'मॉडर्न',
+    },
+    'qr_preset_midnight': {
+      'tr': 'Gece',
+      'en': 'Midnight',
+      'es': 'Medianoche',
+      'ar': 'منتصف الليل',
+      'hi': 'मिडनाइट',
+    },
+    'qr_preset_ocean': {
+      'tr': 'Okyanus',
+      'en': 'Ocean',
+      'es': 'Océano',
+      'ar': 'المحيط',
+      'hi': 'ओशन',
+    },
+    'qr_preset_neon': {
+      'tr': 'Neon',
+      'en': 'Neon',
+      'es': 'Neón',
+      'ar': 'نيون',
+      'hi': 'नियॉन',
+    },
+    'qr_preset_custom': {
+      'tr': 'Özel',
+      'en': 'Custom',
+      'es': 'Personalizado',
+      'ar': 'مخصص',
+      'hi': 'कस्टम',
+    },
+    'qr_swap_colors': {
+      'tr': 'Renkleri Değiştir',
+      'en': 'Swap Colors',
+      'es': 'Intercambiar Colores',
+      'ar': 'تبديل الألوان',
+      'hi': 'रंग बदलें',
+    },
+    'qr_corner_radius': {
+      'tr': 'Köşe Yarıçapı',
+      'en': 'Corner Radius',
+      'es': 'Radio de Esquina',
+      'ar': 'نصف قطر الزاوية',
+      'hi': 'कॉर्नर रेडियस',
+    },
+    'qr_frame_width': {
+      'tr': 'Çerçeve Kalınlığı',
+      'en': 'Frame Width',
+      'es': 'Grosor del Marco',
+      'ar': 'سماكة الإطار',
+      'hi': 'फ्रेम चौड़ाई',
+    },
+    'qr_frame_color': {
+      'tr': 'Çerçeve Rengi',
+      'en': 'Frame Color',
+      'es': 'Color del Marco',
+      'ar': 'لون الإطار',
+      'hi': 'फ्रेम रंग',
+    },
+    'qr_frame_shadow': {
+      'tr': 'Çerçeve Gölgesi',
+      'en': 'Frame Shadow',
+      'es': 'Sombra del Marco',
+      'ar': 'ظل الإطار',
+      'hi': 'फ्रेम शैडो',
     },
     'qr_contrast_good': {
       'tr': 'Kontrast iyi (%s:1). QR tarama için uygun.',

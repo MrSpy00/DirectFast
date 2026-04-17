@@ -703,111 +703,87 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           child: LayoutBuilder(
             builder: (context, constraints) {
               final cardWidth = (constraints.maxWidth - 12) / 2;
+              final shortcuts = <({
+                IconData icon,
+                String labelKey,
+                LinearGradient gradient,
+                int tabIndex,
+              })>[
+                (
+                  icon: Icons.qr_code_2,
+                  labelKey: 'qr_generator',
+                  gradient: AppTheme.primaryGradientFor(context),
+                  tabIndex: 0,
+                ),
+                (
+                  icon: Icons.link_off,
+                  labelKey: 'link_cleaner',
+                  gradient: AppTheme.accentGradientFor(context),
+                  tabIndex: 1,
+                ),
+                (
+                  icon: Icons.bookmarks_outlined,
+                  labelKey: 'templates',
+                  gradient: LinearGradient(
+                    colors: [
+                      Theme.of(context).colorScheme.secondary,
+                      Theme.of(context).colorScheme.tertiary,
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  tabIndex: 2,
+                ),
+                (
+                  icon: Icons.email_outlined,
+                  labelKey: 'gmail_sender',
+                  gradient: LinearGradient(
+                    colors: [
+                      Theme.of(context).colorScheme.tertiary,
+                      Theme.of(context).colorScheme.secondary,
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  tabIndex: 3,
+                ),
+                (
+                  icon: Icons.lock_person_rounded,
+                  labelKey: 'security_toolkit',
+                  gradient: LinearGradient(
+                    colors: [
+                      Theme.of(context).colorScheme.primary,
+                      Theme.of(context).colorScheme.tertiary,
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  tabIndex: 4,
+                ),
+              ];
+
               return Wrap(
                 spacing: 12,
                 runSpacing: 12,
-                children: [
-                  SizedBox(
-                    width: cardWidth,
+                children: List.generate(shortcuts.length, (index) {
+                  final item = shortcuts[index];
+                  final isLastOdd =
+                      shortcuts.length.isOdd && index == shortcuts.length - 1;
+                  final width = isLastOdd ? constraints.maxWidth : cardWidth;
+
+                  return SizedBox(
+                    width: width,
                     child: _UtilityShortcutCard(
-                      icon: Icons.qr_code_2,
-                      label: AppStrings.tr('qr_generator'),
-                      gradient: AppTheme.primaryGradientFor(context),
+                      icon: item.icon,
+                      label: AppStrings.tr(item.labelKey),
+                      gradient: item.gradient,
                       onTap: () {
                         HapticFeedback.lightImpact();
-                        context.push(AppRouter.utils);
+                        context.push(AppRouter.utils, extra: item.tabIndex);
                       },
                     ),
-                  ),
-                  SizedBox(
-                    width: cardWidth,
-                    child: _UtilityShortcutCard(
-                      icon: Icons.link_off,
-                      label: AppStrings.tr('link_cleaner'),
-                      gradient: AppTheme.accentGradientFor(context),
-                      onTap: () {
-                        HapticFeedback.lightImpact();
-                        context.push(AppRouter.utils, extra: 1);
-                      },
-                    ),
-                  ),
-                  SizedBox(
-                    width: cardWidth,
-                    child: _UtilityShortcutCard(
-                      icon: Icons.bookmarks_outlined,
-                      label: AppStrings.tr('templates'),
-                      gradient: LinearGradient(
-                        colors: [
-                          Theme.of(context).colorScheme.secondary,
-                          Theme.of(context).colorScheme.tertiary,
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      onTap: () {
-                        HapticFeedback.lightImpact();
-                        context.push(AppRouter.utils, extra: 2);
-                      },
-                    ),
-                  ),
-                  SizedBox(
-                    width: cardWidth,
-                    child: _UtilityShortcutCard(
-                      icon: Icons.password_rounded,
-                      label: AppStrings.tr('password_generator'),
-                      gradient: LinearGradient(
-                        colors: [
-                          Theme.of(context).colorScheme.primary,
-                          Theme.of(context).colorScheme.secondary,
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      onTap: () {
-                        HapticFeedback.lightImpact();
-                        context.push(AppRouter.utils, extra: 3);
-                      },
-                    ),
-                  ),
-                  SizedBox(
-                    width: cardWidth,
-                    child: _UtilityShortcutCard(
-                      icon: Icons.email_outlined,
-                      label: AppStrings.tr('gmail_sender'),
-                      gradient: LinearGradient(
-                        colors: [
-                          Theme.of(context).colorScheme.tertiary,
-                          Theme.of(context).colorScheme.secondary,
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      onTap: () {
-                        HapticFeedback.lightImpact();
-                        context.push(AppRouter.utils, extra: 4);
-                      },
-                    ),
-                  ),
-                  SizedBox(
-                    width: cardWidth,
-                    child: _UtilityShortcutCard(
-                      icon: Icons.lock_person_rounded,
-                      label: AppStrings.tr('security_toolkit'),
-                      gradient: LinearGradient(
-                        colors: [
-                          Theme.of(context).colorScheme.primary,
-                          Theme.of(context).colorScheme.tertiary,
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      onTap: () {
-                        HapticFeedback.lightImpact();
-                        context.push(AppRouter.utils, extra: 5);
-                      },
-                    ),
-                  ),
-                ],
+                  );
+                }),
               );
             },
           ),

@@ -20,13 +20,13 @@ Chat on messaging platforms without saving contacts.
 - **Quick Templates**: Save and reuse frequently sent messages
 - **Advanced QR Studio**: Highly customizable QR generation with payload templates (URL/Email/Phone/SMS/Wi-Fi), foreground/background controls, module/eye shape, error correction, logo scale, contrast guidance, and export quality control
 - **Link Cleaner**: Remove tracking parameters from URLs
-- **Security Toolkit**: Hashing, Base64/URL encode-decode, token generation, and local encrypt/decrypt utilities in one place
-- **Beautiful UI**: Material 3 design with smooth animations
+- **Security Toolkit**: Hashing, Base64/URL encode-decode, token generation, local encrypt/decrypt utilities, and an Advanced Password Generator unified in one place
+- **Beautiful UI**: Material 3 design with smooth animations and uniform edge-to-edge component padding
 - **Chat History**: Track your recent conversations
 - **Localization**: 25-language infrastructure with graceful fallback order and core manual translations
 - **First-Run Welcome Setup**: New installations are greeted with a welcome flow for language, theme, and theme-color selection
 - **Smart Theming**: Light, Dark, System, and AMOLED modes + theme colors selectable via dropdown + custom RGB palette
-- **Faster Tool Navigation**: Cleaner segmented quick-switch with adaptive multi-row layout
+- **Faster Tool Navigation**: Elegant, horizontally scrollable multi-chip quick-switch navigation for the utilities screen
 - **Privacy First**: All data stored locally on your device
 
 ---
