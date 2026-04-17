@@ -36,6 +36,7 @@ class UtilsScreen extends ConsumerStatefulWidget {
 class _UtilsScreenState extends ConsumerState<UtilsScreen> {
   late final PageController _pageController;
   late final ScrollController _segmentScrollController;
+  late final List<GlobalKey> _segmentKeys;
   int _currentPage = 0;
 
   static const _segments = [
@@ -52,6 +53,10 @@ class _UtilsScreenState extends ConsumerState<UtilsScreen> {
     _currentPage = widget.initialTab.clamp(0, _segments.length - 1);
     _pageController = PageController(initialPage: _currentPage);
     _segmentScrollController = ScrollController();
+    _segmentKeys = List<GlobalKey>.generate(
+      _segments.length,
+      (_) => GlobalKey(),
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _ensureCurrentSegmentVisible(_currentPage, animate: false);
     });
@@ -65,28 +70,19 @@ class _UtilsScreenState extends ConsumerState<UtilsScreen> {
   }
 
   void _ensureCurrentSegmentVisible(int index, {bool animate = true}) {
-    if (!_segmentScrollController.hasClients) {
+    if (index < 0 || index >= _segmentKeys.length) {
       return;
     }
-
-    const estimatedChipWidth = 130.0;
-    const chipSpacing = 10.0;
-    final targetOffset =
-        (index * (estimatedChipWidth + chipSpacing) - 18).clamp(
-      0,
-      _segmentScrollController.position.maxScrollExtent,
+    final targetContext = _segmentKeys[index].currentContext;
+    if (targetContext == null) {
+      return;
+    }
+    Scrollable.ensureVisible(
+      targetContext,
+      alignment: 0.5,
+      duration: animate ? const Duration(milliseconds: 260) : Duration.zero,
+      curve: Curves.easeOutCubic,
     );
-
-    if (animate) {
-      _segmentScrollController.animateTo(
-        targetOffset.toDouble(),
-        duration: const Duration(milliseconds: 260),
-        curve: Curves.easeOutCubic,
-      );
-      return;
-    }
-
-    _segmentScrollController.jumpTo(targetOffset.toDouble());
   }
 
   void _onSegmentTap(int index) {
@@ -100,6 +96,14 @@ class _UtilsScreenState extends ConsumerState<UtilsScreen> {
       curve: Curves.easeInOutCubic,
     );
     _ensureCurrentSegmentVisible(index);
+  }
+
+  void _jumpToAdjacentSegment(int delta) {
+    final target = (_currentPage + delta).clamp(0, _segments.length - 1);
+    if (target == _currentPage) {
+      return;
+    }
+    _onSegmentTap(target);
   }
 
   @override
@@ -262,7 +266,7 @@ class _UtilsScreenState extends ConsumerState<UtilsScreen> {
           const SizedBox(height: 10),
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 8),
+            padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               color:
                   colorScheme.surfaceContainerHighest.withValues(alpha: 0.48),
@@ -271,25 +275,44 @@ class _UtilsScreenState extends ConsumerState<UtilsScreen> {
                 color: colorScheme.outline.withValues(alpha: 0.16),
               ),
             ),
-            child: SizedBox(
-              height: 48,
-              child: ListView.separated(
-                controller: _segmentScrollController,
-                scrollDirection: Axis.horizontal,
-                physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                itemCount: _segments.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 10),
-                itemBuilder: (context, index) {
-                  final segment = _segments[index];
-                  return _SegmentPill(
-                    icon: segment.icon,
-                    label: AppStrings.tr(segment.labelKey),
-                    isSelected: _currentPage == index,
-                    onTap: () => _onSegmentTap(index),
-                  );
-                },
-              ),
+            child: Row(
+              children: [
+                _QuickNavButton(
+                  icon: Icons.chevron_left_rounded,
+                  enabled: _currentPage > 0,
+                  onTap: () => _jumpToAdjacentSegment(-1),
+                ),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: SizedBox(
+                    height: 48,
+                    child: ListView.separated(
+                      controller: _segmentScrollController,
+                      scrollDirection: Axis.horizontal,
+                      physics: const BouncingScrollPhysics(),
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      itemCount: _segments.length,
+                      separatorBuilder: (_, __) => const SizedBox(width: 8),
+                      itemBuilder: (context, index) {
+                        final segment = _segments[index];
+                        return _SegmentPill(
+                          key: _segmentKeys[index],
+                          icon: segment.icon,
+                          label: AppStrings.tr(segment.labelKey),
+                          isSelected: _currentPage == index,
+                          onTap: () => _onSegmentTap(index),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 6),
+                _QuickNavButton(
+                  icon: Icons.chevron_right_rounded,
+                  enabled: _currentPage < _segments.length - 1,
+                  onTap: () => _jumpToAdjacentSegment(1),
+                ),
+              ],
             ),
           ),
         ],
@@ -317,6 +340,7 @@ class _SegmentPill extends StatelessWidget {
     required this.label,
     required this.isSelected,
     required this.onTap,
+    super.key,
   });
 
   @override
@@ -332,8 +356,8 @@ class _SegmentPill extends StatelessWidget {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 220),
           curve: Curves.easeOutCubic,
-          constraints: const BoxConstraints(minWidth: 116, maxWidth: 140),
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          constraints: const BoxConstraints(minWidth: 106, maxWidth: 150),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
           decoration: BoxDecoration(
             gradient: isSelected ? AppTheme.primaryGradientFor(context) : null,
             color: isSelected
@@ -381,7 +405,7 @@ class _SegmentPill extends StatelessWidget {
                     fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
                     color: isSelected
                         ? Colors.white
-                        : onSurface.withValues(alpha: 0.86),
+                        : onSurface.withValues(alpha: 0.9),
                   ),
                 ),
               ),
@@ -393,10 +417,61 @@ class _SegmentPill extends StatelessWidget {
   }
 }
 
+class _QuickNavButton extends StatelessWidget {
+  final IconData icon;
+  final bool enabled;
+  final VoidCallback onTap;
+
+  const _QuickNavButton({
+    required this.icon,
+    required this.enabled,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedOpacity(
+      duration: const Duration(milliseconds: 180),
+      opacity: enabled ? 1 : 0.35,
+      child: Material(
+        color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.7),
+        borderRadius: BorderRadius.circular(12),
+        child: InkWell(
+          onTap: enabled ? onTap : null,
+          borderRadius: BorderRadius.circular(12),
+          child: SizedBox(
+            width: 34,
+            height: 34,
+            child: Icon(
+              icon,
+              size: 20,
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.8),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 enum _QrCenterImageSource {
   none,
   appLogo,
   custom,
+}
+
+enum _QrPayloadType {
+  raw,
+  url,
+  email,
+  phone,
+  sms,
+  wifi,
+  vcard,
+  geo,
 }
 
 class _QrStylePreset {
@@ -684,7 +759,9 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
     }
   }
 
-  Future<void> _pickCenterImage() async {
+  Future<void> _pickCenterImage({
+    ImageSource source = ImageSource.gallery,
+  }) async {
     if (_isPickingCenterImage) {
       return;
     }
@@ -692,7 +769,7 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
     setState(() => _isPickingCenterImage = true);
     try {
       final file = await _imagePicker.pickImage(
-        source: ImageSource.gallery,
+        source: source,
         imageQuality: 95,
         maxWidth: 1200,
         maxHeight: 1200,
@@ -740,11 +817,54 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
     }
   }
 
+  Future<void> _showCenterImageSourcePicker() async {
+    await showModalBottomSheet<void>(
+      context: context,
+      useSafeArea: true,
+      showDragHandle: true,
+      builder: (sheetContext) {
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(18, 6, 18, 18),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                AppStrings.tr('qr_pick_source'),
+                style: Theme.of(sheetContext).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+              ),
+              const SizedBox(height: 10),
+              FilledButton.icon(
+                onPressed: () {
+                  Navigator.of(sheetContext).pop();
+                  _pickCenterImage();
+                },
+                icon: const Icon(Icons.photo_library_outlined),
+                label: Text(AppStrings.tr('qr_pick_gallery')),
+              ),
+              const SizedBox(height: 8),
+              OutlinedButton.icon(
+                onPressed: () {
+                  Navigator.of(sheetContext).pop();
+                  _pickCenterImage(source: ImageSource.camera);
+                },
+                icon: const Icon(Icons.photo_camera_outlined),
+                label: Text(AppStrings.tr('qr_pick_camera')),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   void _setCenterImageSource(_QrCenterImageSource source) {
     HapticFeedback.selectionClick();
     if (source == _QrCenterImageSource.custom &&
         _customCenterImageBytes == null) {
-      _pickCenterImage();
+      _showCenterImageSourcePicker();
       return;
     }
 
@@ -759,6 +879,289 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
         _centerImageSource = _QrCenterImageSource.none;
       }
     });
+  }
+
+  String _payloadTypeLabelKey(_QrPayloadType type) {
+    switch (type) {
+      case _QrPayloadType.raw:
+        return 'qr_payload_raw';
+      case _QrPayloadType.url:
+        return 'qr_payload_url';
+      case _QrPayloadType.email:
+        return 'qr_payload_email';
+      case _QrPayloadType.phone:
+        return 'qr_payload_phone';
+      case _QrPayloadType.sms:
+        return 'qr_payload_sms';
+      case _QrPayloadType.wifi:
+        return 'qr_payload_wifi';
+      case _QrPayloadType.vcard:
+        return 'qr_payload_vcard';
+      case _QrPayloadType.geo:
+        return 'qr_payload_geo';
+    }
+  }
+
+  String _buildPayload({
+    required _QrPayloadType type,
+    required String primary,
+    required String secondary,
+    required String tertiary,
+  }) {
+    switch (type) {
+      case _QrPayloadType.raw:
+        return primary;
+      case _QrPayloadType.url:
+        if (primary.startsWith('http://') || primary.startsWith('https://')) {
+          return primary;
+        }
+        return 'https://$primary';
+      case _QrPayloadType.email:
+        final params = <String, String>{
+          if (secondary.isNotEmpty) 'subject': secondary,
+          if (tertiary.isNotEmpty) 'body': tertiary,
+        };
+        final uri = Uri(
+          scheme: 'mailto',
+          path: primary,
+          queryParameters: params.isEmpty ? null : params,
+        );
+        return uri.toString();
+      case _QrPayloadType.phone:
+        return 'tel:$primary';
+      case _QrPayloadType.sms:
+        final body = tertiary.isNotEmpty ? tertiary : secondary;
+        if (body.isEmpty) {
+          return 'sms:$primary';
+        }
+        return 'sms:$primary?body=${Uri.encodeComponent(body)}';
+      case _QrPayloadType.wifi:
+        final authType = tertiary.isEmpty ? 'WPA' : tertiary.toUpperCase();
+        return 'WIFI:T:$authType;S:$primary;P:$secondary;;';
+      case _QrPayloadType.vcard:
+        final buffer = StringBuffer()
+          ..writeln('BEGIN:VCARD')
+          ..writeln('VERSION:3.0')
+          ..writeln('FN:$primary');
+        if (secondary.isNotEmpty) {
+          buffer.writeln('TEL:$secondary');
+        }
+        if (tertiary.isNotEmpty) {
+          buffer.writeln('EMAIL:$tertiary');
+        }
+        buffer.write('END:VCARD');
+        return buffer.toString();
+      case _QrPayloadType.geo:
+        return 'geo:$primary,$secondary';
+    }
+  }
+
+  Future<void> _showPayloadBuilderSheet() async {
+    var payloadType = _QrPayloadType.url;
+    final primaryController = TextEditingController();
+    final secondaryController = TextEditingController();
+    final tertiaryController = TextEditingController();
+
+    String payloadPreview() {
+      return _buildPayload(
+        type: payloadType,
+        primary: primaryController.text.trim(),
+        secondary: secondaryController.text.trim(),
+        tertiary: tertiaryController.text.trim(),
+      );
+    }
+
+    String primaryHint() {
+      switch (payloadType) {
+        case _QrPayloadType.raw:
+          return AppStrings.tr('enter_text');
+        case _QrPayloadType.url:
+          return AppStrings.tr('enter_url');
+        case _QrPayloadType.email:
+          return AppStrings.tr('enter_email');
+        case _QrPayloadType.phone:
+        case _QrPayloadType.sms:
+          return AppStrings.tr('enter_phone');
+        case _QrPayloadType.wifi:
+          return AppStrings.tr('qr_payload_ssid');
+        case _QrPayloadType.vcard:
+          return AppStrings.tr('qr_payload_name');
+        case _QrPayloadType.geo:
+          return AppStrings.tr('qr_payload_latitude');
+      }
+    }
+
+    String secondaryHint() {
+      switch (payloadType) {
+        case _QrPayloadType.raw:
+        case _QrPayloadType.url:
+        case _QrPayloadType.phone:
+          return '';
+        case _QrPayloadType.email:
+          return AppStrings.tr('gmail_subject_label');
+        case _QrPayloadType.sms:
+          return AppStrings.tr('enter_message');
+        case _QrPayloadType.wifi:
+          return AppStrings.tr('qr_payload_password');
+        case _QrPayloadType.vcard:
+          return AppStrings.tr('enter_phone');
+        case _QrPayloadType.geo:
+          return AppStrings.tr('qr_payload_longitude');
+      }
+    }
+
+    String tertiaryHint() {
+      switch (payloadType) {
+        case _QrPayloadType.email:
+          return AppStrings.tr('gmail_body_label');
+        case _QrPayloadType.wifi:
+          return AppStrings.tr('qr_payload_security');
+        case _QrPayloadType.vcard:
+          return AppStrings.tr('enter_email');
+        default:
+          return '';
+      }
+    }
+
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      showDragHandle: true,
+      builder: (sheetContext) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            final preview = payloadPreview();
+            return Padding(
+              padding: EdgeInsets.fromLTRB(
+                20,
+                8,
+                20,
+                20 + MediaQuery.of(context).viewInsets.bottom,
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      AppStrings.tr('qr_payload_builder'),
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                    ),
+                    const SizedBox(height: 10),
+                    DropdownButtonFormField<_QrPayloadType>(
+                      initialValue: payloadType,
+                      decoration: InputDecoration(
+                        labelText: AppStrings.tr('qr_payload_type'),
+                        prefixIcon: const Icon(Icons.auto_awesome_rounded),
+                      ),
+                      items: _QrPayloadType.values
+                          .map(
+                            (type) => DropdownMenuItem<_QrPayloadType>(
+                              value: type,
+                              child: Text(
+                                AppStrings.tr(_payloadTypeLabelKey(type)),
+                              ),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: (value) {
+                        if (value == null) {
+                          return;
+                        }
+                        setModalState(() {
+                          payloadType = value;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 10),
+                    TextField(
+                      controller: primaryController,
+                      decoration: InputDecoration(
+                        hintText: primaryHint(),
+                      ),
+                      onChanged: (_) => setModalState(() {}),
+                    ),
+                    if (secondaryHint().isNotEmpty) ...[
+                      const SizedBox(height: 10),
+                      TextField(
+                        controller: secondaryController,
+                        decoration: InputDecoration(
+                          hintText: secondaryHint(),
+                        ),
+                        onChanged: (_) => setModalState(() {}),
+                      ),
+                    ],
+                    if (tertiaryHint().isNotEmpty) ...[
+                      const SizedBox(height: 10),
+                      TextField(
+                        controller: tertiaryController,
+                        decoration: InputDecoration(
+                          hintText: tertiaryHint(),
+                        ),
+                        onChanged: (_) => setModalState(() {}),
+                      ),
+                    ],
+                    const SizedBox(height: 12),
+                    Text(
+                      AppStrings.tr('qr_payload_preview'),
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                    ),
+                    const SizedBox(height: 6),
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .surfaceContainerHighest
+                            .withValues(alpha: 0.46),
+                      ),
+                      child: SelectableText(
+                        preview.isEmpty ? '-' : preview,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              fontFamily: 'monospace',
+                            ),
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    FilledButton.icon(
+                      onPressed: () {
+                        if (preview.trim().isEmpty) {
+                          _showSnackBar(
+                            context,
+                            AppStrings.tr('fill_all_fields'),
+                            isError: true,
+                          );
+                          return;
+                        }
+                        setState(() {
+                          _textController.text = preview;
+                          _qrData = preview;
+                        });
+                        Navigator.of(context).pop();
+                        _showSnackBar(
+                          this.context,
+                          AppStrings.tr('qr_payload_applied'),
+                        );
+                      },
+                      icon: const Icon(Icons.check_rounded),
+                      label: Text(AppStrings.tr('qr_payload_apply')),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+    primaryController.dispose();
+    secondaryController.dispose();
+    tertiaryController.dispose();
   }
 
   void _applyPayloadTemplate(String key) {
@@ -1121,6 +1524,12 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
                       onPressed: () => _applyPayloadTemplate(key),
                     );
                   }).toList(),
+                ),
+                const SizedBox(height: 10),
+                OutlinedButton.icon(
+                  onPressed: _showPayloadBuilderSheet,
+                  icon: const Icon(Icons.auto_awesome_rounded),
+                  label: Text(AppStrings.tr('qr_payload_builder')),
                 ),
                 const SizedBox(height: 16),
                 Wrap(
@@ -1499,12 +1908,13 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
                     runSpacing: 8,
                     children: [
                       OutlinedButton.icon(
-                        onPressed:
-                            _isPickingCenterImage ? null : _pickCenterImage,
+                        onPressed: _isPickingCenterImage
+                            ? null
+                            : _showCenterImageSourcePicker,
                         icon: const Icon(Icons.photo_library_outlined),
                         label: Text(
                           _customCenterImageBytes == null
-                              ? AppStrings.tr('qr_pick_image')
+                              ? AppStrings.tr('qr_pick_gallery')
                               : AppStrings.tr('qr_change_image'),
                         ),
                       ),

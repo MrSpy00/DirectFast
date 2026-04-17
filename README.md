@@ -18,7 +18,7 @@ Chat on messaging platforms without saving contacts.
 - **No Contact Saving**: Directly open chats without cluttering your contacts
 - **Smart Clipboard**: Automatic detection of phone numbers and usernames
 - **Quick Templates**: Save and reuse frequently sent messages
-- **Advanced QR Studio**: Highly customizable QR generation with payload templates (URL/Email/Phone/SMS/Wi-Fi), foreground/background controls, module/eye shape, error correction, logo scale, contrast guidance, and export quality control
+- **Advanced QR Studio**: Highly customizable QR generation with payload templates and an advanced payload builder (Raw/URL/Email/Phone/SMS/Wi-Fi/vCard/Geo), foreground/background controls, module/eye shape, error correction, frame/shadow tuning, custom center image support (gallery/camera), contrast guidance, and export quality control
 - **Link Cleaner**: Remove tracking parameters from URLs
 - **Security Toolkit**: Hashing, Base64/URL encode-decode, token generation, local encrypt/decrypt utilities, and an Advanced Password Generator unified in one place
 - **Beautiful UI**: Material 3 design with smooth animations and uniform edge-to-edge component padding
@@ -26,7 +26,8 @@ Chat on messaging platforms without saving contacts.
 - **Localization**: 25-language infrastructure with graceful fallback order and core manual translations
 - **First-Run Welcome Setup**: New installations are greeted with a welcome flow for language, theme, and theme-color selection
 - **Smart Theming**: Light, Dark, System, and AMOLED modes + theme colors selectable via dropdown + custom RGB palette
-- **Faster Tool Navigation**: Elegant, horizontally scrollable multi-chip quick-switch navigation for the utilities screen
+- **Faster Tool Navigation**: Refined quick-switch bar with previous/next controls, centered auto-scroll, and clearer active-state chips for effortless tool hopping
+- **Expanded Utility Localization**: Security Toolkit, quick-switch labels, and newly added QR payload builder flows now include richer locale coverage
 - **Privacy First**: All data stored locally on your device
 
 ---
