@@ -723,6 +723,19 @@ class _HistoryCard extends StatelessWidget {
     return Icon(item.platform.icon, color: Colors.white, size: 28);
   }
 
+  String _safeFormattedDate() {
+    try {
+      return item.formattedDate;
+    } catch (_) {
+      final day = item.timestamp.day.toString().padLeft(2, '0');
+      final month = item.timestamp.month.toString().padLeft(2, '0');
+      final year = item.timestamp.year.toString();
+      final hour = item.timestamp.hour.toString().padLeft(2, '0');
+      final minute = item.timestamp.minute.toString().padLeft(2, '0');
+      return '$day/$month/$year $hour:$minute';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final title =
@@ -730,6 +743,7 @@ class _HistoryCard extends StatelessWidget {
             ? item.displayName!.trim()
             : item.contact;
     final hasSubtitle = title != item.contact;
+    final formattedDate = _safeFormattedDate();
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
@@ -868,7 +882,7 @@ class _HistoryCard extends StatelessWidget {
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
-                                  item.formattedDate,
+                                  formattedDate,
                                   style: Theme.of(context)
                                       .textTheme
                                       .bodySmall
