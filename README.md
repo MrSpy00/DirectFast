@@ -1,5 +1,222 @@
 # DirectFast
 
+## TR
+
+Mevcut sürüm: **v1.0.0**
+
+## 🚀 Kişilerinize Hızlıca Bağlanın
+
+Kişi kaydetmeden mesajlaşma platformlarında sohbet başlatın.
+
+![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)
+![Dart](https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white)
+![Material Design](https://img.shields.io/badge/Material%20Design-757575?style=for-the-badge&logo=material-design&logoColor=white)
+
+---
+
+## ✨ Özellikler
+
+- **18 Platform Desteği**: WhatsApp, Telegram, Signal, Viber, WeChat, LINE, Messenger, Discord, Instagram, X, Snapchat, YouTube, TikTok, Twitch, Facebook, Kick, LinkedIn, Email
+- **Kişi Kaydetmeden Kullanım**: Kişi listenizi kalabalıklaştırmadan sohbetleri doğrudan açın
+- **Akıllı Pano**: Telefon numaralarını ve kullanıcı adlarını otomatik algılama
+- **Pano Zekası Geliştirmesi**: Çoklu numara çıkarımı, URL/mention farkında kullanıcı adı ayrıştırma ve karışık metinlerden satır içi e-posta keşfi
+- **Hızlı Şablonlar**: Sık gönderdiğiniz mesajları kaydedin ve yeniden kullanın
+- **Özel Deep Link’ler**: `directfast://chat?...` ile DirectFast’i önceden doldurulmuş sohbet niyetiyle açın
+- **Yedekleme ve Geri Yükleme**: Yerel verileri düz JSON veya şifreli payload olarak dışa aktarın, ardından ayar geri yükleme seçeneğiyle güvenle içe aktarın
+- **Gizlilik Panosu**: Yerelde tam olarak ne tutulduğunu inceleyin (anahtarlar, sayılar, maskeli önizlemeler) ve gizlilik raporunu kopyalayın
+- **Gelişmiş QR Stüdyosu**: Payload şablonları ve gelişmiş payload oluşturucu (Raw/URL/Email/Phone/SMS/Wi-Fi/vCard/Geo), ön plan/arka plan kontrolleri, modül/göz şekli, hata düzeltme, çerçeve/gölge ayarı, özel merkez görsel desteği (galeri/kamera), kontrast rehberi ve dışa aktarma kalite kontrolü ile yüksek düzeyde özelleştirilebilir QR üretimi
+- **Link Temizleyici**: URL’lerden takip parametrelerini kaldırın
+- **Güvenlik Araç Seti**: Hash alma, Base64/URL encode-decode, token üretimi, yerel encrypt/decrypt yardımcıları ve Gelişmiş Şifre Üretici tek bir yerde
+- **Şık Arayüz**: Akıcı animasyonlar ve bileşenlerde uçtan uca tutarlı padding ile Material 3 tasarımı
+- **Sohbet Geçmişi**: Son konuşmalarınızı takip edin
+- **Yerelleştirme**: Zarif fallback sırası ve çekirdek manuel çevirilerle 25 dil altyapısı
+- **İlk Açılış Hoş Geldin Kurulumu**: Yeni kurulumlar dil, tema ve tema rengi seçimi için hoş geldin akışıyla karşılanır
+- **Akıllı Temalandırma**: Açık, Koyu, Sistem ve AMOLED modları + açılır menüden seçilebilir tema renkleri + özel RGB paleti
+- **Daha Hızlı Araç Gezinmesi**: Önceki/sonraki kontrolleri, ortalanmış otomatik kaydırma ve daha belirgin aktif durum chip’leriyle geliştirilmiş hızlı geçiş çubuğu
+- **Genişletilmiş Araç Yerelleştirmesi**: Güvenlik Araç Seti, hızlı geçiş etiketleri ve yeni eklenen QR payload oluşturucu akışları artık daha zengin dil kapsamına sahip
+- **Önce Gizlilik**: Tüm veriler cihazınızda yerel olarak saklanır
+
+---
+
+## 🏗️ Mimari
+
+Bu uygulama **MVVM** deseniyle birlikte **Clean Architecture** prensiplerini takip eder:
+
+```text
+lib/
+├── core/
+│   ├── constants/        # Uygulama sabitleri ve enum'lar
+│   ├── services/         # Çekirdek servisler (Storage, URL launcher, Clipboard, Deep Link, Backup)
+│   └── utils/            # Yardımcı araçlar ve yardımcı fonksiyonlar
+├── data/
+│   ├── models/           # Veri modelleri
+│   └── repositories/     # Veri depoları
+├── features/
+│   ├── home/            # Ana ekran özelliği
+│   ├── history/         # Geçmiş özelliği
+│   ├── onboarding/      # İlk açılış hoş geldin kurulumu
+│   ├── settings/        # Ayarlar özelliği
+│   └── utils/           # Yardımcı araçlar özelliği
+└── shared/
+    ├── theme/           # Uygulama temalandırması
+    └── widgets/         # Yeniden kullanılabilir bileşenler
+```
+
+---
+
+## 🛠️ Teknoloji Yığını
+
+- **Framework**: Flutter 3.38.x
+- **Dil**: Dart
+- **State Management**: Riverpod
+- **Navigation**: GoRouter
+- **Yerel Depolama**: SharedPreferences
+- **Animasyonlar**: flutter_animate
+- **Fontlar**: Google Fonts
+
+---
+
+## 🌍 Diller ve Temalar
+
+- **Desteklenen Diller (25)**: Turkish, English, Spanish, Arabic, Hindi, French, German, Russian, Portuguese, Chinese, Japanese, Korean, Italian, Indonesian, Bengali, Urdu, Vietnamese, Polish, Dutch, Thai, Persian, Malay, Telugu, Tamil, Punjabi
+- **Tema Modları**: Açık, Koyu, AMOLED, Sistem Varsayılanı
+- **Tema Renkleri**: Çok renkli hazır palet + özel RGB paleti
+- **Uygulama İçi Kontroller**: Dil, tema modu ve tema rengi Ayarlar’dan değiştirilebilir ve yerel olarak kalıcıdır
+
+---
+
+## 🔗 Deep Link Örnekleri
+
+- `directfast://chat?platform=wa&phone=+905551234567`
+- `directfast://chat?platform=telegram&username=my_handle`
+- `directfast://chat/telegram/my_handle`
+
+> Desteklenen kısaltmalar arasında `wa`, `tg`, `ig`, `x`, `fb` ve tam platform adları bulunur.
+
+---
+
+## 🚀 Başlangıç
+
+### Ön Koşullar
+
+- Flutter SDK (>=3.2.0)
+- Dart SDK
+- Android Studio / Xcode (mobil geliştirme için)
+
+### Kurulum
+
+1. Depoyu klonlayın:
+
+```bash
+git clone https://github.com/MrSpy00/DirectFast.git
+cd DirectFast
+```
+
+1. Bağımlılıkları yükleyin:
+
+```bash
+flutter pub get
+```
+
+1. (Opsiyonel) Önceki derleme çıktılarını temizleyin:
+
+```bash
+flutter clean
+flutter pub get
+```
+
+1. Uygulamayı çalıştırın:
+
+```bash
+flutter run
+```
+
+---
+
+## 📱 Desteklenen Platformlar
+
+| Platform  | Girdi Türü     | Durum |
+|-----------|----------------|-------|
+| WhatsApp  | Phone Number   | ✅    |
+| Telegram  | Username       | ✅    |
+| Signal    | Phone Number   | ✅    |
+| Viber     | Phone Number   | ✅    |
+| WeChat    | Username       | ✅    |
+| LINE      | Username       | ✅    |
+| Messenger | Username       | ✅    |
+| Discord   | Username       | ✅    |
+| Instagram | Username       | ✅    |
+| X         | Username       | ✅    |
+| Snapchat  | Username       | ✅    |
+| YouTube   | Username       | ✅    |
+| TikTok    | Username       | ✅    |
+| Twitch    | Username       | ✅    |
+| Facebook  | Username       | ✅    |
+| Kick      | Username       | ✅    |
+| LinkedIn  | Username       | ✅    |
+| Email     | Email Address  | ✅    |
+
+---
+
+## 🔒 Gizlilik ve Güvenlik
+
+- **Harici Sunucu Yok**: Tüm veriler cihazınızda kalır
+- **Girdi Sanitizasyonu**: XSS ve enjeksiyon saldırılarına karşı koruma
+- **Yerel Depolama**: Geçmiş ve şablonlar SharedPreferences içinde yerel olarak saklanır
+- **Takip Yok**: Sıfır analitik veya telemetri
+
+---
+
+## 📚 Açık Kaynak Teşekkürleri
+
+DirectFast, Flutter açık kaynak ekosistemi üzerine inşa edilmiştir.
+
+- Çekirdek bağımlılık listesi ve atıf notları: [OPEN_SOURCE_NOTICES.md](OPEN_SOURCE_NOTICES.md)
+- Tüm paket lisansları uygulama içinden doğrudan görüntülenebilir:
+    Settings → About → Open Source Licenses
+
+---
+
+## 📝 Lisans
+
+Bu proje açık kaynaklıdır ve MIT Lisansı altında sunulmaktadır.
+
+---
+
+## 👨‍💻 Geliştirici
+
+Aegis tarafından geliştirilmiştir
+
+- GitHub: [@MrSpy00](https://github.com/MrSpy00)
+
+---
+
+## 🤝 Katkıda Bulunma
+
+Katkılar, issue’lar ve özellik istekleri memnuniyetle karşılanır!
+
+1. Projeyi fork edin
+2. Feature branch oluşturun (`git checkout -b feature/AmazingFeature`)
+3. Değişikliklerinizi commit edin (`git commit -m 'Add some AmazingFeature'`)
+4. Branch’i push edin (`git push origin feature/AmazingFeature`)
+5. Pull Request açın
+
+---
+
+## ⭐ Desteğinizi Gösterin
+
+Bu proje size yardımcı olduysa bir ⭐️ verin!
+
+---
+
+Flutter ile ❤️ yapıldı
+
+© 2026 Aegis
+
+---
+
+## EN
+
 Current release: **v1.0.0**
 
 ## 🚀 Quick Connect to Your Contacts
