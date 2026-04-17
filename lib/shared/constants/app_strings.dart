@@ -677,6 +677,54 @@ class AppStrings {
       'tr': 'İstatistikler',
       'en': 'Analytics',
     },
+    'search_history': {
+      'tr': 'Geçmişte ara',
+      'en': 'Search history',
+    },
+    'history_filters': {
+      'tr': 'Filtreler',
+      'en': 'Filters',
+    },
+    'all_platforms': {
+      'tr': 'Tüm Platformlar',
+      'en': 'All Platforms',
+    },
+    'sort_newest': {
+      'tr': 'En Yeni',
+      'en': 'Newest',
+    },
+    'sort_oldest': {
+      'tr': 'En Eski',
+      'en': 'Oldest',
+    },
+    'reset_filters': {
+      'tr': 'Sıfırla',
+      'en': 'Reset',
+    },
+    'no_history_match': {
+      'tr': 'Bu filtrelerle eşleşen kayıt bulunamadı',
+      'en': 'No records match the current filters',
+    },
+    'shown_connections': {
+      'tr': 'Gösterilen',
+      'en': 'Shown',
+    },
+    'platform_count': {
+      'tr': 'Platform Sayısı',
+      'en': 'Platform Count',
+    },
+    'history_item_deleted': {
+      'tr': 'Geçmiş kaydı silindi',
+      'en': 'History record deleted',
+    },
+    'undo': {
+      'tr': 'Geri Al',
+      'en': 'Undo',
+    },
+    'clear_search': {
+      'tr': 'Aramayı temizle',
+      'en': 'Clear search',
+    },
     'most_used': {
       'tr': 'En Çok Kullanılan',
       'en': 'Most Used',

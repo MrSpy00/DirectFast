@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../utils/date_formatting.dart';
 import '../../shared/constants/app_strings.dart';
 
 // Provider for locale
@@ -16,14 +18,21 @@ class LocaleNotifier extends StateNotifier<String> {
 
   Future<void> _loadLocale() async {
     final prefs = await SharedPreferences.getInstance();
-    final savedLocale =
-        AppStrings.normalizeLocale(prefs.getString(_localeKey) ?? AppStrings.turkish);
+    final savedLocale = AppStrings.normalizeLocale(
+      prefs.getString(_localeKey) ?? AppStrings.turkish,
+    );
+
+    await ensureDateFormattingInitialized(savedLocale);
+
     state = savedLocale;
     AppStrings.setLocale(savedLocale);
   }
 
   Future<void> setLocale(String locale) async {
     final normalized = AppStrings.normalizeLocale(locale);
+
+    await ensureDateFormattingInitialized(normalized);
+
     state = normalized;
     AppStrings.setLocale(normalized);
 

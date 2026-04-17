@@ -65,18 +65,36 @@ class ChatHistoryItem {
 
   String get formattedDate {
     final now = DateTime.now();
-    final difference = now.difference(timestamp);
+    final nowDate = DateTime(now.year, now.month, now.day);
+    final itemDate = DateTime(timestamp.year, timestamp.month, timestamp.day);
+    final dayDifference = nowDate.difference(itemDate).inDays;
     final locale = AppStrings.currentLocale;
-    final time = DateFormat.Hm(locale).format(timestamp);
+    final time = _formatTime(locale);
 
-    if (difference.inDays == 0) {
+    if (dayDifference <= 0) {
       return '${AppStrings.tr('today')} $time';
-    } else if (difference.inDays == 1) {
+    } else if (dayDifference == 1) {
       return '${AppStrings.tr('yesterday')} $time';
-    } else if (difference.inDays < 7) {
-      return AppStrings.tr('days_ago', args: [difference.inDays.toString()]);
+    } else if (dayDifference < 7) {
+      return AppStrings.tr('days_ago', args: [dayDifference.toString()]);
     } else {
+      return _formatDate(locale);
+    }
+  }
+
+  String _formatTime(String locale) {
+    try {
+      return DateFormat.Hm(locale).format(timestamp);
+    } catch (_) {
+      return DateFormat.Hm().format(timestamp);
+    }
+  }
+
+  String _formatDate(String locale) {
+    try {
       return DateFormat.yMd(locale).format(timestamp);
+    } catch (_) {
+      return DateFormat.yMd().format(timestamp);
     }
   }
 
@@ -108,12 +126,27 @@ class ChatHistoryItem {
   }
 
   factory ChatHistoryItem.fromJson(Map<String, dynamic> json) {
+    final rawTimestamp = (json['timestamp'] ?? '').toString();
+    final parsedTimestamp = DateTime.tryParse(rawTimestamp);
+    if (parsedTimestamp == null) {
+      throw const FormatException('Invalid timestamp');
+    }
+
+    final id = (json['id'] ?? '').toString().trim();
+    final contact = (json['contact'] ?? '').toString().trim();
+    final platformName =
+        (json['platformName'] ?? json['platform'] ?? '').toString().trim();
+
+    if (id.isEmpty || contact.isEmpty) {
+      throw const FormatException('Missing required history fields');
+    }
+
     return ChatHistoryItem(
-      id: json['id'] as String,
-      contact: json['contact'] as String,
-      platformName: json['platformName'] as String,
-      timestamp: DateTime.parse(json['timestamp'] as String),
-      displayName: json['displayName'] as String?,
+      id: id,
+      contact: contact,
+      platformName: platformName.isEmpty ? 'whatsapp' : platformName,
+      timestamp: parsedTimestamp,
+      displayName: json['displayName']?.toString(),
     );
   }
 
@@ -125,9 +158,26 @@ class ChatHistoryItem {
   // Decode JSON string to list
   static List<ChatHistoryItem> decodeList(String jsonString) {
     try {
-      final List<dynamic> jsonList = jsonDecode(jsonString);
-      return jsonList.map((json) => ChatHistoryItem.fromJson(json)).toList();
-    } catch (e) {
+      final decoded = jsonDecode(jsonString);
+      if (decoded is! List) {
+        return [];
+      }
+
+      final items = <ChatHistoryItem>[];
+      for (final raw in decoded) {
+        if (raw is! Map) {
+          continue;
+        }
+
+        try {
+          items.add(ChatHistoryItem.fromJson(Map<String, dynamic>.from(raw)));
+        } catch (_) {
+          // Skip malformed entries but keep valid history records.
+        }
+      }
+
+      return items;
+    } catch (_) {
       return [];
     }
   }

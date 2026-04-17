@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import 'core/services/deep_link_service.dart';
+import 'core/utils/date_formatting.dart';
 import 'core/services/storage_service.dart';
 import 'core/services/locale_service.dart';
 import 'core/utils/app_router.dart';
@@ -24,6 +26,7 @@ void main() async {
   final prefs = await SharedPreferences.getInstance();
   final savedLocale = prefs.getString('app_locale') ?? AppStrings.turkish;
   AppStrings.setLocale(savedLocale);
+  await ensureDateFormattingInitialized(savedLocale);
 
   // Set system UI overlay style
   SystemChrome.setSystemUIOverlayStyle(
