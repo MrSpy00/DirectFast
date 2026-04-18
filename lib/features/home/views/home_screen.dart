@@ -10,21 +10,13 @@ import '../../../shared/widgets/glassmorphic_container.dart';
 import '../../../shared/widgets/app_logo.dart';
 import '../../../shared/widgets/brand_icon.dart';
 import '../viewmodels/home_viewmodel.dart';
-import '../../history/viewmodels/history_viewmodel.dart';
+import '../../../core/features/history/providers/history_provider.dart';
 import '../../../data/models/chat_history_item.dart';
 import '../../../shared/theme/app_theme.dart';
 import '../../../core/utils/app_router.dart';
 import '../../../core/services/clipboard_service.dart';
 import '../../../core/services/locale_service.dart';
 
-/// HomeScreen — premium micro-interactions, smart clipboard overlay,
-/// recent contacts carousel, haptic feedback throughout.
-///
-/// Performance notes:
-/// - [_CyberBackground] is a plain [StatelessWidget] — zero repaint cost.
-/// - Platform grid tiles are wrapped in [RepaintBoundary].
-/// - [GlassmorphicContainer.flat] (no BackdropFilter) used for inner cards.
-/// - Single BackdropFilter reserved for the [_SmartClipboardBanner] pill.
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
@@ -40,7 +32,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // Pre-warm clipboard check so the banner appears without delay.
     ClipboardService.getClipboardContent();
   }
 
@@ -104,8 +95,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
   }
 
-  // ── Build ─────────────────────────────────────────────────────────────────
-
   @override
   Widget build(BuildContext context) {
     ref.watch(localeProvider);
@@ -114,8 +103,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final clipboardSuggestion = ref.watch(clipboardSuggestionProvider);
     final recentHistory = ref.watch(historyProvider);
 
-    // Reset banner dismiss when the user switches platform — new context means
-    // the clipboard content might be relevant again.
     ref.listen<PlatformType>(selectedPlatformProvider, (_, __) {
       if (_clipboardBannerDismissed) {
         setState(() => _clipboardBannerDismissed = false);
@@ -183,7 +170,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
       body: Stack(
         children: [
-          // Static gradient background — zero frame cost.
           const RepaintBoundary(child: _CyberBackground()),
 
           SafeArea(
@@ -193,15 +179,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Reserve space for the floating banner (avoids content jump).
                   if (showBanner) const SizedBox(height: 56),
                   const SizedBox(height: 8),
 
                   _buildHeroSection(),
                   const SizedBox(height: 24),
 
-                  // Recent contacts carousel — only when history exists and
-                  // we are in a messaging category.
                   if (recentHistory.isNotEmpty &&
                       selectedCategory != PlatformCategory.utility) ...[
                     _buildRecentContacts(recentHistory, selectedPlatform),
@@ -230,8 +213,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
             ),
           ),
-
-          // ── Smart Clipboard Banner (floating pill) ─────────────────────────
           if (showBanner)
             SafeArea(
               child: Align(
@@ -262,8 +243,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
     );
   }
-
-  // ── Section builders ──────────────────────────────────────────────────────
 
   Widget _buildHeroSection() {
     return RepaintBoundary(
@@ -324,14 +303,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  /// Horizontally scrolling row of the last 3 unique contacts, deduped by
-  /// `platformName:contact`. Tap fills the input field and selects the
-  /// matching platform.
   Widget _buildRecentContacts(
     List<ChatHistoryItem> history,
     PlatformType selectedPlatform,
   ) {
-    // Deduplicate: keep first occurrence of each platform+contact combo.
     final seen = <String>{};
     final unique = <ChatHistoryItem>[];
     for (final item in history) {
@@ -373,7 +348,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               return _TappableScale(
                 onTap: () {
                   HapticFeedback.lightImpact();
-                  // Switch to matching platform and fill the contact field.
                   ref.read(selectedCategoryProvider.notifier).state =
                       item.platform.category;
                   ref.read(selectedPlatformProvider.notifier).state =
@@ -666,7 +640,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     ).animate().fadeIn(duration: 400.ms, delay: 300.ms);
   }
 
-  /// Utilities panel — shown when the Utilities category tab is active.
   Widget _buildUtilitiesPanel() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -810,10 +783,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  // ── Icon helpers ──────────────────────────────────────────────────────────
-
-  /// Icon for platform grid tiles and the launch button (28 dp).
-  /// Always tinted to prevent SVG background artifacts.
   Widget _getPlatformIcon(PlatformType platform, bool isSelected) {
     final name = _svgNameFor(platform);
     if (name != null) {
@@ -829,7 +798,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  /// Small icon for recent-contacts chips (20 dp).
   Widget _buildSmallPlatformIcon(PlatformType platform, bool isSelected) {
     final name = _svgNameFor(platform);
     if (name != null) {
@@ -846,7 +814,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  /// Properly padded 24 dp icon for [InputDecoration.prefixIcon].
   Widget _buildPrefixIcon(PlatformType platform) {
     final name = _svgNameFor(platform);
     if (name != null) {
@@ -855,18 +822,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return Icon(platform.icon, color: platform.color);
   }
 
-  /// Returns the SVG bundle asset name for a platform, or null if the
-  /// platform uses a Material icon instead.
   static String? _svgNameFor(PlatformType platform) {
     return platform.logoAssetName;
   }
 }
 
-// ── Smart Clipboard Banner ────────────────────────────────────────────────────
-
-/// Dynamic Island-style floating pill that appears at the top of the screen
-/// when the clipboard contains content relevant to the selected platform.
-/// A single [BackdropFilter] gives it depth without stacking blur layers.
 class _SmartClipboardBanner extends StatelessWidget {
   final String content;
   final VoidCallback onUse;
@@ -899,7 +859,6 @@ class _SmartClipboardBanner extends StatelessWidget {
             ),
             child: Row(
               children: [
-                // Gradient paste icon
                 Container(
                   width: 30,
                   height: 30,
@@ -914,7 +873,6 @@ class _SmartClipboardBanner extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 10),
-                // Clipboard content preview
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -940,7 +898,6 @@ class _SmartClipboardBanner extends StatelessWidget {
                     ],
                   ),
                 ),
-                // "Use" action
                 TextButton(
                   onPressed: onUse,
                   style: TextButton.styleFrom(
@@ -958,7 +915,6 @@ class _SmartClipboardBanner extends StatelessWidget {
                     ),
                   ),
                 ),
-                // Dismiss
                 GestureDetector(
                   onTap: onDismiss,
                   child: Icon(
@@ -979,8 +935,6 @@ class _SmartClipboardBanner extends StatelessWidget {
     );
   }
 }
-
-// ── Press-scale wrapper ───────────────────────────────────────────────────────
 
 class _TappableScale extends StatefulWidget {
   final Widget child;
@@ -1013,8 +967,6 @@ class _TappableScaleState extends State<_TappableScale> {
     );
   }
 }
-
-// ── Private const widgets ─────────────────────────────────────────────────────
 
 class _AppTitle extends StatelessWidget {
   const _AppTitle();
@@ -1061,7 +1013,6 @@ class _InfoCard extends StatelessWidget {
   }
 }
 
-/// Shortcut card for a utility tool inside the Utilities tab panel.
 class _UtilityShortcutCard extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -1122,7 +1073,6 @@ class _UtilityShortcutCard extends StatelessWidget {
   }
 }
 
-/// Static gradient background. Stateless → raster-cached permanently.
 class _CyberBackground extends StatelessWidget {
   const _CyberBackground();
 

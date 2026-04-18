@@ -1,26 +1,9 @@
 import 'package:flutter/material.dart';
 
 /// App logo rendered from `assets/images/logo.png`.
-///
-/// ## Why PNG, not SVG
-/// The `logo.svg` carries an opaque background rectangle in its canvas, which
-/// bleeds through any `ClipOval` or transparent container and produces the
-/// visible square / colour-ring artifact. The `logo.png` asset is the
-/// authoritative source (it is already used for launcher icons in pubspec) and
-/// respects the image's own alpha channel, giving a clean circular clip.
-///
-/// ## Rendering pipeline
-/// ```
-/// DecoratedBox (glow BoxShadows, circle shape)
-///   └── ClipOval
-///         └── Image.asset(logo.png, BoxFit.cover)  ← fills circle cleanly
-///               errorBuilder → _LogoFallback (gradient + ⚡ icon)
-/// ```
 class AppLogo extends StatelessWidget {
   final double size;
 
-  /// Optional tint applied via [BlendMode.srcIn].
-  /// When null the PNG renders with its original colours.
   final Color? color;
 
   /// When true, renders concentric neon glow shadows.
@@ -82,10 +65,7 @@ class AppLogo extends StatelessWidget {
   }
 }
 
-/// Animated [AppLogo] with a pulsing neon glow.
-///
-/// The PNG raster layer is isolated inside a [RepaintBoundary], so only the
-/// shadow decoration (driven by [AnimationController]) repaints each frame.
+/// Animated [AppLogo] with a pulsing glow.
 class AnimatedAppLogo extends StatefulWidget {
   final double size;
   final Color? color;
@@ -153,8 +133,6 @@ class _AnimatedAppLogoState extends State<AnimatedAppLogo>
             child: child,
           );
         },
-        // PNG layer isolated so the shadow-animation repaints only the
-        // DecoratedBox and leaves the raster cache for the image intact.
         child: RepaintBoundary(
           child: ClipOval(
             child: Image.asset(
@@ -176,7 +154,6 @@ class _AnimatedAppLogoState extends State<AnimatedAppLogo>
   }
 }
 
-/// Shown while the PNG is loading or if it fails to decode.
 class _LogoFallback extends StatelessWidget {
   final double size;
   final Color primaryColor;

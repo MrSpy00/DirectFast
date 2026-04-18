@@ -23,8 +23,6 @@ import '../../../core/services/locale_service.dart';
 import '../viewmodels/templates_viewmodel.dart';
 import '../../../data/models/template_item.dart';
 
-// ── Screen ────────────────────────────────────────────────────────────────────
-
 class UtilsScreen extends ConsumerStatefulWidget {
   final int initialTab;
   const UtilsScreen({super.key, this.initialTab = 0});
@@ -161,7 +159,6 @@ class _UtilsScreenState extends ConsumerState<UtilsScreen> {
       padding: const EdgeInsets.fromLTRB(12, 12, 20, 0),
       child: Row(
         children: [
-          // Pill-shaped back button
           Material(
             color: Colors.transparent,
             child: InkWell(
@@ -320,8 +317,6 @@ class _UtilsScreenState extends ConsumerState<UtilsScreen> {
     ).animate().fadeIn(duration: 350.ms, delay: 80.ms);
   }
 }
-
-// ── Premium Segmented Control ─────────────────────────────────────────────────
 
 class _Segment {
   final IconData icon;
@@ -505,8 +500,6 @@ class _QrStylePreset {
     required this.shadowBlur,
   });
 }
-
-// ── QR Generator Page ─────────────────────────────────────────────────────────
 
 class _QRGeneratorPage extends StatefulWidget {
   const _QRGeneratorPage();
@@ -1290,9 +1283,13 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
       final image = await boundary.toImage(pixelRatio: _exportPixelRatio);
       final bytes = await image.toByteData(format: ui.ImageByteFormat.png);
       final png = bytes!.buffer.asUint8List();
-      await Share.shareXFiles(
-        [XFile.fromData(png, mimeType: 'image/png', name: 'qr_code.png')],
-        text: AppStrings.tr('qr_generator'),
+      await SharePlus.instance.share(
+        ShareParams(
+          files: [
+            XFile.fromData(png, mimeType: 'image/png', name: 'qr_code.png'),
+          ],
+          text: AppStrings.tr('qr_generator'),
+        ),
       );
     } catch (e) {
       if (mounted) {
@@ -2012,7 +2009,6 @@ class _QRGeneratorPageState extends State<_QRGeneratorPage> {
   }
 }
 
-/// Row of colour swatches for QR foreground colour.
 class _QrColorPicker extends StatelessWidget {
   final String title;
   final List<Color> presets;
@@ -2093,8 +2089,6 @@ class _QrColorPicker extends StatelessWidget {
     );
   }
 }
-
-// ── Link Cleaner Page ─────────────────────────────────────────────────────────
 
 class _LinkCleanerPage extends StatefulWidget {
   const _LinkCleanerPage();
@@ -2181,7 +2175,6 @@ class _LinkCleanerPageState extends State<_LinkCleanerPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Tool header
                 Row(
                   children: [
                     Container(
@@ -2310,8 +2303,6 @@ class _LinkCleanerPageState extends State<_LinkCleanerPage> {
     );
   }
 }
-
-// ── Password Generator Page ─────────────────────────────────────────────────
 
 class _PasswordGeneratorSection extends StatefulWidget {
   const _PasswordGeneratorSection();
@@ -2710,9 +2701,6 @@ class _PasswordOptionTile extends StatelessWidget {
   }
 }
 
-// ── Shared widgets ─────────────────────────────────────────────────────────────
-
-/// Gradient-filled primary action button used by every tool page.
 class _GradientButton extends StatelessWidget {
   final VoidCallback onPressed;
   final IconData icon;
@@ -2837,8 +2825,6 @@ class _ModeButton extends StatelessWidget {
   }
 }
 
-// ── Press-scale wrapper ───────────────────────────────────────────────────────
-
 class _TappableScale extends StatefulWidget {
   final Widget child;
   final VoidCallback? onTap;
@@ -2870,8 +2856,6 @@ class _TappableScaleState extends State<_TappableScale> {
     );
   }
 }
-
-// ── Templates Page ────────────────────────────────────────────────────────────
 
 class _TemplatesPage extends ConsumerStatefulWidget {
   const _TemplatesPage();
@@ -3027,8 +3011,6 @@ class _TemplatesPageState extends ConsumerState<_TemplatesPage> {
   }
 }
 
-// ── Template Card ─────────────────────────────────────────────────────────────
-
 class _TemplateCard extends StatelessWidget {
   final TemplateItem template;
   final VoidCallback onDelete;
@@ -3042,7 +3024,6 @@ class _TemplateCard extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Gradient icon badge
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
@@ -3056,7 +3037,6 @@ class _TemplateCard extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 14),
-          // Name + message preview
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -3085,7 +3065,6 @@ class _TemplateCard extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 8),
-          // Action buttons
           Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -3156,8 +3135,6 @@ class _IconAction extends StatelessWidget {
   }
 }
 
-// ── Add Template Bottom Sheet ─────────────────────────────────────────────────
-
 class _AddTemplateSheet extends StatefulWidget {
   final Future<void> Function(String name, String message) onSave;
 
@@ -3212,7 +3189,6 @@ class _AddTemplateSheetState extends State<_AddTemplateSheet> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Drag handle
             Center(
               child: Container(
                 width: 36,
@@ -3271,8 +3247,6 @@ class _AddTemplateSheetState extends State<_AddTemplateSheet> {
     );
   }
 }
-
-// ── Gmail Composer Page ─────────────────────────────────────────────────────
 
 class _GmailComposerPage extends StatefulWidget {
   const _GmailComposerPage();
@@ -4142,8 +4116,6 @@ class _SecurityToolkitPageState extends State<_SecurityToolkitPage> {
     );
   }
 }
-
-// ── Global helper ─────────────────────────────────────────────────────────────
 
 void _showSnackBar(
   BuildContext context,

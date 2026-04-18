@@ -6,26 +6,22 @@ import '../constants/app_constants.dart';
 import '../../shared/constants/app_strings.dart';
 
 class UrlLauncherService {
-  /// Launch chat based on platform and contact - WITH ROBUST FALLBACK
+  /// Launch a chat link and fall back to web when needed.
   static Future<LaunchResult> launchChat({
     required PlatformType platform,
     required String contact,
   }) async {
     try {
-      // Special handling for Discord
       if (platform == PlatformType.discord) {
         return await _handleDiscord(contact);
       }
 
-      // Special handling for WeChat
       if (platform == PlatformType.wechat) {
         return await _handleWeChat(contact);
       }
 
-      // Clean contact based on platform
       final cleanedContact = _sanitizeContact(contact, platform);
 
-      // Try app-specific URL first, then fallback to web
       return await _tryLaunchWithFallback(platform, cleanedContact);
     } catch (e) {
       return LaunchResult(
@@ -35,16 +31,14 @@ class UrlLauncherService {
     }
   }
 
-  /// Try launching with app scheme first, fallback to web (NUCLEAR-PROOF VERSION)
+  /// Try app scheme first, then fall back to web URL.
   static Future<LaunchResult> _tryLaunchWithFallback(
     PlatformType platform,
     String contact,
   ) async {
-    // Build both app and web URLs
     final appUrl = _buildAppUrl(platform, contact);
     final webUrl = _buildWebUrl(platform, contact);
 
-    // Try app URL first
     if (appUrl != null) {
       try {
         final appUri = Uri.parse(appUrl);
@@ -66,19 +60,17 @@ class UrlLauncherService {
             );
           }
         }
-      } on PlatformException {
-        // App not installed or launch failed, continue to web fallback
-      } catch (_) {
-        // Any other error, continue to web fallback
+      } on PlatformException catch (e) {
+        _ignoreError(e);
+      } catch (e) {
+        _ignoreError(e);
       }
     }
 
-    // Fallback to web URL
     if (webUrl != null) {
       try {
         final webUri = Uri.parse(webUrl);
 
-        // First try: Check canLaunchUrl
         try {
           final canLaunchWeb = await canLaunchUrl(webUri);
 
@@ -98,12 +90,10 @@ class UrlLauncherService {
               );
             }
           }
-        } catch (checkError) {
-          // Silently continue to force launch
+        } catch (e) {
+          _ignoreError(e);
         }
 
-        // NUCLEAR OPTION: Force launch without checking canLaunchUrl
-        // This bypasses Android 11+ visibility restrictions
         try {
           final forceLaunched = await launchUrl(
             webUri,
@@ -119,11 +109,10 @@ class UrlLauncherService {
               ),
             );
           }
-        } catch (forceError) {
-          // Continue to last resort
+        } catch (e) {
+          _ignoreError(e);
         }
 
-        // LAST RESORT: Try with platformDefault mode
         try {
           final lastResortLaunched = await launchUrl(
             webUri,
@@ -138,8 +127,8 @@ class UrlLauncherService {
               ),
             );
           }
-        } catch (lastResortError) {
-          // Silent failure, will return error below
+        } catch (e) {
+          _ignoreError(e);
         }
       } on PlatformException catch (e) {
         return LaunchResult(
@@ -169,42 +158,34 @@ class UrlLauncherService {
     );
   }
 
-  /// Build app-specific URL (scheme://...)
+  /// Build app-specific URL.
   static String? _buildAppUrl(PlatformType platform, String contact) {
     switch (platform) {
       case PlatformType.whatsapp:
-        // WhatsApp app scheme
         return 'whatsapp://send?phone=$contact';
 
       case PlatformType.telegram:
-        // Telegram app scheme
         return 'tg://resolve?domain=$contact';
 
       case PlatformType.signal:
-        // Signal app scheme
         return 'sgnl://signal.me/#p/$contact';
 
       case PlatformType.viber:
-        // Viber app scheme
         return '${AppConstants.viberUrlTemplate}$contact';
 
       case PlatformType.wechat:
-        // Handled separately
         return null;
 
       case PlatformType.line:
         return 'line://ti/p/~$contact';
 
       case PlatformType.messenger:
-        // Messenger ID scheme varies; web fallback is more reliable
         return null;
 
       case PlatformType.instagram:
-        // Instagram app scheme
         return 'instagram://user?username=$contact';
 
       case PlatformType.twitter:
-        // Twitter/X app scheme
         return 'twitter://user?screen_name=$contact';
 
       case PlatformType.snapchat:
@@ -229,11 +210,9 @@ class UrlLauncherService {
         return 'linkedin://in/$contact';
 
       case PlatformType.email:
-        // Email (no app URL, use web directly)
         return null;
 
       case PlatformType.discord:
-        // Handled separately
         return null;
     }
   }
@@ -248,7 +227,6 @@ class UrlLauncherService {
         return '${AppConstants.telegramUrlTemplate}$contact';
 
       case PlatformType.signal:
-        // Signal web doesn't have public profiles
         return null;
 
       case PlatformType.viber:
@@ -298,13 +276,11 @@ class UrlLauncherService {
     }
   }
 
-  /// Special handler for Discord
+  /// Handle Discord by copying username and opening the app/site.
   static Future<LaunchResult> _handleDiscord(String username) async {
     try {
-      // Copy username to clipboard for user convenience
       await FlutterClipboard.copy(username);
 
-      // Try Discord app first
       try {
         final discordUri = Uri.parse('discord://');
         final canLaunch = await canLaunchUrl(discordUri);
@@ -324,10 +300,9 @@ class UrlLauncherService {
           }
         }
       } catch (e) {
-        // App launch failed, try web
+        _ignoreError(e);
       }
 
-      // Fallback to Discord web
       const webUrl = 'https://discord.com';
       final webUri = Uri.parse(webUrl);
       final launched = await launchUrl(
@@ -355,10 +330,7 @@ class UrlLauncherService {
     }
   }
 
-  /// Special handler for WeChat.
-  ///
-  /// WeChat does not provide a consistent public user-profile deep link,
-  /// so we copy the identifier and open the app (or website fallback).
+  /// Handle WeChat by copying username and opening the app/site.
   static Future<LaunchResult> _handleWeChat(String username) async {
     try {
       await FlutterClipboard.copy(username);
@@ -381,8 +353,8 @@ class UrlLauncherService {
             );
           }
         }
-      } catch (_) {
-        // Continue to web fallback
+      } catch (e) {
+        _ignoreError(e);
       }
 
       final webUri = Uri.parse('https://www.wechat.com/');
@@ -415,24 +387,17 @@ class UrlLauncherService {
   static String _sanitizeContact(String contact, PlatformType platform) {
     String sanitized = contact.trim();
 
-    // Remove HTML tags
     sanitized = sanitized.replaceAll(RegExp('<[^>]*>'), '');
 
-    // Platform-specific cleaning
     if (platform.requiresPhoneNumber) {
-      // For phone numbers: allow +, digits, spaces, dashes, parentheses
       sanitized = sanitized.replaceAll(RegExp(r'[^\d+\s\-()]'), '');
-      // Remove spaces and dashes for clean number
       sanitized = sanitized.replaceAll(RegExp(r'[\s\-()]'), '');
     } else if (platform.requiresUsername) {
-      // Remove @ if present
       if (sanitized.startsWith('@')) {
         sanitized = sanitized.substring(1);
       }
-      // For usernames: allow alphanumeric, underscore, dot, hyphen
       sanitized = sanitized.replaceAll(RegExp('[^a-zA-Z0-9_.-]'), '');
     } else if (platform.requiresEmail) {
-      // For email: allow alphanumeric, @, dot, underscore, dash
       sanitized = sanitized.replaceAll(RegExp(r'[^a-zA-Z0-9@._\-]'), '');
     }
 
@@ -454,7 +419,6 @@ class UrlLauncherService {
       case PlatformType.whatsapp:
       case PlatformType.signal:
       case PlatformType.viber:
-        // Validate phone number format
         final cleanNumber = sanitized.replaceAll(RegExp(r'[+\s\-()]'), '');
         return cleanNumber.length >= 7 && cleanNumber.length <= 15;
 
@@ -472,11 +436,9 @@ class UrlLauncherService {
       case PlatformType.facebook:
       case PlatformType.kick:
       case PlatformType.linkedin:
-        // Validate username (3-30 characters)
         return sanitized.length >= 2 && sanitized.length <= 50;
 
       case PlatformType.email:
-        // Basic email validation
         return AppConstants.emailRegex.hasMatch(sanitized);
     }
   }
@@ -508,6 +470,8 @@ class UrlLauncherService {
 
     return null;
   }
+
+  static void _ignoreError(Object _) {}
 }
 
 class LaunchResult {

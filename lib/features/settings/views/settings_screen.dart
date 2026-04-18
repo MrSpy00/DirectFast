@@ -31,8 +31,6 @@ class SettingsScreen extends ConsumerWidget {
       ),
       body: Container(
         decoration: BoxDecoration(
-          // In dark mode the scaffold background is already #000000 — no
-          // gradient needed (redundant layer over a pure-black surface).
           gradient: Theme.of(context).brightness == Brightness.dark
               ? null
               : LinearGradient(
@@ -51,15 +49,12 @@ class SettingsScreen extends ConsumerWidget {
           padding: const EdgeInsets.all(16),
           physics: const BouncingScrollPhysics(),
           children: [
-            // ── Language ───────────────────────────────────────────────────
             _SectionTitle(title: AppStrings.tr('language'))
                 .animate()
                 .fadeIn(duration: 400.ms)
                 .slideX(begin: -0.2, end: 0),
             const SizedBox(height: 12),
 
-            // GlassmorphicContainer.flat — option lists do not benefit from
-            // BackdropFilter; flat avoids the GPU compositing layer entirely.
             GlassmorphicContainer.flat(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               child: DropdownButtonHideUnderline(
@@ -103,7 +98,6 @@ class SettingsScreen extends ConsumerWidget {
 
             const SizedBox(height: 32),
 
-            // ── Theme ──────────────────────────────────────────────────────
             _SectionTitle(title: AppStrings.tr('theme'))
                 .animate()
                 .fadeIn(duration: 400.ms, delay: 100.ms)
@@ -308,7 +302,6 @@ class SettingsScreen extends ConsumerWidget {
 
             const SizedBox(height: 32),
 
-            // ── Data & Privacy ─────────────────────────────────────────────
             _SectionTitle(title: AppStrings.tr('data_privacy'))
                 .animate()
                 .fadeIn(duration: 400.ms, delay: 180.ms)
@@ -344,22 +337,16 @@ class SettingsScreen extends ConsumerWidget {
 
             const SizedBox(height: 32),
 
-            // ── About ──────────────────────────────────────────────────────
             _SectionTitle(title: AppStrings.tr('about'))
                 .animate()
                 .fadeIn(duration: 400.ms, delay: 200.ms)
                 .slideX(begin: -0.2, end: 0),
             const SizedBox(height: 12),
 
-            // App info card — uses GlassmorphicContainer (with blur) as the
-            // hero card; only one BackdropFilter on this screen.
             GlassmorphicContainer(
               padding: const EdgeInsets.all(24),
               child: Column(
                 children: [
-                  // Animated logo — glow is handled internally.
-                  // No extra .shimmer() repeat here; repeating shimmers on
-                  // settings (a long-lived screen) waste battery.
                   const AnimatedAppLogo(size: 100),
 
                   const SizedBox(height: 24),
@@ -383,8 +370,6 @@ class SettingsScreen extends ConsumerWidget {
 
                   const SizedBox(height: 24),
 
-                  // Developer / Links card — static gradient, no repeating
-                  // shimmer (all white text is intentional: sits on accentGradient).
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
@@ -417,7 +402,6 @@ class SettingsScreen extends ConsumerWidget {
                         ),
                         const SizedBox(height: 16),
 
-                        // GitHub button
                         _LinkButton(
                           icon: Icons.code,
                           label: AppStrings.tr('view_github'),
@@ -425,7 +409,6 @@ class SettingsScreen extends ConsumerWidget {
                         ),
                         const SizedBox(height: 12),
 
-                        // Coffee button
                         _LinkButton(
                           icon: Icons.local_cafe,
                           label: AppStrings.tr('buy_coffee'),
@@ -460,7 +443,6 @@ class SettingsScreen extends ConsumerWidget {
 
             const SizedBox(height: 32),
 
-            // Privacy notice
             GlassmorphicContainer.flat(
               padding: const EdgeInsets.all(16),
               opacity: 0.05,
@@ -483,7 +465,6 @@ class SettingsScreen extends ConsumerWidget {
 
             const SizedBox(height: 16),
 
-            // Copyright
             Center(
               child: Text(
                 AppStrings.tr('copyright', args: [AppConstants.developerName]),
@@ -679,8 +660,6 @@ class SettingsScreen extends ConsumerWidget {
   }
 }
 
-// ── Shared sub-widgets ────────────────────────────────────────────────────────
-
 class _SectionTitle extends StatelessWidget {
   final String title;
 
@@ -697,7 +676,6 @@ class _SectionTitle extends StatelessWidget {
   }
 }
 
-/// Reusable frosted-glass link button inside the developer card.
 class _LinkButton extends StatelessWidget {
   final IconData icon;
   final String label;

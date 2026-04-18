@@ -4,6 +4,7 @@ import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 import 'core/services/deep_link_service.dart';
 import 'core/utils/date_formatting.dart';
@@ -18,15 +19,13 @@ import 'shared/constants/app_strings.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize SharedPreferences storage
   await StorageService.init();
+  await initializeDateFormatting();
 
-  // Load saved locale immediately before runApp.
   final savedLocale = AppStrings.normalizeLocale(StorageService.getLocale());
   AppStrings.setLocale(savedLocale);
   await ensureDateFormattingInitialized(savedLocale);
 
-  // Set system UI overlay style
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
@@ -34,7 +33,6 @@ void main() async {
     ),
   );
 
-  // Set preferred orientations
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,

@@ -1,6 +1,6 @@
 import 'package:directfast/core/constants/platform_type.dart';
+import 'package:directfast/core/features/history/providers/history_provider.dart';
 import 'package:directfast/data/models/chat_history_item.dart';
-import 'package:directfast/features/history/viewmodels/history_viewmodel.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

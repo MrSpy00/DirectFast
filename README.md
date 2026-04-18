@@ -179,6 +179,10 @@ Proje, `.github/workflows/main.yml` ile otomatik olarak aşağıdaki kontrolleri
 
 Push ve Pull Request işlemlerinde build doğrulaması yapılır. `v*` tag'lerinde workflow, üretilen `DirectFast.apk` dosyasını otomatik olarak ilgili GitHub Release'e yükler.
 
+Android release imzalama akışı sabit keystore ile çalışır (`android/key.properties` veya GitHub Secrets). Bu sayede yeni sürümler mevcut kurulumların üzerine güncelleme olarak yüklenebilir.
+
+`Paket geçersiz` veya `uygulama yüklenemedi` hatası alırsanız, cihazda daha önce farklı imza ile kurulmuş sürüm olabilir. Bu durumda uygulamayı bir kez kaldırıp yeniden yükleyin; sonraki sürümler aynı imza ile sorunsuz güncellenir.
+
 ---
 
 ## 📦 APK İndir
@@ -461,6 +465,10 @@ The project uses `.github/workflows/main.yml` to automatically run:
 - `flutter build apk --release`
 
 Build validation runs on Push and Pull Request. On `v*` tags, the workflow automatically uploads the generated `DirectFast.apk` to the matching GitHub Release.
+
+Android release signing uses a stable keystore (`android/key.properties` locally or GitHub Secrets in CI). This keeps package signatures consistent so updates install over existing builds.
+
+If you see `invalid package` or install/update mismatch errors, a differently signed older build may still be installed. Uninstall once, reinstall, and subsequent updates will install normally with the same signing key.
 
 ---
 

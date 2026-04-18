@@ -9,17 +9,6 @@ import '../../../shared/widgets/app_logo.dart';
 import '../../../shared/theme/app_theme.dart';
 import '../../../shared/constants/app_strings.dart';
 
-/// Animated splash screen.
-///
-/// ## Animation budget
-/// Three tickers are active for the ~2.7 s display window:
-///   1. [_logoController] — 1.5 s one-shot (fade + elastic scale)
-///   2. [_backgroundController] — 10 s continuous (grid drift + gradient stop)
-///   3. [AnimatedAppLogo] internal controller — 2 s glow pulse
-///
-/// All three are disposed on leave. The background controller is isolated
-/// inside [_CyberGridBackground] via [RepaintBoundary] so its repaints
-/// do not propagate to the logo/text layer.
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -67,7 +56,7 @@ class _SplashScreenState extends State<SplashScreen>
 
   Future<void> _run() async {
     await _logoController.forward();
-    await Future.delayed(const Duration(milliseconds: 1200));
+    await Future<void>.delayed(const Duration(milliseconds: 1200));
     if (mounted) {
       final onboardingDone = StorageService.isOnboardingCompleted();
       context.go(onboardingDone ? AppRouter.home : AppRouter.welcome);
@@ -86,13 +75,10 @@ class _SplashScreenState extends State<SplashScreen>
     return Scaffold(
       body: Stack(
         children: [
-          // Background in its own repaint boundary — repaints never touch
-          // the logo/text layer above.
           RepaintBoundary(
             child: _CyberGridBackground(controller: _backgroundController),
           ),
 
-          // Logo, name, tagline
           Center(
             child: AnimatedBuilder(
               animation: _logoController,
@@ -106,7 +92,6 @@ class _SplashScreenState extends State<SplashScreen>
                       const AnimatedAppLogo(size: 150),
                       const SizedBox(height: 32),
 
-                      // App name — gradient shader text
                       Text(
                         AppConstants.appName,
                         style: Theme.of(context)
@@ -125,7 +110,6 @@ class _SplashScreenState extends State<SplashScreen>
 
                       const SizedBox(height: 12),
 
-                      // Tagline
                       Text(
                         AppStrings.tr('splash_tagline'),
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -139,7 +123,6 @@ class _SplashScreenState extends State<SplashScreen>
 
                       const SizedBox(height: 48),
 
-                      // Loading indicator
                       SizedBox(
                         width: 40,
                         height: 40,
@@ -160,7 +143,6 @@ class _SplashScreenState extends State<SplashScreen>
             ),
           ),
 
-          // Bottom branding
           Positioned(
             bottom: 40,
             left: 0,
@@ -202,8 +184,6 @@ class _SplashScreenState extends State<SplashScreen>
   }
 }
 
-// ── Animated background ───────────────────────────────────────────────────────
-
 class _CyberGridBackground extends StatelessWidget {
   final AnimationController controller;
 
@@ -231,7 +211,6 @@ class _CyberGridBackground extends StatelessWidget {
             colors: isDark ? darkColors : lightColors,
             stops: [
               0.0,
-              // Slight mid-stop oscillation driven by the controller.
               0.5 + math.sin(controller.value * 2 * math.pi) * 0.08,
               1.0,
             ],
@@ -271,21 +250,18 @@ class _CyberGridPainter extends CustomPainter {
     const gridSpacing = 40.0;
     final offset = animationValue * gridSpacing;
 
-    // Vertical lines
     for (double x = -gridSpacing + offset % gridSpacing;
         x < size.width;
         x += gridSpacing) {
       canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
     }
 
-    // Horizontal lines
     for (double y = -gridSpacing + offset % gridSpacing;
         y < size.height;
         y += gridSpacing) {
       canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
     }
 
-    // Animated diagonal accent line with glow
     final glowPaint = Paint()
       ..color = gridColor.withValues(alpha: isDark ? 0.35 : 0.2)
       ..strokeWidth = 2

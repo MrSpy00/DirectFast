@@ -1,0 +1,7 @@
+# Copy this file to android/key.properties and fill your own values.
+# The file is ignored by git and must never contain placeholder secrets in commits.
+
+storePassword=YOUR_KEYSTORE_PASSWORD
+keyPassword=YOUR_KEY_PASSWORD
+keyAlias=upload
+storeFile=upload-keystore.jks

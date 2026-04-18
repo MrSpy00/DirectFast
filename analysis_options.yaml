@@ -1,8 +1,23 @@
 include: package:flutter_lints/flutter.yaml
 
+analyzer:
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
+  errors:
+    dead_code: error
+    invalid_assignment: error
+    missing_required_param: error
+    missing_return: error
+    unnecessary_null_comparison: error
+  exclude:
+    - build/**
+    - '**/*.g.dart'
+    - '**/*.freezed.dart'
+
 linter:
   rules:
-    # Error rules
     - avoid_print
     - avoid_relative_lib_imports
     - avoid_slow_async_io
@@ -10,8 +25,6 @@ linter:
     - cancel_subscriptions
     - close_sinks
     - valid_regexps
-
-    # Style rules
     - always_declare_return_types
     - always_put_control_body_on_new_line
     - always_put_required_named_parameters_first
@@ -83,6 +96,7 @@ linter:
     - unnecessary_string_interpolations
     - unnecessary_this
     - use_full_hex_values_for_flutter_colors
+    - use_build_context_synchronously
     - use_function_type_syntax_for_parameters
     - use_key_in_widget_constructors
     - use_rethrow_when_possible

@@ -112,7 +112,6 @@ class AppTheme {
     ),
   ];
 
-  // ── Dark/AMOLED surface hierarchies ────────────────────────────────────────
   static const _darkSurface = Color(0xFF121212);
   static const _darkSurfaceContainerLow = Color(0xFF1A1A1A);
   static const _darkSurfaceContainer = Color(0xFF202020);
@@ -205,7 +204,6 @@ class AppTheme {
     );
   }
 
-  // ── Text Theme ─────────────────────────────────────────────────────────────
   static TextTheme _buildTextTheme(Brightness brightness) {
     final baseTextTheme = GoogleFonts.interTextTheme();
     final color =
@@ -299,7 +297,6 @@ class AppTheme {
     );
   }
 
-  // ── Light Theme ────────────────────────────────────────────────────────────
   static ThemeData lightTheme({required Color seedColor}) {
     final hsl = HSLColor.fromColor(seedColor);
     final accent = hsl
@@ -551,12 +548,10 @@ class AppTheme {
     );
   }
 
-  // ── Dark Theme ──────────────────────────────────────────────────────────────
   static ThemeData darkTheme({required Color seedColor}) {
     return _buildDarkTheme(seedColor: seedColor, amoled: false);
   }
 
-  // ── AMOLED Theme (True Black) ───────────────────────────────────────────────
   static ThemeData amoledTheme({required Color seedColor}) {
     return _buildDarkTheme(seedColor: seedColor, amoled: true);
   }

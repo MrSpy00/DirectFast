@@ -1,25 +1,12 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 
-/// A glassmorphism-style container.
-///
-/// ## Performance notes
-/// Every [BackdropFilter] creates a new GPU compositing layer and forces the
-/// engine to rasterise all content behind it. Stacking five or more of these
-/// on a single screen can cut render time in half on mid-range devices.
-///
-/// To preserve frame budget, keep [blur] at or below 6 and use [useBlur: false]
-/// for deeply-nested or frequently rebuilt widgets (e.g. list-item cards).
-/// When blur is disabled the widget renders a plain semi-transparent container
-/// that is visually very close to the blurred version at a fraction of the cost.
+/// A lightweight glass-style container.
 class GlassmorphicContainer extends StatelessWidget {
   final Widget child;
 
-  /// Blur radius. Defaults to 6 — enough to convey depth without thrashing
-  /// the compositor. Values above 10 are rarely perceptible and always costly.
   final double blur;
 
-  /// White-overlay opacity for the gradient fill (0.0 – 1.0).
   final double opacity;
 
   final BorderRadius? borderRadius;
@@ -29,9 +16,6 @@ class GlassmorphicContainer extends StatelessWidget {
   final double? width;
   final double? height;
 
-  /// When false, [BackdropFilter] is skipped entirely.
-  /// The container still renders the semi-transparent gradient, so it looks
-  /// nearly identical on dark backgrounds — without the compositing cost.
   final bool useBlur;
 
   const GlassmorphicContainer({
@@ -48,8 +32,7 @@ class GlassmorphicContainer extends StatelessWidget {
     this.useBlur = true,
   });
 
-  // Named constructor: zero-blur variant for performance-critical paths
-  // (e.g. list cells, grid items that rebuild often).
+  // Zero-blur variant for performance-critical paths.
   const GlassmorphicContainer.flat({
     required this.child,
     super.key,

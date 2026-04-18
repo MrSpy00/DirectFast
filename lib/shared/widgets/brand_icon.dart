@@ -7,7 +7,8 @@ class BrandIcon extends StatelessWidget {
   final Color? color;
 
   const BrandIcon({
-    required this.iconName, super.key,
+    required this.iconName,
+    super.key,
     this.size = 28.0,
     this.color,
   });

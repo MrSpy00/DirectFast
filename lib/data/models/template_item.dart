@@ -32,10 +32,27 @@ class TemplateItem {
 
   static List<TemplateItem> decodeList(String jsonString) {
     try {
-      final List<dynamic> list = jsonDecode(jsonString);
-      return list.map((e) => TemplateItem.fromJson(e)).toList();
+      final decoded = jsonDecode(jsonString);
+      if (decoded is! List<dynamic>) {
+        return const <TemplateItem>[];
+      }
+
+      final items = <TemplateItem>[];
+      for (final entry in decoded) {
+        if (entry is! Map) {
+          continue;
+        }
+
+        try {
+          items.add(TemplateItem.fromJson(Map<String, dynamic>.from(entry)));
+        } catch (_) {
+          // Ignore malformed records and keep valid templates.
+        }
+      }
+
+      return items;
     } catch (_) {
-      return [];
+      return const <TemplateItem>[];
     }
   }
 }

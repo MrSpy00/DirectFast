@@ -1,30 +1,26 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import '../../../core/constants/platform_type.dart';
 import '../../../core/services/url_launcher_service.dart';
 import '../../../core/services/clipboard_service.dart';
-import '../../history/viewmodels/history_viewmodel.dart';
+import '../../../core/features/history/providers/history_provider.dart';
 
-// Provider for selected platform
 final selectedPlatformProvider = StateProvider<PlatformType>((ref) {
   return PlatformType.whatsapp;
 });
 
-// Provider for selected category
 final selectedCategoryProvider = StateProvider<PlatformCategory>((ref) {
   return PlatformCategory.chat;
 });
 
-// Provider for contact input
 final contactInputProvider = StateProvider<String>((ref) {
   return '';
 });
 
-// One-shot prefill value (used by deep links).
 final pendingContactProvider = StateProvider<String?>((ref) {
   return null;
 });
 
-// Provider for clipboard suggestion
 final clipboardSuggestionProvider = FutureProvider<String?>((ref) async {
   final selectedPlatform = ref.watch(selectedPlatformProvider);
 
@@ -39,7 +35,6 @@ final clipboardSuggestionProvider = FutureProvider<String?>((ref) async {
   return null;
 });
 
-// Provider for launching chat
 final chatLauncherProvider = Provider<ChatLauncher>((ref) {
   return ChatLauncher(ref);
 });
@@ -53,7 +48,6 @@ class ChatLauncher {
     required PlatformType platform,
     required String contact,
   }) async {
-    // Validate contact
     final error = UrlLauncherService.getValidationError(
       platform: platform,
       contact: contact,
@@ -63,14 +57,12 @@ class ChatLauncher {
       return LaunchResult(success: false, error: error);
     }
 
-    // Try to launch
     final result = await UrlLauncherService.launchChat(
       platform: platform,
       contact: contact,
     );
 
     if (result.success) {
-      // Add to history
       await ref.read(historyProvider.notifier).addHistoryItem(
             platform: platform,
             contact: contact,

@@ -4,7 +4,6 @@ import 'storage_service.dart';
 import '../utils/date_formatting.dart';
 import '../../shared/constants/app_strings.dart';
 
-// Provider for locale
 final localeProvider = NotifierProvider<LocaleNotifier, String>(
   LocaleNotifier.new,
 );
@@ -35,7 +34,6 @@ class LocaleNotifier extends Notifier<String> {
       final fromStorage = StorageService.getLocale();
       return AppStrings.normalizeLocale(fromStorage);
     } catch (_) {
-      // Keep startup robust in isolated tests where storage is not initialized.
       return AppStrings.normalizeLocale(AppStrings.currentLocale);
     }
   }
