@@ -18,6 +18,54 @@ import '../viewmodels/theme_viewmodel.dart';
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
+  InputDecoration _settingsDropdownDecoration(
+    BuildContext context, {
+    required String label,
+    required IconData icon,
+  }) {
+    return InputDecoration(
+      labelText: label,
+      prefixIcon: Icon(icon),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: BorderSide.none,
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: BorderSide.none,
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: BorderSide(
+          color: Theme.of(context).colorScheme.primary,
+          width: 1.8,
+        ),
+      ),
+      fillColor: Theme.of(context)
+          .colorScheme
+          .surfaceContainerHighest
+          .withValues(alpha: 0.42),
+      filled: true,
+    );
+  }
+
+  BoxDecoration _colorDotDecoration(BuildContext context, Color color) {
+    final isVeryDark =
+        ThemeData.estimateBrightnessForColor(color) == Brightness.dark;
+
+    return BoxDecoration(
+      color: color,
+      borderRadius: BorderRadius.circular(99),
+      border: isVeryDark
+          ? Border.all(
+              color:
+                  Theme.of(context).colorScheme.outline.withValues(alpha: 0.5),
+            )
+          : null,
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final appThemeMode = ref.watch(appThemeModeProvider);
@@ -54,56 +102,61 @@ class SettingsScreen extends ConsumerWidget {
                 .fadeIn(duration: 400.ms)
                 .slideX(begin: -0.2, end: 0),
             const SizedBox(height: 12),
-
             GlassmorphicContainer.flat(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  value: currentLocale,
-                  isExpanded: true,
-                  borderRadius: BorderRadius.circular(14),
-                  icon: const Icon(Icons.keyboard_arrow_down_rounded),
-                  items: [
-                    for (final locale in AppStrings.supportedLocales)
-                      DropdownMenuItem<String>(
-                        value: locale,
-                        child: Row(
-                          children: [
-                            const Icon(Icons.language_rounded, size: 18),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Text(
-                                '${AppStrings.tr(AppStrings.localeLabelKey(locale))} • ${AppStrings.localeNativeName(locale)}',
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                  ],
-                  onChanged: (value) async {
-                    if (value == null || value == currentLocale) {
-                      return;
-                    }
-                    await HapticFeedback.lightImpact();
-                    await ref.read(localeProvider.notifier).setLocale(value);
-                  },
+              padding: const EdgeInsets.all(14),
+              child: DropdownButtonFormField<String>(
+                key: ValueKey(currentLocale),
+                initialValue: currentLocale,
+                isExpanded: true,
+                borderRadius: BorderRadius.circular(16),
+                icon: const Icon(Icons.expand_more_rounded),
+                menuMaxHeight: 420,
+                dropdownColor: Theme.of(context)
+                    .colorScheme
+                    .surfaceContainerHigh
+                    .withValues(alpha: 0.96),
+                decoration: _settingsDropdownDecoration(
+                  context,
+                  label: AppStrings.tr('language'),
+                  icon: Icons.language_rounded,
                 ),
+                items: [
+                  for (final locale in AppStrings.supportedLocales)
+                    DropdownMenuItem<String>(
+                      value: locale,
+                      child: Row(
+                        children: [
+                          const Icon(Icons.language_rounded, size: 18),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              '${AppStrings.tr(AppStrings.localeLabelKey(locale))} • ${AppStrings.localeNativeName(locale)}',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+                onChanged: (value) async {
+                  if (value == null || value == currentLocale) {
+                    return;
+                  }
+                  await HapticFeedback.lightImpact();
+                  await ref.read(localeProvider.notifier).setLocale(value);
+                },
               ),
             )
                 .animate()
                 .fadeIn(duration: 400.ms, delay: 50.ms)
                 .slideX(begin: -0.2, end: 0),
-
             const SizedBox(height: 32),
-
             _SectionTitle(title: AppStrings.tr('theme'))
                 .animate()
                 .fadeIn(duration: 400.ms, delay: 100.ms)
                 .slideX(begin: -0.2, end: 0),
             const SizedBox(height: 12),
-
             GlassmorphicContainer.flat(
               padding: EdgeInsets.zero,
               child: Column(
@@ -161,15 +214,12 @@ class SettingsScreen extends ConsumerWidget {
                 .animate()
                 .fadeIn(duration: 400.ms, delay: 150.ms)
                 .slideX(begin: -0.2, end: 0),
-
             const SizedBox(height: 24),
-
             _SectionTitle(title: AppStrings.tr('theme_colors'))
                 .animate()
                 .fadeIn(duration: 400.ms, delay: 170.ms)
                 .slideX(begin: -0.2, end: 0),
             const SizedBox(height: 8),
-
             Text(
               AppStrings.tr('choose_theme_color'),
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -179,9 +229,7 @@ class SettingsScreen extends ConsumerWidget {
                         .withValues(alpha: 0.65),
                   ),
             ).animate().fadeIn(duration: 350.ms, delay: 180.ms),
-
             const SizedBox(height: 12),
-
             GlassmorphicContainer.flat(
               padding: const EdgeInsets.all(14),
               child: DropdownButtonFormField<String>(
@@ -190,16 +238,17 @@ class SettingsScreen extends ConsumerWidget {
                     ? AppTheme.customColorId
                     : AppTheme.optionById(themeColorId).id,
                 isExpanded: true,
-                decoration: InputDecoration(
-                  labelText: AppStrings.tr('theme_colors'),
-                  prefixIcon: const Icon(Icons.palette_rounded),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 12,
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+                borderRadius: BorderRadius.circular(16),
+                icon: const Icon(Icons.expand_more_rounded),
+                menuMaxHeight: 420,
+                dropdownColor: Theme.of(context)
+                    .colorScheme
+                    .surfaceContainerHigh
+                    .withValues(alpha: 0.96),
+                decoration: _settingsDropdownDecoration(
+                  context,
+                  label: AppStrings.tr('theme_colors'),
+                  icon: Icons.palette_rounded,
                 ),
                 items: [
                   for (final option in AppTheme.colorOptions)
@@ -210,10 +259,8 @@ class SettingsScreen extends ConsumerWidget {
                           Container(
                             width: 16,
                             height: 16,
-                            decoration: BoxDecoration(
-                              color: option.seedColor,
-                              borderRadius: BorderRadius.circular(99),
-                            ),
+                            decoration:
+                                _colorDotDecoration(context, option.seedColor),
                           ),
                           const SizedBox(width: 10),
                           Expanded(
@@ -233,10 +280,10 @@ class SettingsScreen extends ConsumerWidget {
                         Container(
                           width: 16,
                           height: 16,
-                          decoration: BoxDecoration(
-                            color: customThemeColor ??
+                          decoration: _colorDotDecoration(
+                            context,
+                            customThemeColor ??
                                 Theme.of(context).colorScheme.primary,
-                            borderRadius: BorderRadius.circular(99),
                           ),
                         ),
                         const SizedBox(width: 10),
@@ -280,9 +327,7 @@ class SettingsScreen extends ConsumerWidget {
                 .animate()
                 .fadeIn(duration: 400.ms, delay: 200.ms)
                 .slideX(begin: -0.2, end: 0),
-
             const SizedBox(height: 10),
-
             Align(
               alignment: Alignment.centerRight,
               child: OutlinedButton.icon(
@@ -299,15 +344,12 @@ class SettingsScreen extends ConsumerWidget {
                 label: Text(AppStrings.tr('pick_custom_color')),
               ),
             ).animate().fadeIn(duration: 350.ms, delay: 220.ms),
-
             const SizedBox(height: 32),
-
             _SectionTitle(title: AppStrings.tr('data_privacy'))
                 .animate()
                 .fadeIn(duration: 400.ms, delay: 180.ms)
                 .slideX(begin: -0.2, end: 0),
             const SizedBox(height: 12),
-
             GlassmorphicContainer.flat(
               padding: EdgeInsets.zero,
               child: Column(
@@ -334,23 +376,18 @@ class SettingsScreen extends ConsumerWidget {
                 ],
               ),
             ).animate().fadeIn(duration: 400.ms, delay: 220.ms),
-
             const SizedBox(height: 32),
-
             _SectionTitle(title: AppStrings.tr('about'))
                 .animate()
                 .fadeIn(duration: 400.ms, delay: 200.ms)
                 .slideX(begin: -0.2, end: 0),
             const SizedBox(height: 12),
-
             GlassmorphicContainer(
               padding: const EdgeInsets.all(24),
               child: Column(
                 children: [
                   const AnimatedAppLogo(size: 100),
-
                   const SizedBox(height: 24),
-
                   Text(
                     AppConstants.appName,
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
@@ -367,9 +404,7 @@ class SettingsScreen extends ConsumerWidget {
                               .withValues(alpha: 0.6),
                         ),
                   ),
-
                   const SizedBox(height: 24),
-
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
@@ -401,27 +436,23 @@ class SettingsScreen extends ConsumerWidget {
                           ],
                         ),
                         const SizedBox(height: 16),
-
                         _LinkButton(
                           icon: Icons.code,
                           label: AppStrings.tr('view_github'),
                           onTap: () => _launchGitHub(context),
                         ),
                         const SizedBox(height: 12),
-
                         _LinkButton(
                           icon: Icons.local_cafe,
                           label: AppStrings.tr('buy_coffee'),
                           onTap: () => _launchCoffee(context),
                         ),
                         const SizedBox(height: 12),
-
                         _LinkButton(
                           icon: Icons.source_outlined,
                           label: AppStrings.tr('open_source_licenses'),
                           onTap: () => _openLicenses(context),
                         ),
-
                         const SizedBox(height: 10),
                         Text(
                           AppStrings.tr('open_source_notice'),
@@ -440,9 +471,7 @@ class SettingsScreen extends ConsumerWidget {
                   begin: const Offset(0.9, 0.9),
                   end: const Offset(1, 1),
                 ),
-
             const SizedBox(height: 32),
-
             GlassmorphicContainer.flat(
               padding: const EdgeInsets.all(16),
               opacity: 0.05,
@@ -462,9 +491,7 @@ class SettingsScreen extends ConsumerWidget {
                 ],
               ),
             ).animate().fadeIn(duration: 600.ms, delay: 300.ms),
-
             const SizedBox(height: 16),
-
             Center(
               child: Text(
                 AppStrings.tr('copyright', args: [AppConstants.developerName]),
@@ -476,7 +503,6 @@ class SettingsScreen extends ConsumerWidget {
                     ),
               ),
             ).animate().fadeIn(duration: 600.ms, delay: 350.ms),
-
             const SizedBox(height: 32),
           ],
         ),

@@ -697,6 +697,10 @@ class AppStrings {
       'tr': 'En Eski',
       'en': 'Oldest',
     },
+    'sort_alphabetical': {
+      'tr': 'Alfabetik (A-Z)',
+      'en': 'Alphabetical (A-Z)',
+    },
     'reset_filters': {
       'tr': 'Sıfırla',
       'en': 'Reset',
@@ -1029,6 +1033,13 @@ class AppStrings {
     'color_coral': {
       'tr': 'Mercan',
       'en': 'Coral',
+    },
+    'color_black': {
+      'tr': 'Siyah',
+      'en': 'Black',
+      'es': 'Negro',
+      'ar': 'أسود',
+      'hi': 'काला',
     },
 
     // About

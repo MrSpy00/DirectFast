@@ -23,7 +23,19 @@ class HistoryScreen extends ConsumerStatefulWidget {
 }
 
 class _HistoryScreenState extends ConsumerState<HistoryScreen> {
-  List<_HistorySection> _groupHistoryByDate(List<ChatHistoryItem> history) {
+  List<_HistorySection> _groupHistoryByDate(
+    List<ChatHistoryItem> history, {
+    required HistorySortOption sortOption,
+  }) {
+    if (sortOption == HistorySortOption.alphabetical) {
+      return [
+        _HistorySection(
+          label: AppStrings.tr('sort_alphabetical'),
+          items: history,
+        ),
+      ];
+    }
+
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final yesterday = today.subtract(const Duration(days: 1));
@@ -179,7 +191,10 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
     final selectedPlatform = ref.watch(historyPlatformFilterProvider);
     final sortOption = ref.watch(historySortProvider);
 
-    final sections = _groupHistoryByDate(visibleHistory);
+    final sections = _groupHistoryByDate(
+      visibleHistory,
+      sortOption: sortOption,
+    );
     final rows = _buildRows(sections);
     final hasHistory = allHistory.isNotEmpty;
     final hasActiveFilters = searchQuery.trim().isNotEmpty ||
@@ -367,6 +382,17 @@ class _HistoryControls extends StatelessWidget {
     return BrandIcon(iconName: logoName, size: 16);
   }
 
+  String _sortLabel(HistorySortOption option) {
+    switch (option) {
+      case HistorySortOption.newestFirst:
+        return AppStrings.tr('sort_newest');
+      case HistorySortOption.oldestFirst:
+        return AppStrings.tr('sort_oldest');
+      case HistorySortOption.alphabetical:
+        return AppStrings.tr('sort_alphabetical');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return GlassmorphicContainer.flat(
@@ -412,15 +438,15 @@ class _HistoryControls extends StatelessWidget {
                       value: HistorySortOption.oldestFirst,
                       child: Text(AppStrings.tr('sort_oldest')),
                     ),
+                    PopupMenuItem(
+                      value: HistorySortOption.alphabetical,
+                      child: Text(AppStrings.tr('sort_alphabetical')),
+                    ),
                   ];
                 },
                 child: Chip(
                   avatar: const Icon(Icons.swap_vert_rounded, size: 16),
-                  label: Text(
-                    sortOption == HistorySortOption.newestFirst
-                        ? AppStrings.tr('sort_newest')
-                        : AppStrings.tr('sort_oldest'),
-                  ),
+                  label: Text(_sortLabel(sortOption)),
                 ),
               ),
               if (hasActiveFilters)

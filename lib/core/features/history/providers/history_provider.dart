@@ -8,6 +8,7 @@ import '../../../../data/models/chat_history_item.dart';
 enum HistorySortOption {
   newestFirst,
   oldestFirst,
+  alphabetical,
 }
 
 final historyProvider =
@@ -33,7 +34,8 @@ final historySortProvider =
 final historyAvailablePlatformsProvider = Provider<List<PlatformType>>((ref) {
   final items = ref.watch(historyProvider);
   final platforms = items.map((item) => item.platform).toSet().toList();
-  platforms.sort((left, right) => left.displayName.compareTo(right.displayName));
+  platforms
+      .sort((left, right) => left.displayName.compareTo(right.displayName));
   return platforms;
 });
 
@@ -67,11 +69,20 @@ List<ChatHistoryItem> applyHistoryFilters({
   }).toList(growable: false);
 
   filtered.sort((left, right) {
-    if (sort == HistorySortOption.newestFirst) {
-      return right.timestamp.compareTo(left.timestamp);
+    switch (sort) {
+      case HistorySortOption.newestFirst:
+        return right.timestamp.compareTo(left.timestamp);
+      case HistorySortOption.oldestFirst:
+        return left.timestamp.compareTo(right.timestamp);
+      case HistorySortOption.alphabetical:
+        final leftLabel = _sortableLabel(left);
+        final rightLabel = _sortableLabel(right);
+        final labelCompare = leftLabel.compareTo(rightLabel);
+        if (labelCompare != 0) {
+          return labelCompare;
+        }
+        return right.timestamp.compareTo(left.timestamp);
     }
-
-    return left.timestamp.compareTo(right.timestamp);
   });
 
   return filtered;
@@ -85,6 +96,15 @@ bool _matchesQuery(ChatHistoryItem item, String normalizedQuery) {
   return displayName.contains(normalizedQuery) ||
       contact.contains(normalizedQuery) ||
       platformLabel.contains(normalizedQuery);
+}
+
+String _sortableLabel(ChatHistoryItem item) {
+  final displayName = item.displayName?.trim();
+  if (displayName != null && displayName.isNotEmpty) {
+    return displayName.toLowerCase();
+  }
+
+  return item.contact.toLowerCase();
 }
 
 class HistorySearchQueryNotifier extends Notifier<String> {

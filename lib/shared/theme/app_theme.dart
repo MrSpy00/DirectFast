@@ -110,6 +110,11 @@ class AppTheme {
       labelKey: 'color_coral',
       seedColor: Color(0xFFFF7043),
     ),
+    ThemeColorOption(
+      id: 'black',
+      labelKey: 'color_black',
+      seedColor: Color(0xFF000000),
+    ),
   ];
 
   static const _darkSurface = Color(0xFF121212);
@@ -119,10 +124,10 @@ class AppTheme {
   static const _darkSurfaceContainerHighest = Color(0xFF2F2F2F);
 
   static const _amoledSurface = Color(0xFF000000);
-  static const _amoledSurfaceContainerLow = Color(0xFF0C0C0C);
-  static const _amoledSurfaceContainer = Color(0xFF141414);
-  static const _amoledSurfaceContainerHigh = Color(0xFF1C1C1C);
-  static const _amoledSurfaceContainerHighest = Color(0xFF242424);
+  static const _amoledSurfaceContainerLow = Color(0xFF000000);
+  static const _amoledSurfaceContainer = Color(0xFF000000);
+  static const _amoledSurfaceContainerHigh = Color(0xFF000000);
+  static const _amoledSurfaceContainerHighest = Color(0xFF000000);
 
   static ThemeColorOption optionById(String id) {
     return colorOptions.firstWhere(
@@ -196,6 +201,17 @@ class AppTheme {
 
   static LinearGradient darkGradientFor(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final isAmoled = scheme.surface == _amoledSurface &&
+        scheme.surfaceContainer == _amoledSurfaceContainer;
+
+    if (isAmoled) {
+      return const LinearGradient(
+        colors: [_amoledSurface, _amoledSurface],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      );
+    }
+
     final tint = Color.lerp(scheme.surfaceContainerLow, scheme.primary, 0.28)!;
     return LinearGradient(
       colors: [scheme.surface, tint, scheme.surfaceContainer],
@@ -407,6 +423,21 @@ class AppTheme {
           borderRadius: BorderRadius.circular(12),
         ),
       ),
+      popupMenuTheme: PopupMenuThemeData(
+        color: colorScheme.surface,
+        elevation: 4,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(
+            color: colorScheme.outline.withValues(alpha: 0.2),
+          ),
+        ),
+        textStyle: GoogleFonts.inter(
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          color: colorScheme.onSurface,
+        ),
+      ),
     );
   }
 
@@ -466,7 +497,8 @@ class AppTheme {
       surfaceContainerHigh: surfaceHigh,
       surfaceContainerHighest: surfaceHighest,
       onSurface: Colors.white,
-      onSurfaceVariant: const Color(0xFFCAC4D0),
+      onSurfaceVariant:
+          amoled ? const Color(0xFFCFCFCF) : const Color(0xFFCAC4D0),
       surfaceTint: primary,
     );
 
@@ -504,7 +536,9 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         isDense: false,
         filled: true,
-        fillColor: surfaceHighest.withValues(alpha: 0.86),
+        fillColor: amoled
+            ? Colors.white.withValues(alpha: 0.06)
+            : surfaceHighest.withValues(alpha: 0.86),
         prefixIconColor: colorScheme.primary,
         suffixIconColor: colorScheme.onSurfaceVariant,
         alignLabelWithHint: true,
@@ -543,6 +577,21 @@ class AppTheme {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
+        ),
+      ),
+      popupMenuTheme: PopupMenuThemeData(
+        color: colorScheme.surfaceContainer,
+        elevation: 6,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(
+            color: colorScheme.outline.withValues(alpha: 0.25),
+          ),
+        ),
+        textStyle: GoogleFonts.inter(
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          color: colorScheme.onSurface,
         ),
       ),
     );
