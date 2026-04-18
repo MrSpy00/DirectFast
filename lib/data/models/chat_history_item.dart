@@ -44,14 +44,17 @@ class ChatHistoryItem {
     return _platformLookup[platformName.toLowerCase()] ?? PlatformType.whatsapp;
   }
 
-  String get formattedDate {
+  String get formattedDate => formattedDateForLocale(AppStrings.currentLocale);
+
+  String formattedDateForLocale([String? locale]) {
+    final activeLocale = _resolveLocale(locale);
+
     try {
       final now = DateTime.now();
       final nowDate = DateTime(now.year, now.month, now.day);
       final itemDate = DateTime(timestamp.year, timestamp.month, timestamp.day);
       final dayDifference = nowDate.difference(itemDate).inDays;
-      final locale = AppStrings.currentLocale;
-      final time = _formatTime(locale);
+      final time = formatTimeHm(timestamp, activeLocale);
 
       if (dayDifference <= 0) {
         return '${AppStrings.tr('today')} $time';
@@ -65,23 +68,29 @@ class ChatHistoryItem {
         return AppStrings.tr('days_ago', args: [dayDifference.toString()]);
       }
 
-      return _formatDate(locale);
+      return formatDateYMd(timestamp, activeLocale);
     } catch (_) {
       return _manualTimestampLabel();
     }
   }
 
-  String _formatTime(String locale) {
-    return formatTimeHm(timestamp, locale);
-  }
-
-  String _formatDate(String locale) {
-    return formatDateYMd(timestamp, locale);
+  String _resolveLocale(String? locale) {
+    final candidate = (locale ?? '').trim();
+    if (candidate.isEmpty) {
+      return AppStrings.fallbackLocale;
+    }
+    return AppStrings.normalizeLocale(candidate);
   }
 
   String _manualTimestampLabel() {
-    final date = formatDateYMd(timestamp, AppStrings.fallbackLocale);
-    final time = formatTimeHm(timestamp, AppStrings.fallbackLocale);
+    final day = timestamp.day.toString().padLeft(2, '0');
+    final month = timestamp.month.toString().padLeft(2, '0');
+    final year = timestamp.year.toString();
+    final hour = timestamp.hour.toString().padLeft(2, '0');
+    final minute = timestamp.minute.toString().padLeft(2, '0');
+
+    final date = '$day.$month.$year';
+    final time = '$hour:$minute';
     return '$date $time';
   }
 

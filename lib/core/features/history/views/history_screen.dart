@@ -52,7 +52,10 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
       if (todayItems.isNotEmpty)
         _HistorySection(label: AppStrings.tr('today'), items: todayItems),
       if (yesterdayItems.isNotEmpty)
-        _HistorySection(label: AppStrings.tr('yesterday'), items: yesterdayItems),
+        _HistorySection(
+          label: AppStrings.tr('yesterday'),
+          items: yesterdayItems,
+        ),
       if (olderItems.isNotEmpty)
         _HistorySection(label: AppStrings.tr('older'), items: olderItems),
     ];
@@ -743,7 +746,49 @@ class _HistoryCard extends StatelessWidget {
     return Icon(item.platform.icon, color: Colors.white, size: 28);
   }
 
+  String _resolvedLocale() {
+    final candidate = locale.trim();
+    if (candidate.isEmpty) {
+      return AppStrings.fallbackLocale;
+    }
+
+    return AppStrings.normalizeLocale(candidate);
+  }
+
   String _dateLabel() {
+    final activeLocale = _resolvedLocale();
+
+    try {
+      final now = DateTime.now();
+      final nowDate = DateTime(now.year, now.month, now.day);
+      final itemDate = DateTime(
+        item.timestamp.year,
+        item.timestamp.month,
+        item.timestamp.day,
+      );
+      final dayDifference = nowDate.difference(itemDate).inDays;
+      final time = formatTimeHm(item.timestamp, activeLocale);
+
+      if (dayDifference <= 0) {
+        return '${AppStrings.tr('today')} $time';
+      }
+
+      if (dayDifference == 1) {
+        return '${AppStrings.tr('yesterday')} $time';
+      }
+
+      if (dayDifference < 7) {
+        return AppStrings.tr('days_ago', args: [dayDifference.toString()]);
+      }
+
+      final date = formatDateYMd(item.timestamp, activeLocale);
+      return '$date $time';
+    } catch (_) {
+      return _manualDateLabel();
+    }
+  }
+
+  String _manualDateLabel() {
     final now = DateTime.now();
     final nowDate = DateTime(now.year, now.month, now.day);
     final itemDate = DateTime(
@@ -752,7 +797,7 @@ class _HistoryCard extends StatelessWidget {
       item.timestamp.day,
     );
     final dayDifference = nowDate.difference(itemDate).inDays;
-    final time = formatTimeHm(item.timestamp, locale);
+    final time = _manualTime(item.timestamp);
 
     if (dayDifference <= 0) {
       return '${AppStrings.tr('today')} $time';
@@ -766,8 +811,20 @@ class _HistoryCard extends StatelessWidget {
       return AppStrings.tr('days_ago', args: [dayDifference.toString()]);
     }
 
-    final date = formatDateYMd(item.timestamp, locale);
-    return '$date $time';
+    return '${_manualDate(item.timestamp)} $time';
+  }
+
+  String _manualDate(DateTime value) {
+    final day = value.day.toString().padLeft(2, '0');
+    final month = value.month.toString().padLeft(2, '0');
+    final year = value.year.toString();
+    return '$day.$month.$year';
+  }
+
+  String _manualTime(DateTime value) {
+    final hour = value.hour.toString().padLeft(2, '0');
+    final minute = value.minute.toString().padLeft(2, '0');
+    return '$hour:$minute';
   }
 
   @override

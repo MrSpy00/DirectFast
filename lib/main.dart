@@ -16,15 +16,29 @@ import 'features/settings/viewmodels/theme_viewmodel.dart';
 import 'shared/theme/app_theme.dart';
 import 'shared/constants/app_strings.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  await _initializeApplication();
+
+  runApp(
+    const ProviderScope(
+      child: DirectFastApp(),
+    ),
+  );
+}
+
+Future<void> _initializeApplication() async {
   await StorageService.init();
-  await initializeDateFormatting();
 
   final savedLocale = AppStrings.normalizeLocale(StorageService.getLocale());
   AppStrings.setLocale(savedLocale);
-  await ensureDateFormattingInitialized(savedLocale);
+
+  await initializeDateFormatting();
+  await primeDateFormattingLocales([
+    AppStrings.fallbackLocale,
+    savedLocale,
+  ]);
 
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
@@ -37,12 +51,6 @@ void main() async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
-
-  runApp(
-    const ProviderScope(
-      child: DirectFastApp(),
-    ),
-  );
 }
 
 class DirectFastApp extends ConsumerStatefulWidget {

@@ -4,8 +4,6 @@ import 'package:intl/intl.dart';
 final Set<String> _initializedLocales = <String>{};
 final Set<String> _unavailableLocales = <String>{};
 
-const Set<String> _builtInFallbackLocales = <String>{'en', 'en_US'};
-
 String _normalizeLocale(String locale) {
   final trimmed = locale.trim();
   if (trimmed.isEmpty) {
@@ -70,12 +68,21 @@ Future<void> ensureDateFormattingInitialized(String locale) async {
   Intl.defaultLocale = 'en';
 }
 
+Future<void> primeDateFormattingLocales(Iterable<String> locales) async {
+  for (final locale in locales) {
+    await ensureDateFormattingInitialized(locale);
+  }
+}
+
 bool _isLocaleReadyForFormatting(String locale) {
-  return _initializedLocales.contains(locale) ||
-      _builtInFallbackLocales.contains(locale);
+  return _initializedLocales.contains(locale);
 }
 
 String formatTimeHm(DateTime value, String locale) {
+  if (_initializedLocales.isEmpty) {
+    return _fallbackTime(value);
+  }
+
   for (final candidate in _localeCandidates(locale)) {
     if (!_isLocaleReadyForFormatting(candidate) ||
         _unavailableLocales.contains(candidate)) {
@@ -94,6 +101,10 @@ String formatTimeHm(DateTime value, String locale) {
 }
 
 String formatDateYMd(DateTime value, String locale) {
+  if (_initializedLocales.isEmpty) {
+    return _fallbackDate(value);
+  }
+
   for (final candidate in _localeCandidates(locale)) {
     if (!_isLocaleReadyForFormatting(candidate) ||
         _unavailableLocales.contains(candidate)) {
