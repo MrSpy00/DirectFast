@@ -79,12 +79,14 @@ class WelcomeScreen extends ConsumerWidget {
                             ),
                           ),
                       ],
-                      onChanged: (value) {
+                      onChanged: (value) async {
                         if (value == null || value == locale) {
                           return;
                         }
-                        HapticFeedback.selectionClick();
-                        ref.read(localeProvider.notifier).setLocale(value);
+                        await HapticFeedback.selectionClick();
+                        await ref
+                            .read(localeProvider.notifier)
+                            .setLocale(value);
                       },
                     ),
                     const SizedBox(height: 14),

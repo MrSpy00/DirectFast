@@ -4,7 +4,6 @@ import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'core/services/deep_link_service.dart';
 import 'core/utils/date_formatting.dart';
@@ -22,9 +21,8 @@ void main() async {
   // Initialize SharedPreferences storage
   await StorageService.init();
 
-  // Load saved locale immediately before runApp
-  final prefs = await SharedPreferences.getInstance();
-  final savedLocale = prefs.getString('app_locale') ?? AppStrings.turkish;
+  // Load saved locale immediately before runApp.
+  final savedLocale = AppStrings.normalizeLocale(StorageService.getLocale());
   AppStrings.setLocale(savedLocale);
   await ensureDateFormattingInitialized(savedLocale);
 

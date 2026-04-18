@@ -1,43 +1,43 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
+import 'storage_service.dart';
 import '../utils/date_formatting.dart';
 import '../../shared/constants/app_strings.dart';
 
 // Provider for locale
-final localeProvider = StateNotifierProvider<LocaleNotifier, String>((ref) {
-  return LocaleNotifier();
-});
+final localeProvider = NotifierProvider<LocaleNotifier, String>(
+  LocaleNotifier.new,
+);
 
-class LocaleNotifier extends StateNotifier<String> {
-  LocaleNotifier() : super(AppStrings.turkish) {
-    _loadLocale();
-  }
-
-  static const String _localeKey = 'app_locale';
-
-  Future<void> _loadLocale() async {
-    final prefs = await SharedPreferences.getInstance();
-    final savedLocale = AppStrings.normalizeLocale(
-      prefs.getString(_localeKey) ?? AppStrings.turkish,
-    );
-
-    await ensureDateFormattingInitialized(savedLocale);
-
-    state = savedLocale;
-    AppStrings.setLocale(savedLocale);
+class LocaleNotifier extends Notifier<String> {
+  @override
+  String build() {
+    final initialLocale = _resolveInitialLocale();
+    AppStrings.setLocale(initialLocale);
+    return initialLocale;
   }
 
   Future<void> setLocale(String locale) async {
     final normalized = AppStrings.normalizeLocale(locale);
+    if (normalized == state) {
+      return;
+    }
 
     await ensureDateFormattingInitialized(normalized);
 
     state = normalized;
     AppStrings.setLocale(normalized);
+    await StorageService.setLocale(normalized);
+  }
 
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_localeKey, normalized);
+  String _resolveInitialLocale() {
+    try {
+      final fromStorage = StorageService.getLocale();
+      return AppStrings.normalizeLocale(fromStorage);
+    } catch (_) {
+      // Keep startup robust in isolated tests where storage is not initialized.
+      return AppStrings.normalizeLocale(AppStrings.currentLocale);
+    }
   }
 
   String get currentLocale => state;
