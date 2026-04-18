@@ -1,9 +1,31 @@
 import 'dart:convert';
-import 'package:intl/intl.dart';
 import '../../core/constants/platform_type.dart';
+import '../../core/utils/date_formatting.dart';
 import '../../shared/constants/app_strings.dart';
 
 class ChatHistoryItem {
+  static const Map<String, PlatformType> _platformLookup = {
+    'whatsapp': PlatformType.whatsapp,
+    'telegram': PlatformType.telegram,
+    'signal': PlatformType.signal,
+    'viber': PlatformType.viber,
+    'wechat': PlatformType.wechat,
+    'line': PlatformType.line,
+    'messenger': PlatformType.messenger,
+    'discord': PlatformType.discord,
+    'instagram': PlatformType.instagram,
+    'x': PlatformType.twitter,
+    'twitter': PlatformType.twitter,
+    'snapchat': PlatformType.snapchat,
+    'youtube': PlatformType.youtube,
+    'tiktok': PlatformType.tiktok,
+    'twitch': PlatformType.twitch,
+    'facebook': PlatformType.facebook,
+    'kick': PlatformType.kick,
+    'linkedin': PlatformType.linkedin,
+    'email': PlatformType.email,
+  };
+
   final String id;
   final String contact;
   final String platformName;
@@ -19,88 +41,48 @@ class ChatHistoryItem {
   });
 
   PlatformType get platform {
-    switch (platformName.toLowerCase()) {
-      case 'whatsapp':
-        return PlatformType.whatsapp;
-      case 'telegram':
-        return PlatformType.telegram;
-      case 'signal':
-        return PlatformType.signal;
-      case 'viber':
-        return PlatformType.viber;
-      case 'wechat':
-        return PlatformType.wechat;
-      case 'line':
-        return PlatformType.line;
-      case 'messenger':
-        return PlatformType.messenger;
-      case 'discord':
-        return PlatformType.discord;
-      case 'instagram':
-        return PlatformType.instagram;
-      case 'x':
-      case 'twitter':
-        return PlatformType.twitter;
-      case 'snapchat':
-        return PlatformType.snapchat;
-      case 'youtube':
-        return PlatformType.youtube;
-      case 'tiktok':
-        return PlatformType.tiktok;
-      case 'twitch':
-        return PlatformType.twitch;
-      case 'facebook':
-        return PlatformType.facebook;
-      case 'kick':
-        return PlatformType.kick;
-      case 'linkedin':
-        return PlatformType.linkedin;
-      case 'email':
-        return PlatformType.email;
-      default:
-        // Fallback for legacy data or unknown platforms
-        return PlatformType.whatsapp;
-    }
+    return _platformLookup[platformName.toLowerCase()] ?? PlatformType.whatsapp;
   }
 
   String get formattedDate {
-    final now = DateTime.now();
-    final nowDate = DateTime(now.year, now.month, now.day);
-    final itemDate = DateTime(timestamp.year, timestamp.month, timestamp.day);
-    final dayDifference = nowDate.difference(itemDate).inDays;
-    final locale = AppStrings.currentLocale;
-    final time = _formatTime(locale);
+    try {
+      final now = DateTime.now();
+      final nowDate = DateTime(now.year, now.month, now.day);
+      final itemDate = DateTime(timestamp.year, timestamp.month, timestamp.day);
+      final dayDifference = nowDate.difference(itemDate).inDays;
+      final locale = AppStrings.currentLocale;
+      final time = _formatTime(locale);
 
-    if (dayDifference <= 0) {
-      return '${AppStrings.tr('today')} $time';
-    } else if (dayDifference == 1) {
-      return '${AppStrings.tr('yesterday')} $time';
-    } else if (dayDifference < 7) {
-      return AppStrings.tr('days_ago', args: [dayDifference.toString()]);
-    } else {
+      if (dayDifference <= 0) {
+        return '${AppStrings.tr('today')} $time';
+      }
+
+      if (dayDifference == 1) {
+        return '${AppStrings.tr('yesterday')} $time';
+      }
+
+      if (dayDifference < 7) {
+        return AppStrings.tr('days_ago', args: [dayDifference.toString()]);
+      }
+
       return _formatDate(locale);
+    } catch (_) {
+      return _manualTimestampLabel();
     }
   }
 
   String _formatTime(String locale) {
-    try {
-      return DateFormat.Hm(locale).format(timestamp);
-    } catch (_) {
-      final hour = timestamp.hour.toString().padLeft(2, '0');
-      final minute = timestamp.minute.toString().padLeft(2, '0');
-      return '$hour:$minute';
-    }
+    return formatTimeHm(timestamp, locale);
   }
 
   String _formatDate(String locale) {
-    try {
-      return DateFormat.yMd(locale).format(timestamp);
-    } catch (_) {
-      final day = timestamp.day.toString().padLeft(2, '0');
-      final month = timestamp.month.toString().padLeft(2, '0');
-      final year = timestamp.year.toString();
-      return '$day/$month/$year';
-    }
+    return formatDateYMd(timestamp, locale);
+  }
+
+  String _manualTimestampLabel() {
+    final date = formatDateYMd(timestamp, AppStrings.fallbackLocale);
+    final time = formatTimeHm(timestamp, AppStrings.fallbackLocale);
+    return '$date $time';
   }
 
   ChatHistoryItem copyWith({

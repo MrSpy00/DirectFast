@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/constants/platform_type.dart';
 import '../../../core/services/locale_service.dart';
+import '../../../core/utils/date_formatting.dart';
 import '../../../data/models/chat_history_item.dart';
 import '../../../shared/constants/app_strings.dart';
 import '../../../shared/theme/app_theme.dart';
@@ -117,7 +118,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
   }
 
   void _showClearConfirmation(BuildContext context, WidgetRef ref) {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
@@ -251,7 +252,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                                     const EdgeInsets.fromLTRB(16, 8, 16, 16),
                                 cacheExtent: 1000,
                                 itemCount: groupedHistory.length + 1,
-                                itemBuilder: (itemContext, index) {
+                                itemBuilder: (_, index) {
                                   if (index == 0) {
                                     return _AnalyticsHeader(
                                       visibleHistory: visibleHistory,
@@ -723,16 +724,14 @@ class _HistoryCard extends StatelessWidget {
     return Icon(item.platform.icon, color: Colors.white, size: 28);
   }
 
-  String _safeFormattedDate() {
+  String _dateLabel() {
     try {
       return item.formattedDate;
     } catch (_) {
-      final day = item.timestamp.day.toString().padLeft(2, '0');
-      final month = item.timestamp.month.toString().padLeft(2, '0');
-      final year = item.timestamp.year.toString();
-      final hour = item.timestamp.hour.toString().padLeft(2, '0');
-      final minute = item.timestamp.minute.toString().padLeft(2, '0');
-      return '$day/$month/$year $hour:$minute';
+      final locale = AppStrings.currentLocale;
+      final date = formatDateYMd(item.timestamp, locale);
+      final time = formatTimeHm(item.timestamp, locale);
+      return '$date $time';
     }
   }
 
@@ -743,7 +742,7 @@ class _HistoryCard extends StatelessWidget {
             ? item.displayName!.trim()
             : item.contact;
     final hasSubtitle = title != item.contact;
-    final formattedDate = _safeFormattedDate();
+    final dateLabel = _dateLabel();
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
@@ -882,7 +881,7 @@ class _HistoryCard extends StatelessWidget {
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
-                                  formattedDate,
+                                  dateLabel,
                                   style: Theme.of(context)
                                       .textTheme
                                       .bodySmall

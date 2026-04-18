@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/legacy.dart' show StateProvider;
 import 'package:uuid/uuid.dart';
+
 import '../../../core/constants/platform_type.dart';
 import '../../../core/services/storage_service.dart';
 import '../../../data/models/chat_history_item.dart';
@@ -11,9 +13,7 @@ enum HistorySortOption {
 
 // Provider for history list
 final historyProvider =
-    StateNotifierProvider<HistoryNotifier, List<ChatHistoryItem>>((ref) {
-  return HistoryNotifier();
-});
+    NotifierProvider<HistoryNotifier, List<ChatHistoryItem>>(HistoryNotifier.new);
 
 final historySearchQueryProvider = StateProvider<String>((ref) {
   return '';
@@ -58,9 +58,7 @@ List<ChatHistoryItem> applyHistoryFilters({
   final normalizedQuery = query.trim().toLowerCase();
 
   final filtered = items.where((item) {
-    final matchesPlatform =
-        platformFilter == null || item.platform == platformFilter;
-    if (!matchesPlatform) {
+    if (!_matchesPlatform(item: item, platformFilter: platformFilter)) {
       return false;
     }
 
@@ -68,13 +66,7 @@ List<ChatHistoryItem> applyHistoryFilters({
       return true;
     }
 
-    final displayName = item.displayName?.toLowerCase() ?? '';
-    final contact = item.contact.toLowerCase();
-    final platformLabel = item.platform.displayName.toLowerCase();
-
-    return displayName.contains(normalizedQuery) ||
-        contact.contains(normalizedQuery) ||
-        platformLabel.contains(normalizedQuery);
+    return _matchesQuery(item: item, normalizedQuery: normalizedQuery);
   }).toList(growable: false);
 
   filtered.sort((a, b) {
@@ -88,13 +80,40 @@ List<ChatHistoryItem> applyHistoryFilters({
   return filtered;
 }
 
-class HistoryNotifier extends StateNotifier<List<ChatHistoryItem>> {
-  HistoryNotifier() : super([]) {
-    loadHistory();
+bool _matchesPlatform({
+  required ChatHistoryItem item,
+  required PlatformType? platformFilter,
+}) {
+  return platformFilter == null || item.platform == platformFilter;
+}
+
+bool _matchesQuery({
+  required ChatHistoryItem item,
+  required String normalizedQuery,
+}) {
+  final displayName = item.displayName?.toLowerCase() ?? '';
+  final contact = item.contact.toLowerCase();
+  final platformLabel = item.platform.displayName.toLowerCase();
+
+  return displayName.contains(normalizedQuery) ||
+      contact.contains(normalizedQuery) ||
+      platformLabel.contains(normalizedQuery);
+}
+
+class HistoryNotifier extends Notifier<List<ChatHistoryItem>> {
+  static const Uuid _uuid = Uuid();
+
+  @override
+  List<ChatHistoryItem> build() {
+    return StorageService.getAllHistory();
+  }
+
+  void _reloadHistory() {
+    state = StorageService.getAllHistory();
   }
 
   void loadHistory() {
-    state = StorageService.getAllHistory();
+    _reloadHistory();
   }
 
   Future<void> addHistoryItem({
@@ -103,7 +122,7 @@ class HistoryNotifier extends StateNotifier<List<ChatHistoryItem>> {
     String? displayName,
   }) async {
     final item = ChatHistoryItem(
-      id: const Uuid().v4(),
+      id: _uuid.v4(),
       contact: contact,
       platformName: platform.name,
       timestamp: DateTime.now(),
@@ -111,25 +130,25 @@ class HistoryNotifier extends StateNotifier<List<ChatHistoryItem>> {
     );
 
     await StorageService.addToHistory(item);
-    loadHistory();
+    _reloadHistory();
   }
 
   Future<void> deleteItem(String id) async {
     await StorageService.deleteHistoryItem(id);
-    loadHistory();
+    _reloadHistory();
   }
 
   Future<void> clearAll() async {
     await StorageService.clearAllHistory();
-    loadHistory();
+    _reloadHistory();
   }
 
   Future<void> restoreItem(ChatHistoryItem item) async {
     await StorageService.addToHistory(item);
-    loadHistory();
+    _reloadHistory();
   }
 
   Future<void> refresh() async {
-    loadHistory();
+    _reloadHistory();
   }
 }
