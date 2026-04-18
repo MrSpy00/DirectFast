@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/services/storage_service.dart';
 import '../../../shared/constants/app_strings.dart';
-import '../../../core/features/history/providers/history_provider.dart';
+import '../../history/viewmodels/history_viewmodel.dart';
 import '../../utils/viewmodels/templates_viewmodel.dart';
 
 class PrivacyDashboardScreen extends ConsumerWidget {

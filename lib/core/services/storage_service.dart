@@ -6,7 +6,7 @@ import '../constants/app_constants.dart';
 class StorageService {
   static SharedPreferences? _prefs;
 
-  // Keys for SharedPreferences
+  // SharedPreferences keys.
   static const String _historyKey = 'chat_history';
   static const String _templatesKey = 'templates_v1';
   static const String _themeKey = 'theme_mode';
@@ -22,32 +22,24 @@ class StorageService {
   /// Get SharedPreferences instance
   static SharedPreferences get prefs {
     if (_prefs == null) {
-      throw Exception(
+      throw StateError(
         'StorageService not initialized. Call StorageService.init() first.',
       );
     }
     return _prefs!;
   }
 
-  // ===========================
-  // HISTORY OPERATIONS
-  // ===========================
-
   /// Add item to history
   static Future<void> addToHistory(ChatHistoryItem item) async {
     final currentHistory = getAllHistory();
 
-    // Check if item already exists (avoid duplicates)
     final existingIndex = currentHistory.indexWhere((h) => h.id == item.id);
     if (existingIndex != -1) {
-      // Update existing item
       currentHistory[existingIndex] = item;
     } else {
-      // Add new item
       currentHistory.add(item);
     }
 
-    // Save to SharedPreferences
     await _saveHistory(currentHistory);
   }
 
@@ -61,13 +53,10 @@ class StorageService {
       }
 
       final items = ChatHistoryItem.decodeList(jsonString);
-
-      // Sort by timestamp (newest first)
       items.sort((a, b) => b.timestamp.compareTo(a.timestamp));
 
       return items;
-    } catch (e) {
-      // Gracefully return empty history on deserialization error
+    } catch (_) {
       return [];
     }
   }
@@ -94,10 +83,6 @@ class StorageService {
     final jsonString = ChatHistoryItem.encodeList(items);
     await prefs.setString(_historyKey, jsonString);
   }
-
-  // ===========================
-  // TEMPLATE OPERATIONS
-  // ===========================
 
   /// Add or update a template
   static Future<void> addTemplate(TemplateItem item) async {
@@ -142,10 +127,6 @@ class StorageService {
   static Future<void> _saveTemplates(List<TemplateItem> items) async {
     await prefs.setString(_templatesKey, TemplateItem.encodeList(items));
   }
-
-  // ===========================
-  // SETTINGS OPERATIONS
-  // ===========================
 
   /// Get theme mode
   static String getThemeMode() {
@@ -200,10 +181,6 @@ class StorageService {
   static Future<void> setOnboardingCompleted(bool completed) async {
     await prefs.setBool(_onboardingCompletedKey, completed);
   }
-
-  // ===========================
-  // UTILITY METHODS
-  // ===========================
 
   /// Clear all data (for debugging or reset)
   static Future<void> clearAll() async {

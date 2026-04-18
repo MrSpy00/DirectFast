@@ -10,7 +10,7 @@ import '../../../shared/widgets/glassmorphic_container.dart';
 import '../../../shared/widgets/app_logo.dart';
 import '../../../shared/widgets/brand_icon.dart';
 import '../viewmodels/home_viewmodel.dart';
-import '../../../core/features/history/providers/history_provider.dart';
+import '../../history/viewmodels/history_viewmodel.dart';
 import '../../../data/models/chat_history_item.dart';
 import '../../../shared/theme/app_theme.dart';
 import '../../../core/utils/app_router.dart';
@@ -171,7 +171,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       body: Stack(
         children: [
           const RepaintBoundary(child: _CyberBackground()),
-
           SafeArea(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(20),
@@ -181,19 +180,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 children: [
                   if (showBanner) const SizedBox(height: 56),
                   const SizedBox(height: 8),
-
                   _buildHeroSection(),
                   const SizedBox(height: 24),
-
                   if (recentHistory.isNotEmpty &&
                       selectedCategory != PlatformCategory.utility) ...[
                     _buildRecentContacts(recentHistory, selectedPlatform),
                     const SizedBox(height: 20),
                   ],
-
                   _buildCategoryTabs(selectedCategory),
                   const SizedBox(height: 24),
-
                   if (selectedCategory == PlatformCategory.utility)
                     _buildUtilitiesPanel()
                   else ...[
@@ -206,7 +201,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     const SizedBox(height: 24),
                     _buildInputSection(selectedPlatform),
                   ],
-
                   const SizedBox(height: 24),
                   const _InfoCard(),
                 ],

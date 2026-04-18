@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/legacy.dart';
 import '../../../core/constants/platform_type.dart';
 import '../../../core/services/url_launcher_service.dart';
 import '../../../core/services/clipboard_service.dart';
-import '../../../core/features/history/providers/history_provider.dart';
+import '../../history/viewmodels/history_viewmodel.dart';
 
 final selectedPlatformProvider = StateProvider<PlatformType>((ref) {
   return PlatformType.whatsapp;

@@ -110,7 +110,6 @@ class ChatHistoryItem {
     );
   }
 
-  // JSON Serialization
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -146,12 +145,10 @@ class ChatHistoryItem {
     );
   }
 
-  // Encode list to JSON string
   static String encodeList(List<ChatHistoryItem> items) {
     return jsonEncode(items.map((item) => item.toJson()).toList());
   }
 
-  // Decode JSON string to list
   static List<ChatHistoryItem> decodeList(String jsonString) {
     try {
       final decoded = jsonDecode(jsonString);

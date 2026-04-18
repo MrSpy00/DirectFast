@@ -5,7 +5,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../../core/services/backup_service.dart';
 import '../../../shared/constants/app_strings.dart';
-import '../../../core/features/history/providers/history_provider.dart';
+import '../../history/viewmodels/history_viewmodel.dart';
 import '../../utils/viewmodels/templates_viewmodel.dart';
 
 class DataBackupScreen extends ConsumerStatefulWidget {
