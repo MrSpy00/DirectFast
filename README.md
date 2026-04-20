@@ -2,7 +2,7 @@
 
 ## TR
 
-Mevcut sürüm: **v1.0.1**
+Mevcut sürüm: **v1.0.0**
 
 ## 🚀 Kişilerinize Hızlıca Bağlanın
 
@@ -284,7 +284,7 @@ Flutter ile ❤️ yapıldı
 
 ## EN
 
-Current release: **v1.0.1**
+Current release: **v1.0.0**
 
 ## 🚀 Quick Connect to Your Contacts
 
