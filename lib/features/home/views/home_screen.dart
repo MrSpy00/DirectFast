@@ -748,8 +748,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ];
 
               return Wrap(
-                spacing: 12,
-                runSpacing: 12,
+                spacing: 10,
+                runSpacing: 10,
                 children: List.generate(shortcuts.length, (index) {
                   final item = shortcuts[index];
                   final isLastOdd =
@@ -1028,26 +1028,26 @@ class _UtilityShortcutCard extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(18),
         child: Padding(
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.all(12),
           child: Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   gradient: gradient,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(icon, color: Colors.white, size: 22),
+                child: Icon(icon, color: Colors.white, size: 20),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   label,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        fontWeight: FontWeight.w700,
+                        fontWeight: FontWeight.w600,
                         height: 1.2,
                       ),
-                  maxLines: 3,
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -1074,6 +1074,7 @@ class _CyberBackground extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final scheme = Theme.of(context).colorScheme;
+    final isAmoled = AppTheme.isAmoledColorScheme(scheme);
 
     final darkMiddle = Color.lerp(Colors.black, scheme.primary, 0.16)!;
     final darkEnd = Color.lerp(Colors.black, scheme.secondary, 0.12)!;
@@ -1088,7 +1089,12 @@ class _CyberBackground extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: isDark
+          colors: isAmoled
+              ? const [
+                  Colors.black,
+                  Colors.black,
+                ]
+              : isDark
               ? [
                   Colors.black,
                   darkMiddle,

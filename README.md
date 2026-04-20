@@ -2,20 +2,18 @@
 
 ## TR
 
-Mevcut sürüm: **v1.0.0**
+Mevcut sürüm: **v1.0.1**
 
 ## 🚀 Kişilerinize Hızlıca Bağlanın
 
 Kişi kaydetmeden mesajlaşma platformlarında sohbet başlatın.
 
-![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)
-![Dart](https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white)
-![Material Design](https://img.shields.io/badge/Material%20Design-757575?style=for-the-badge&logo=material-design&logoColor=white)
-![CI](https://img.shields.io/github/actions/workflow/status/MrSpy00/DirectFast/main.yml?branch=main&style=for-the-badge&label=CI)
-![Release](https://img.shields.io/github/v/release/MrSpy00/DirectFast?style=for-the-badge&label=Release)
+![Flutter](https://img.shields.io/badge/Flutter-02569B?style=flat-square&logo=flutter&logoColor=white)
+![Dart](https://img.shields.io/badge/Dart-0175C2?style=flat-square&logo=dart&logoColor=white)
+![Material Design](https://img.shields.io/badge/Material%20Design-757575?style=flat-square&logo=material-design&logoColor=white)
 
-[![Download APK](https://img.shields.io/badge/Download-DirectFast.apk-2ea44f?style=for-the-badge)](https://github.com/MrSpy00/DirectFast/releases/download/1.0.0/DirectFast.apk)
-[![Sponsor](https://img.shields.io/badge/Sponsor-Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge)](https://buymeacoffee.com/aegissoft)
+[![Download DirectFast](https://img.shields.io/badge/Download-DirectFast-2ea44f?style=flat-square)](https://github.com/MrSpy00/DirectFast/releases/latest)
+[![Sponsor](https://img.shields.io/badge/Sponsor-Buy%20Me%20a%20Coffee-ffdd00?style=flat-square)](https://buymeacoffee.com/aegissoft)
 
 ---
 
@@ -79,7 +77,7 @@ lib/
 - **Animasyonlar**: flutter_animate
 - **Fontlar**: Google Fonts
 - **Testing**: flutter_test (Unit + Widget)
-- **CI/CD**: GitHub Actions
+- **Kalite Kontrol**: Yerel analyze + test + release build
 
 ---
 
@@ -168,28 +166,25 @@ flutter test --coverage
 
 ---
 
-## ⚙️ CI/CD (GitHub Actions)
+## ⚙️ Kalite Akışı
 
-Proje, `.github/workflows/main.yml` ile otomatik olarak aşağıdaki kontrolleri çalıştırır:
+Otomatik CI tetikleri devre dışıdır. Güncel kalite akışı yerel komutlarla ilerler:
 
 - `flutter pub get`
 - `flutter analyze`
 - `flutter test --coverage`
 - `flutter build apk --release`
 
-Push ve Pull Request işlemlerinde build doğrulaması yapılır. `v*` tag'lerinde workflow, üretilen `DirectFast.apk` dosyasını otomatik olarak ilgili GitHub Release'e yükler.
+Android release imzalama için `android/key.properties` (veya CI tarafında secret tabanlı eşdeğer) kullanılmalıdır.
 
-Android release imzalama akışı sabit keystore ile çalışır (`android/key.properties` veya GitHub Secrets). Bu sayede yeni sürümler mevcut kurulumların üzerine güncelleme olarak yüklenebilir.
-
-`Paket geçersiz` veya `uygulama yüklenemedi` hatası alırsanız, cihazda daha önce farklı imza ile kurulmuş sürüm olabilir. Bu durumda uygulamayı bir kez kaldırıp yeniden yükleyin; sonraki sürümler aynı imza ile sorunsuz güncellenir.
+`Paket geçersiz` veya `uygulama yüklenemedi` hatası alırsanız, cihazda farklı imza ile yüklenmiş eski bir sürüm olabilir. Uygulamayı bir kez kaldırıp aynı imzalı sürümü tekrar yükleyin.
 
 ---
 
-## 📦 APK İndir
+## 📦 İndir
 
-- [![Download APK](https://img.shields.io/badge/Download-DirectFast.apk-2ea44f?style=for-the-badge)](https://github.com/MrSpy00/DirectFast/releases/download/1.0.0/DirectFast.apk)
-- **Release Sayfası**: [v1.0.0 Release](https://github.com/MrSpy00/DirectFast/releases/tag/1.0.0)
-- **Doğrudan APK**: [DirectFast.apk](https://github.com/MrSpy00/DirectFast/releases/download/1.0.0/DirectFast.apk)
+- [Download DirectFast](https://github.com/MrSpy00/DirectFast/releases/latest)
+- **Release Sayfası**: [DirectFast Releases](https://github.com/MrSpy00/DirectFast/releases)
 
 ---
 
@@ -289,20 +284,18 @@ Flutter ile ❤️ yapıldı
 
 ## EN
 
-Current release: **v1.0.0**
+Current release: **v1.0.1**
 
 ## 🚀 Quick Connect to Your Contacts
 
 Chat on messaging platforms without saving contacts.
 
-![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)
-![Dart](https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white)
-![Material Design](https://img.shields.io/badge/Material%20Design-757575?style=for-the-badge&logo=material-design&logoColor=white)
-![CI](https://img.shields.io/github/actions/workflow/status/MrSpy00/DirectFast/main.yml?branch=main&style=for-the-badge&label=CI)
-![Release](https://img.shields.io/github/v/release/MrSpy00/DirectFast?style=for-the-badge&label=Release)
+![Flutter](https://img.shields.io/badge/Flutter-02569B?style=flat-square&logo=flutter&logoColor=white)
+![Dart](https://img.shields.io/badge/Dart-0175C2?style=flat-square&logo=dart&logoColor=white)
+![Material Design](https://img.shields.io/badge/Material%20Design-757575?style=flat-square&logo=material-design&logoColor=white)
 
-[![Download APK](https://img.shields.io/badge/Download-DirectFast.apk-2ea44f?style=for-the-badge)](https://github.com/MrSpy00/DirectFast/releases/download/1.0.0/DirectFast.apk)
-[![Sponsor](https://img.shields.io/badge/Sponsor-Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge)](https://buymeacoffee.com/aegissoft)
+[![Download DirectFast](https://img.shields.io/badge/Download-DirectFast-2ea44f?style=flat-square)](https://github.com/MrSpy00/DirectFast/releases/latest)
+[![Sponsor](https://img.shields.io/badge/Sponsor-Buy%20Me%20a%20Coffee-ffdd00?style=flat-square)](https://buymeacoffee.com/aegissoft)
 
 ---
 
@@ -366,7 +359,7 @@ lib/
 - **Animations**: flutter_animate
 - **Fonts**: Google Fonts
 - **Testing**: flutter_test (Unit + Widget)
-- **CI/CD**: GitHub Actions
+- **Quality Flow**: Local analyze + test + release build
 
 ---
 
@@ -455,28 +448,25 @@ flutter test --coverage
 
 ---
 
-## ⚙️ CI/CD (GitHub Actions, EN)
+## ⚙️ Quality Flow (EN)
 
-The project uses `.github/workflows/main.yml` to automatically run:
+Automatic CI triggers are disabled. The active quality path is local:
 
 - `flutter pub get`
 - `flutter analyze`
 - `flutter test --coverage`
 - `flutter build apk --release`
 
-Build validation runs on Push and Pull Request. On `v*` tags, the workflow automatically uploads the generated `DirectFast.apk` to the matching GitHub Release.
+For Android release signing, use a stable keystore via `android/key.properties` (or an equivalent secret-based setup).
 
-Android release signing uses a stable keystore (`android/key.properties` locally or GitHub Secrets in CI). This keeps package signatures consistent so updates install over existing builds.
-
-If you see `invalid package` or install/update mismatch errors, a differently signed older build may still be installed. Uninstall once, reinstall, and subsequent updates will install normally with the same signing key.
+If you hit `invalid package` or install/update mismatch errors, an older build signed with a different key may still be installed. Uninstall once, reinstall, then continue with the same signing key.
 
 ---
 
-## 📦 Download APK
+## 📦 Download
 
-- [![Download APK](https://img.shields.io/badge/Download-DirectFast.apk-2ea44f?style=for-the-badge)](https://github.com/MrSpy00/DirectFast/releases/download/1.0.0/DirectFast.apk)
-- **Release Page**: [v1.0.0 Release](https://github.com/MrSpy00/DirectFast/releases/tag/1.0.0)
-- **Direct APK**: [DirectFast.apk](https://github.com/MrSpy00/DirectFast/releases/download/1.0.0/DirectFast.apk)
+- [Download DirectFast](https://github.com/MrSpy00/DirectFast/releases/latest)
+- **Release Page**: [DirectFast Releases](https://github.com/MrSpy00/DirectFast/releases)
 
 ---
 

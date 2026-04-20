@@ -18,35 +18,23 @@ import '../viewmodels/theme_viewmodel.dart';
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
-  InputDecoration _settingsDropdownDecoration(
-    BuildContext context, {
-    required String label,
-    required IconData icon,
-  }) {
-    return InputDecoration(
-      labelText: label,
-      prefixIcon: Icon(icon),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: BorderSide.none,
+  MenuStyle _settingsMenuStyle(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return MenuStyle(
+      backgroundColor: WidgetStatePropertyAll(
+        scheme.surfaceContainerHigh.withValues(alpha: 0.98),
       ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: BorderSide.none,
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(14),
-        borderSide: BorderSide(
-          color: Theme.of(context).colorScheme.primary,
-          width: 1.8,
+      surfaceTintColor: const WidgetStatePropertyAll(Colors.transparent),
+      elevation: const WidgetStatePropertyAll(10),
+      shape: WidgetStatePropertyAll(
+        RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: scheme.outline.withValues(alpha: 0.2)),
         ),
       ),
-      fillColor: Theme.of(context)
-          .colorScheme
-          .surfaceContainerHighest
-          .withValues(alpha: 0.42),
-      filled: true,
+      padding: const WidgetStatePropertyAll(
+        EdgeInsets.symmetric(vertical: 4),
+      ),
     );
   }
 
@@ -103,48 +91,37 @@ class SettingsScreen extends ConsumerWidget {
                 .slideX(begin: -0.2, end: 0),
             const SizedBox(height: 12),
             GlassmorphicContainer.flat(
-              padding: const EdgeInsets.all(14),
-              child: DropdownButtonFormField<String>(
-                key: ValueKey(currentLocale),
-                initialValue: currentLocale,
-                isExpanded: true,
-                borderRadius: BorderRadius.circular(16),
-                icon: const Icon(Icons.expand_more_rounded),
-                menuMaxHeight: 420,
-                dropdownColor: Theme.of(context)
-                    .colorScheme
-                    .surfaceContainerHigh
-                    .withValues(alpha: 0.96),
-                decoration: _settingsDropdownDecoration(
-                  context,
-                  label: AppStrings.tr('language'),
-                  icon: Icons.language_rounded,
-                ),
-                items: [
-                  for (final locale in AppStrings.supportedLocales)
-                    DropdownMenuItem<String>(
-                      value: locale,
-                      child: Row(
-                        children: [
-                          const Icon(Icons.language_rounded, size: 18),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Text(
+              padding: const EdgeInsets.fromLTRB(14, 6, 14, 6),
+              child: LayoutBuilder(
+                builder: (layoutContext, constraints) {
+                  return DropdownMenu<String>(
+                    key: ValueKey(currentLocale),
+                    width: constraints.maxWidth,
+                    initialSelection: currentLocale,
+                    leadingIcon: const Icon(Icons.language_rounded),
+                    label: Text(AppStrings.tr('language')),
+                    menuHeight: 420,
+                    enableSearch: false,
+                    requestFocusOnTap: false,
+                    menuStyle: _settingsMenuStyle(context),
+                    dropdownMenuEntries: [
+                      for (final locale in AppStrings.supportedLocales)
+                        DropdownMenuEntry<String>(
+                          value: locale,
+                          label:
                               '${AppStrings.tr(AppStrings.localeLabelKey(locale))} • ${AppStrings.localeNativeName(locale)}',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                ],
-                onChanged: (value) async {
-                  if (value == null || value == currentLocale) {
-                    return;
-                  }
-                  await HapticFeedback.lightImpact();
-                  await ref.read(localeProvider.notifier).setLocale(value);
+                          leadingIcon:
+                              const Icon(Icons.language_rounded, size: 18),
+                        ),
+                    ],
+                    onSelected: (value) async {
+                      if (value == null || value == currentLocale) {
+                        return;
+                      }
+                      await HapticFeedback.lightImpact();
+                      await ref.read(localeProvider.notifier).setLocale(value);
+                    },
+                  );
                 },
               ),
             )
@@ -231,53 +208,37 @@ class SettingsScreen extends ConsumerWidget {
             ).animate().fadeIn(duration: 350.ms, delay: 180.ms),
             const SizedBox(height: 12),
             GlassmorphicContainer.flat(
-              padding: const EdgeInsets.all(14),
-              child: DropdownButtonFormField<String>(
-                key: ValueKey(themeColorId),
-                initialValue: themeColorId == AppTheme.customColorId
-                    ? AppTheme.customColorId
-                    : AppTheme.optionById(themeColorId).id,
-                isExpanded: true,
-                borderRadius: BorderRadius.circular(16),
-                icon: const Icon(Icons.expand_more_rounded),
-                menuMaxHeight: 420,
-                dropdownColor: Theme.of(context)
-                    .colorScheme
-                    .surfaceContainerHigh
-                    .withValues(alpha: 0.96),
-                decoration: _settingsDropdownDecoration(
-                  context,
-                  label: AppStrings.tr('theme_colors'),
-                  icon: Icons.palette_rounded,
-                ),
-                items: [
-                  for (final option in AppTheme.colorOptions)
-                    DropdownMenuItem<String>(
-                      value: option.id,
-                      child: Row(
-                        children: [
-                          Container(
+              padding: const EdgeInsets.fromLTRB(14, 6, 14, 6),
+              child: LayoutBuilder(
+                builder: (layoutContext, constraints) {
+                  return DropdownMenu<String>(
+                    key: ValueKey(themeColorId),
+                    width: constraints.maxWidth,
+                    initialSelection: themeColorId == AppTheme.customColorId
+                        ? AppTheme.customColorId
+                        : AppTheme.optionById(themeColorId).id,
+                    leadingIcon: const Icon(Icons.palette_rounded),
+                    label: Text(AppStrings.tr('theme_colors')),
+                    menuHeight: 420,
+                    enableSearch: false,
+                    requestFocusOnTap: false,
+                    menuStyle: _settingsMenuStyle(context),
+                    dropdownMenuEntries: [
+                      for (final option in AppTheme.colorOptions)
+                        DropdownMenuEntry<String>(
+                          value: option.id,
+                          label: AppStrings.tr(option.labelKey),
+                          leadingIcon: Container(
                             width: 16,
                             height: 16,
                             decoration:
                                 _colorDotDecoration(context, option.seedColor),
                           ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Text(
-                              AppStrings.tr(option.labelKey),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  DropdownMenuItem<String>(
-                    value: AppTheme.customColorId,
-                    child: Row(
-                      children: [
-                        Container(
+                        ),
+                      DropdownMenuEntry<String>(
+                        value: AppTheme.customColorId,
+                        label: AppStrings.tr('custom_color'),
+                        leadingIcon: Container(
                           width: 16,
                           height: 16,
                           decoration: _colorDotDecoration(
@@ -286,41 +247,33 @@ class SettingsScreen extends ConsumerWidget {
                                 Theme.of(context).colorScheme.primary,
                           ),
                         ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Text(
-                            AppStrings.tr('custom_color'),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-                onChanged: (value) async {
-                  if (value == null) {
-                    return;
-                  }
-                  await HapticFeedback.lightImpact();
-                  if (!context.mounted) {
-                    return;
-                  }
+                      ),
+                    ],
+                    onSelected: (value) async {
+                      if (value == null) {
+                        return;
+                      }
+                      await HapticFeedback.lightImpact();
+                      if (!context.mounted) {
+                        return;
+                      }
 
-                  if (value == AppTheme.customColorId) {
-                    final baseColor = customThemeColor ??
-                        Theme.of(context).colorScheme.primary;
-                    await _showCustomColorPicker(
-                      context: context,
-                      ref: ref,
-                      initialColor: baseColor,
-                    );
-                    return;
-                  }
+                      if (value == AppTheme.customColorId) {
+                        final baseColor = customThemeColor ??
+                            Theme.of(context).colorScheme.primary;
+                        await _showCustomColorPicker(
+                          context: context,
+                          ref: ref,
+                          initialColor: baseColor,
+                        );
+                        return;
+                      }
 
-                  await ref
-                      .read(themeColorIdProvider.notifier)
-                      .setThemeColorId(value);
+                      await ref
+                          .read(themeColorIdProvider.notifier)
+                          .setThemeColorId(value);
+                    },
+                  );
                 },
               ),
             )

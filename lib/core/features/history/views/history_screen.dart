@@ -393,6 +393,17 @@ class _HistoryControls extends StatelessWidget {
     }
   }
 
+  IconData _sortIcon(HistorySortOption option) {
+    switch (option) {
+      case HistorySortOption.newestFirst:
+        return Icons.schedule_rounded;
+      case HistorySortOption.oldestFirst:
+        return Icons.history_toggle_off_rounded;
+      case HistorySortOption.alphabetical:
+        return Icons.sort_by_alpha_rounded;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return GlassmorphicContainer.flat(
@@ -425,36 +436,72 @@ class _HistoryControls extends StatelessWidget {
                 style: Theme.of(context).textTheme.labelLarge,
               ),
               const Spacer(),
-              PopupMenuButton<HistorySortOption>(
-                initialValue: sortOption,
-                onSelected: onSortChanged,
-                itemBuilder: (popupContext) {
-                  return [
-                    PopupMenuItem(
-                      value: HistorySortOption.newestFirst,
-                      child: Text(AppStrings.tr('sort_newest')),
-                    ),
-                    PopupMenuItem(
-                      value: HistorySortOption.oldestFirst,
-                      child: Text(AppStrings.tr('sort_oldest')),
-                    ),
-                    PopupMenuItem(
-                      value: HistorySortOption.alphabetical,
-                      child: Text(AppStrings.tr('sort_alphabetical')),
-                    ),
-                  ];
-                },
-                child: Chip(
-                  avatar: const Icon(Icons.swap_vert_rounded, size: 16),
-                  label: Text(_sortLabel(sortOption)),
-                ),
-              ),
               if (hasActiveFilters)
                 TextButton(
                   onPressed: onResetFilters,
                   child: Text(AppStrings.tr('reset_filters')),
                 ),
             ],
+          ),
+          const SizedBox(height: 8),
+          LayoutBuilder(
+            builder: (layoutContext, constraints) {
+              final menuWidth = constraints.maxWidth < 340
+                  ? constraints.maxWidth
+                  : 280.0;
+
+              return DropdownMenu<HistorySortOption>(
+                width: menuWidth,
+                initialSelection: sortOption,
+                leadingIcon: const Icon(Icons.swap_vert_rounded, size: 18),
+                label: Text(AppStrings.tr('history_filters')),
+                enableSearch: false,
+                requestFocusOnTap: false,
+                menuStyle: MenuStyle(
+                  backgroundColor: WidgetStatePropertyAll(
+                    Theme.of(context)
+                        .colorScheme
+                        .surfaceContainerHigh
+                        .withValues(alpha: 0.98),
+                  ),
+                  surfaceTintColor:
+                      const WidgetStatePropertyAll(Colors.transparent),
+                  elevation: const WidgetStatePropertyAll(8),
+                  shape: WidgetStatePropertyAll(
+                    RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      side: BorderSide(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .outline
+                            .withValues(alpha: 0.2),
+                      ),
+                    ),
+                  ),
+                ),
+                inputDecorationTheme: InputDecorationTheme(
+                  filled: true,
+                  fillColor: Theme.of(context)
+                      .colorScheme
+                      .surfaceContainerHighest
+                      .withValues(alpha: 0.5),
+                ),
+                dropdownMenuEntries: [
+                  for (final option in HistorySortOption.values)
+                    DropdownMenuEntry<HistorySortOption>(
+                      value: option,
+                      label: _sortLabel(option),
+                      leadingIcon: Icon(_sortIcon(option), size: 18),
+                    ),
+                ],
+                onSelected: (value) {
+                  if (value == null) {
+                    return;
+                  }
+                  onSortChanged(value);
+                },
+              );
+            },
           ),
           const SizedBox(height: 8),
           SingleChildScrollView(

@@ -1035,11 +1035,11 @@ class AppStrings {
       'en': 'Coral',
     },
     'color_black': {
-      'tr': 'Siyah',
-      'en': 'Black',
-      'es': 'Negro',
-      'ar': 'أسود',
-      'hi': 'काला',
+      'tr': 'Simsiyah',
+      'en': 'Pitch Black',
+      'es': 'Negro Intenso',
+      'ar': 'أسود فاحم',
+      'hi': 'गहरा काला',
     },
 
     // About

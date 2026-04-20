@@ -201,8 +201,7 @@ class AppTheme {
 
   static LinearGradient darkGradientFor(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final isAmoled = scheme.surface == _amoledSurface &&
-        scheme.surfaceContainer == _amoledSurfaceContainer;
+    final isAmoled = isAmoledColorScheme(scheme);
 
     if (isAmoled) {
       return const LinearGradient(
@@ -218,6 +217,12 @@ class AppTheme {
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
     );
+  }
+
+  static bool isAmoledColorScheme(ColorScheme scheme) {
+    return scheme.surface == _amoledSurface &&
+        scheme.surfaceContainer == _amoledSurfaceContainer &&
+        scheme.surfaceContainerHighest == _amoledSurfaceContainerHighest;
   }
 
   static TextTheme _buildTextTheme(Brightness brightness) {
@@ -501,6 +506,10 @@ class AppTheme {
           amoled ? const Color(0xFFCFCFCF) : const Color(0xFFCAC4D0),
       surfaceTint: primary,
     );
+    final inputFillColor =
+        amoled ? surface : surfaceHighest.withValues(alpha: 0.86);
+    final inputBorderColor =
+        amoled ? colorScheme.onSurface.withValues(alpha: 0.18) : Colors.transparent;
 
     return ThemeData(
       useMaterial3: true,
@@ -518,7 +527,7 @@ class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
-        color: colorScheme.surfaceContainerLow,
+        color: amoled ? surface : colorScheme.surfaceContainerLow,
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
@@ -536,9 +545,7 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         isDense: false,
         filled: true,
-        fillColor: amoled
-            ? Colors.white.withValues(alpha: 0.06)
-            : surfaceHighest.withValues(alpha: 0.86),
+        fillColor: inputFillColor,
         prefixIconColor: colorScheme.primary,
         suffixIconColor: colorScheme.onSurfaceVariant,
         alignLabelWithHint: true,
@@ -548,11 +555,11 @@ class AppTheme {
             const BoxConstraints(minWidth: 46, minHeight: 46),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide.none,
+          borderSide: BorderSide(color: inputBorderColor),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide.none,
+          borderSide: BorderSide(color: inputBorderColor),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
@@ -580,7 +587,7 @@ class AppTheme {
         ),
       ),
       popupMenuTheme: PopupMenuThemeData(
-        color: colorScheme.surfaceContainer,
+        color: amoled ? surface : colorScheme.surfaceContainer,
         elevation: 6,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
@@ -593,6 +600,15 @@ class AppTheme {
           fontWeight: FontWeight.w500,
           color: colorScheme.onSurface,
         ),
+      ),
+      bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: surface,
+        modalBackgroundColor: surface,
+        surfaceTintColor: Colors.transparent,
+      ),
+      dialogTheme: DialogThemeData(
+        backgroundColor: surface,
+        surfaceTintColor: Colors.transparent,
       ),
     );
   }
