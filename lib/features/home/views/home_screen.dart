@@ -26,6 +26,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   final TextEditingController _contactController = TextEditingController();
+  final FocusNode _contactFocusNode = FocusNode();
   String? _errorMessage;
   bool _clipboardBannerDismissed = false;
 
@@ -37,8 +38,51 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   void dispose() {
+    _contactFocusNode.dispose();
     _contactController.dispose();
     super.dispose();
+  }
+
+  TextInputType _keyboardTypeForPlatform(PlatformType platform) {
+    if (platform.requiresPhoneNumber) {
+      return TextInputType.phone;
+    }
+    if (platform.requiresEmail) {
+      return TextInputType.emailAddress;
+    }
+    return TextInputType.text;
+  }
+
+  Iterable<String>? _autofillHintsForPlatform(PlatformType platform) {
+    if (platform.requiresPhoneNumber) {
+      return const [AutofillHints.telephoneNumber];
+    }
+    if (platform.requiresEmail) {
+      return const [AutofillHints.email];
+    }
+    if (platform.requiresUsername) {
+      return const [AutofillHints.username];
+    }
+    return null;
+  }
+
+  void _refreshKeyboardIfNeeded(PlatformType? previous, PlatformType next) {
+    if (previous == null) {
+      return;
+    }
+
+    final hadInputType = _keyboardTypeForPlatform(previous);
+    final nextInputType = _keyboardTypeForPlatform(next);
+    if (hadInputType == nextInputType || !_contactFocusNode.hasFocus) {
+      return;
+    }
+
+    _contactFocusNode.unfocus();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _contactFocusNode.requestFocus();
+      }
+    });
   }
 
   Future<void> _quickPaste() async {
@@ -103,7 +147,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final clipboardSuggestion = ref.watch(clipboardSuggestionProvider);
     final recentHistory = ref.watch(historyProvider);
 
-    ref.listen<PlatformType>(selectedPlatformProvider, (_, __) {
+    ref.listen<PlatformType>(selectedPlatformProvider, (previous, next) {
+      _refreshKeyboardIfNeeded(previous, next);
       if (_clipboardBannerDismissed) {
         setState(() => _clipboardBannerDismissed = false);
       }
@@ -563,15 +608,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           TextField(
+            key: ValueKey('contact-input-${platform.name}'),
             controller: _contactController,
+            focusNode: _contactFocusNode,
             decoration: InputDecoration(
-              hintText: AppStrings.tr(
-                platform.requiresPhoneNumber
-                    ? 'enter_phone'
-                    : platform.requiresEmail
-                        ? 'enter_email'
-                        : 'enter_username',
-              ),
+              hintText: platform.inputHint,
               prefixIcon: _buildPrefixIcon(platform),
               suffixIcon: IconButton(
                 icon: const Icon(Icons.content_paste),
@@ -581,11 +622,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               errorText: _errorMessage,
             ),
             textAlignVertical: TextAlignVertical.center,
-            keyboardType: platform.requiresPhoneNumber
-                ? TextInputType.phone
-                : platform.requiresEmail
-                    ? TextInputType.emailAddress
-                    : TextInputType.text,
+            keyboardType: _keyboardTypeForPlatform(platform),
+            textInputAction: TextInputAction.go,
+            autofillHints: _autofillHintsForPlatform(platform),
+            autocorrect: false,
+            enableSuggestions: platform.requiresEmail,
+            onChanged: (value) {
+              ref.read(contactInputProvider.notifier).state = value;
+              if (_errorMessage != null && value.trim().isNotEmpty) {
+                setState(() => _errorMessage = null);
+              }
+            },
             onSubmitted: (_) => _launchChat(),
           ),
           const SizedBox(height: 20),

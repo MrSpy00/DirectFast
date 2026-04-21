@@ -7,7 +7,7 @@ class AppConstants {
   static const String developerName = 'aegis';
   static const String githubUrl = 'https://github.com/MrSpy00';
   static const String coffeeUrl = 'https://buymeacoffee.com/aegissoft';
-  static const String appVersion = '1.0.1';
+  static const String appVersion = '1.0.0';
 
   // Regex Patterns
   static final RegExp phoneNumberRegex = RegExp(r'^\+?[1-9]\d{1,14}$');
