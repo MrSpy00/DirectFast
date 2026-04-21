@@ -26,7 +26,6 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   final TextEditingController _contactController = TextEditingController();
-  final FocusNode _contactFocusNode = FocusNode();
   String? _errorMessage;
   bool _clipboardBannerDismissed = false;
 
@@ -38,7 +37,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   void dispose() {
-    _contactFocusNode.dispose();
     _contactController.dispose();
     super.dispose();
   }
@@ -64,25 +62,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       return const [AutofillHints.username];
     }
     return null;
-  }
-
-  void _refreshKeyboardIfNeeded(PlatformType? previous, PlatformType next) {
-    if (previous == null) {
-      return;
-    }
-
-    final hadInputType = _keyboardTypeForPlatform(previous);
-    final nextInputType = _keyboardTypeForPlatform(next);
-    if (hadInputType == nextInputType || !_contactFocusNode.hasFocus) {
-      return;
-    }
-
-    _contactFocusNode.unfocus();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        _contactFocusNode.requestFocus();
-      }
-    });
   }
 
   Future<void> _quickPaste() async {
@@ -147,8 +126,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final clipboardSuggestion = ref.watch(clipboardSuggestionProvider);
     final recentHistory = ref.watch(historyProvider);
 
-    ref.listen<PlatformType>(selectedPlatformProvider, (previous, next) {
-      _refreshKeyboardIfNeeded(previous, next);
+    ref.listen<PlatformType>(selectedPlatformProvider, (_, __) {
       if (_clipboardBannerDismissed) {
         setState(() => _clipboardBannerDismissed = false);
       }
@@ -610,7 +588,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           TextField(
             key: ValueKey('contact-input-${platform.name}'),
             controller: _contactController,
-            focusNode: _contactFocusNode,
             decoration: InputDecoration(
               hintText: platform.inputHint,
               prefixIcon: _buildPrefixIcon(platform),
