@@ -279,6 +279,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                               child: ListView.builder(
                                 padding:
                                     const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                                // ignore: deprecated_member_use
                                 cacheExtent: 1200,
                                 itemCount: rows.length + 1,
                                 itemBuilder: (buildContext, index) {
