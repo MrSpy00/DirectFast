@@ -49,6 +49,11 @@ subprojects {
                 logger.lifecycle("⚡ Auto-injected namespace for '${project.name}': $fallbackNamespace")
             }
         }
+        extensions.findByType(com.android.build.api.variant.LibraryAndroidComponentsExtension::class.java)?.finalizeDsl { ext ->
+            if ((ext.compileSdk ?: 0) < 35) {
+                ext.compileSdk = 35
+            }
+        }
     }
 
     // 3. Ensure app module is evaluated for all subprojects
