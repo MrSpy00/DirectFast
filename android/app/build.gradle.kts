@@ -3,7 +3,6 @@ import java.util.Properties
 
 plugins {
     id("com.android.application")
-    id("kotlin-android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
@@ -25,10 +24,6 @@ android {
         // Java 21+ compatibility for modern Android builds
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
-    }
-
-    kotlinOptions {
-        jvmTarget = "21"
     }
 
     defaultConfig {
@@ -64,9 +59,15 @@ android {
         }
     }
 
-    packagingOptions {
+    packaging {
         resources.excludes.add("META-INF/LICENSE*")
         resources.excludes.add("META-INF/NOTICE*")
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21
     }
 }
 
